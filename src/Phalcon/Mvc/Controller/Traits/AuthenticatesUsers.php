@@ -6,7 +6,7 @@ namespace Phalcon\Mvc\Controller\Traits;
 use Apps\Users;
 use Phalcon\Mvc\Model;
 
-trait UserLogin
+trait AuthenticatesUsers
 {
 
 	protected function login($credentials)
@@ -16,11 +16,7 @@ trait UserLogin
 			return $this->onLoginFailed($credentials);
 		}
 
-		if (!$user = $this->attemptLogin($credentials)){
-			return $this->onLoginFailed($credentials);
-		}
-
-		return $this->onAfterLogin($user);
+		return $this->attemptLogin($credentials);
 
 	}
 
@@ -34,23 +30,13 @@ trait UserLogin
 		$this->onAfterLogout();
 	}
 
-	protected function validateLoginCredential($credentials)
-	{
-		return true;
-	}
+
 
 	protected function attemptLogin($credentials)
 	{
 		try {
 			// Check if the user exist
-			$user = Users::findFirst(
-				[
-					'conditions' => $this->getUsername() . " = ?1",
-					"bind" => [
-						1 => $credentials[$this->getUsername()]
-					]
-				]
-			);
+			$user = $this->findUser($credentials);
 
 			if ($user == false) {
 				if ($this->isLoginThrottlingEnabled()){
@@ -108,12 +94,23 @@ trait UserLogin
 		return method_exists($this, 'createRememberEnvironment');
 	}
 
+	protected function findUser($credentials)
+	{
+		$model = auth()->getUserModel();
+		return $model->findAuthByUsername($credentials[$this->getUsername()]);
+	}
+
+	protected function validateLoginCredential($credentials)
+	{
+		return true;
+	}
+
 	protected function onLoginFailed($credentials)
 	{
 		return;
 	}
 
-	protected function onAfterLogin($credentials)
+	protected function onLoginSuccessful($credentials)
 	{
 		return;
 	}

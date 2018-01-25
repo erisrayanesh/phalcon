@@ -87,7 +87,7 @@ function session()
 }
 
 /**
- * @return \Apps\Core\Components\FlashInputs
+ * @return \Phalcon\Flash\FlashInputs
  */
 function inputs()
 {
@@ -95,7 +95,7 @@ function inputs()
 }
 
 /**
- * @return \Apps\Core\Components\Auth
+ * @return \Phalcon\Auth\Auth
  */
 function auth()
 {
@@ -116,7 +116,7 @@ function security()
 }
 
 /**
- * @return \Apps\Core\Components\Acl
+ * @return \Phalcon\Acl\Acl
  */
 function acl()
 {

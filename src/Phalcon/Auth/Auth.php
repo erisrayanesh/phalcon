@@ -11,11 +11,23 @@ class Auth extends Component
 	/**
 	 * @var Authenticatable
 	 */
+	protected $userModel;
+
+	protected $identityKey = 'id';
+
+	protected $usernameKey = 'email';
+
+	protected $passwordKey = 'password';
+
+	/**
+	 * @var Authenticatable
+	 */
 	protected $user;
 
 	/**
 	 * Auth constructor.
 	 * @param string $sessionKey
+	 * @param Authenticatable $model
 	 */
 	public function __construct($sessionKey = "__auth.identity")
 	{
@@ -24,7 +36,7 @@ class Auth extends Component
 
 	public function login(Authenticatable $user)
 	{
-		$this->setSessionIdentity($user->getAuthenticatableIdentity(), $user->getAuthenticatableName());
+		$this->setSessionIdentity($user->{$this->getIdentityKey()}, $user->getAuthName());
 		$this->user = $user;
 	}
 
@@ -84,6 +96,50 @@ class Auth extends Component
         return $this->user;
     }
 
+	public function init()
+	{
+		$identity = $this->session->get($this->getSessionKey());
+
+		if (empty($identity)) {
+			return;
+		}
+
+		if (!isset($identity['id'])) {
+			return;
+		}
+
+		$user = $this->findUserById($identity['id']);
+		if ($user == false) {
+			return;
+		}
+
+		$this->user = $user;
+	}
+
+	public function findUserById($id)
+	{
+		$instance = $this->getUserInstance();
+		$method = "findFirstBy" . camelize($this->getIdentityKey());
+		return $instance->{$method}($id);
+	}
+
+	public function findUserByUsername($username)
+	{
+		$instance = $this->getUserInstance();
+		$method = "findFirstBy" . camelize($this->getUsernameKey());
+		return $instance->{$method}($username);
+	}
+
+	/**
+	 * @return Authenticatable
+	 */
+	public function getUserInstance()
+	{
+		$class = $this->getUserModel();
+		return new $class();
+	}
+
+
 	//=====================
 
 	/**
@@ -105,26 +161,80 @@ class Auth extends Component
 		return $this;
 	}
 
-	//=======================
-
-	public function init(Authenticatable $class)
+	/**
+	 * @return Authenticatable
+	 */
+	public function getUserModel()
 	{
-		$identity = $this->session->get($this->getSessionKey());
-
-		if (empty($identity)) {
-			return;
-		}
-
-		if (!isset($identity['id'])) {
-			return;
-		}
-
-		$user = $class->findAuthenticatable($identity['id']);
-		if ($user == false) {
-			return;
-		}
-
-		$this->user = $user;
+		return $this->userModel;
 	}
+
+	/**
+	 * @param Authenticatable $userModel
+	 * @return Auth
+	 */
+	public function setUserModel(Authenticatable $userModel)
+	{
+		$this->userModel = $userModel;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getIdentityKey(): string
+	{
+		return $this->identityKey;
+	}
+
+	/**
+	 * @param string $identityKey
+	 * @return Auth
+	 */
+	public function setIdentityKey(string $identityKey): Auth
+	{
+		$this->identityKey = $identityKey;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getUsernameKey(): string
+	{
+		return $this->usernameKey;
+	}
+
+	/**
+	 * @param string $usernameKey
+	 * @return Auth
+	 */
+	public function setUsernameKey(string $usernameKey): Auth
+	{
+		$this->usernameKey = $usernameKey;
+
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPasswordKey(): string
+	{
+		return $this->passwordKey;
+	}
+
+	/**
+	 * @param string $passwordKey
+	 * @return Auth
+	 */
+	public function setPasswordKey(string $passwordKey): Auth
+	{
+		$this->passwordKey = $passwordKey;
+
+		return $this;
+	}
+
 
 }
