@@ -9,10 +9,12 @@ use Phalcon\Mvc\Model;
 trait AuthenticatesUsers
 {
 
-	protected function login($credentials)
+	protected function login($credentials = null)
 	{
 
-		if (!$this->validateLoginCredential($credentials)){
+		$credentials = $credentials ?: $this->getLoginCredentials();
+
+		if (!$this->validateLoginCredentials($credentials)){
 			return $this->onLoginFailed($credentials);
 		}
 
@@ -99,7 +101,15 @@ trait AuthenticatesUsers
 		return auth()->findUserByUsername($credentials[$this->getUsernameKey()]);
 	}
 
-	protected function validateLoginCredential($credentials)
+	protected function getLoginCredentials()
+	{
+		return request_only([
+			$this->getUsernameKey(),
+			$this->getPasswordKey()
+		]);
+	}
+
+	protected function validateLoginCredentials($credentials)
 	{
 		return true;
 	}
