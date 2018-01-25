@@ -67,10 +67,10 @@ trait AuthenticatesUsers
 				$this->createRememberEnvironment($user);
 			}
 
-			return true;
+			return $this->onLoginSuccessful($user);
 
 		} catch (\Exception $exc) {
-			return false;
+			return $this->onLoginFailed($credentials);
 		}
 	}
 
@@ -109,7 +109,7 @@ trait AuthenticatesUsers
 		return;
 	}
 
-	protected function onLoginSuccessful($credentials)
+	protected function onLoginSuccessful($user)
 	{
 		return;
 	}
