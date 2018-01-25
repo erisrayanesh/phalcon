@@ -18,7 +18,7 @@ trait ThrottlesLogins
 		return $this->getFailedLoginAttemptsCount($credentials, request()->getClientAddress()) >= $this->getMaxAttempts();
 	}
 
-	protected  function throttleLogin($user_id)
+	protected  function registerFailedLogin($user_id)
 	{
 		security()->hash(rand());
 

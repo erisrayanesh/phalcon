@@ -46,7 +46,7 @@ trait AuthenticatesUsers
 
 			if ($user == false) {
 				if ($this->isLoginThrottlingEnabled()){
-					$this->registerUserThrottling(0);
+					$this->registerFailedLogin(0);
 				}
 				throw new \Exception('user not found');
 			}
@@ -57,7 +57,7 @@ trait AuthenticatesUsers
 					$user->{$this->getPasswordKey()})) {
 
 				if ($this->isLoginThrottlingEnabled()){
-					$this->registerUserThrottling($user->id);
+					$this->registerFailedLogin($user->id);
 				}
 				throw new \Exception('Wrong username/password combination');
 			}
