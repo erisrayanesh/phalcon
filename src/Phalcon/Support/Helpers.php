@@ -692,7 +692,7 @@ function request_except($list)
  */
 function resourceRoute($controller, array $options = [])
 {
-	$res = new \Apps\Core\ResourceRouteBuilder($controller, $options);
+	$res = new \Phalcon\Mvc\Router\ResourceRouteBuilder($controller, $options);
 	return $res->get();
 }
 
