@@ -1,7 +1,7 @@
 <?php
-namespace Apps\Core\Components;
+namespace Phalcon\Translate;
 
-use Apps\Core\Interfaces\Arrayable;
+use Phalcon\Support\Interfaces\Arrayable;
 use Phalcon\Mvc\User\Component;
 use Phalcon\Translate\Adapter\NativeArray;
 

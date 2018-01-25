@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Core\Exceptions;
+namespace Phalcon\Mvc\Model\Exceptions;
 
 class ModelNotFoundException extends \Exception
 {

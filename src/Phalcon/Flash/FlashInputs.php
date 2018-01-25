@@ -1,8 +1,7 @@
 <?php
-namespace Apps\Core\Components;
+namespace Phalcon\Flash;
 
-
-use Apps\Core\ErrorsBag;
+use Phalcon\Support\ErrorsBag;
 use Phalcon\Mvc\User\Component;
 use Phalcon\Validation\Message;
 
