@@ -3,7 +3,7 @@
 namespace Phalcon\Mvc\Controller\Traits;
 
 
-trait ControllerRedirector
+trait Redirectable
 {
 
 	protected $redirectMessages = [];

@@ -3,7 +3,7 @@
 namespace Phalcon\Mvc\Controller\Traits;
 
 
-trait ControllerAuthorization
+trait Authorizable
 {
 
 	protected function authorize($name)
@@ -11,10 +11,11 @@ trait ControllerAuthorization
 		$ret = true;
 
 		if (!$ret){
+			$ret = false;
 			$this->onAuthorizationFailed($name);
 		}
 
-		return true;
+		return $ret;
 	}
 
 
