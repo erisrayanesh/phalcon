@@ -2,7 +2,21 @@
     "name": "erisrayanesh/phalcon",
     "description": "The PhalconPhp framework extender",
     "type": "library",
-    "license": "GPL",
+    "version": "1.0.0",
+    "keywords": [
+        "phalcon",
+        "framework",
+        "erisrayanesh"
+    ],
+    "type": "library",
+    "license": "BSD-3",
+    "homepage": "http://www.erisrayanesh.com",
+    "authors" : [
+        {
+            "name" : "Eris Rayanesh Afzar Inc.",
+            "email" : "info@erisrayanesh.com"
+        }
+    ],
     "minimum-stability": "dev",
     "require": {
         "php": ">=7.0",
