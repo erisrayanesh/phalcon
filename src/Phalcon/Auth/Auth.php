@@ -162,7 +162,7 @@ class Auth extends Component
 	}
 
 	/**
-	 * @return Authenticatable
+	 * @return string
 	 */
 	public function getUserModel()
 	{
@@ -170,10 +170,10 @@ class Auth extends Component
 	}
 
 	/**
-	 * @param Authenticatable $userModel
+	 * @param string $userModel
 	 * @return Auth
 	 */
-	public function setUserModel(Authenticatable $userModel)
+	public function setUserModel($userModel)
 	{
 		$this->userModel = $userModel;
 		return $this;
