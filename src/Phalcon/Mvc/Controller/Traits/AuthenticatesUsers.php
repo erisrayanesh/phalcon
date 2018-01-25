@@ -18,6 +18,12 @@ trait AuthenticatesUsers
 			return $this->onLoginFailed($credentials);
 		}
 
+		if ($this->isLoginThrottlingEnabled()){
+			if ($this->hasTooManyLoginAttempts()){
+				return $this->onLoginThrottled($credentials);
+			}
+		}
+
 		return $this->attemptLogin($credentials);
 
 	}
@@ -31,8 +37,6 @@ trait AuthenticatesUsers
 		auth()->logout();
 		$this->onAfterLogout();
 	}
-
-
 
 	protected function attemptLogin($credentials)
 	{
@@ -88,7 +92,7 @@ trait AuthenticatesUsers
 
 	protected function isLoginThrottlingEnabled()
 	{
-		return method_exists($this, 'registerUserThrottling');
+		return method_exists($this, 'hasTooManyLoginAttempts');
 	}
 
 	protected function isUserRememberEnabled()
@@ -120,6 +124,12 @@ trait AuthenticatesUsers
 	}
 
 	protected function onLoginSuccessful($user)
+	{
+		session()->regenerateId();
+		return $this->onAuthenticated($user);
+	}
+
+	protected function onAuthenticated($user)
 	{
 		return;
 	}

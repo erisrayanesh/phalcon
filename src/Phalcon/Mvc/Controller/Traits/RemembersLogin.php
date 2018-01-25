@@ -6,7 +6,7 @@ namespace Phalcon\Mvc\Controller\Traits;
 use Apps\Users;
 use Phalcon\Mvc\Model;
 
-trait UserLoginRemember
+trait RemembersLogin
 {
 
 	protected function isLoginThrottlingEnabled()
