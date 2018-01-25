@@ -30,6 +30,8 @@ trait ThrottlesLogins
 		$this->createLoginAttempt(request()->getClientAddress(), request()->getUserAgent(), $user_id, true);
 	}
 
+
+
 	protected function getFailedLoginAttemptsCount($credentials, $ip)
 	{
 		return 0;

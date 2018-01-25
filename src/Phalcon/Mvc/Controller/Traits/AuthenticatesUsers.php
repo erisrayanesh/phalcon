@@ -139,5 +139,10 @@ trait AuthenticatesUsers
 		return;
 	}
 
+	protected function onLoginThrottled($credentials)
+	{
+		return;
+	}
+
 
 }
