@@ -19,7 +19,7 @@ trait AuthenticatesUsers
 		}
 
 		if ($this->isLoginThrottlingEnabled()){
-			if ($this->hasTooManyLoginAttempts()){
+			if ($this->hasTooManyLoginAttempts($credentials)){
 				return $this->onLoginThrottled($credentials);
 			}
 		}
