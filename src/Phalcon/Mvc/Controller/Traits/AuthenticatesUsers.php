@@ -47,8 +47,8 @@ trait AuthenticatesUsers
 
 			// Check the password
 			if (!security()->checkHash(
-					$credentials[$this->getPassword()],
-					$user->readAttribute($this->getPassword()))) {
+					$credentials[$this->getPasswordKey()],
+					$user->{$this->getPasswordKey()})) {
 
 				if ($this->isLoginThrottlingEnabled()){
 					$this->registerUserThrottling($user->id);
@@ -60,7 +60,7 @@ trait AuthenticatesUsers
 				$this->registerSuccessLogin($user->id);
 			}
 
-			auth()->login($user, $user->id, $user->fname);
+			auth()->login($user);
 
 			// Check if the remember me was selected
 			if (isset($credentials['remember']) && $this->isUserRememberEnabled()) {
@@ -74,14 +74,14 @@ trait AuthenticatesUsers
 		}
 	}
 
-	protected function getUsername()
+	protected function getUsernameKey()
 	{
-		return 'email';
+		return auth()->getUsernameKey();
 	}
 
-	protected function getPassword()
+	protected function getPasswordKey()
 	{
-		return 'password';
+		return auth()->getPasswordKey();
 	}
 
 	protected function isLoginThrottlingEnabled()
@@ -96,8 +96,7 @@ trait AuthenticatesUsers
 
 	protected function findUser($credentials)
 	{
-		$model = auth()->getUserModel();
-		return $model->findAuthByUsername($credentials[$this->getUsername()]);
+		return auth()->findUserByUsername($credentials[$this->getUsernameKey()]);
 	}
 
 	protected function validateLoginCredential($credentials)

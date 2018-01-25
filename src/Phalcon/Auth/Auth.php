@@ -182,7 +182,7 @@ class Auth extends Component
 	/**
 	 * @return string
 	 */
-	public function getIdentityKey(): string
+	public function getIdentityKey()
 	{
 		return $this->identityKey;
 	}
@@ -191,7 +191,7 @@ class Auth extends Component
 	 * @param string $identityKey
 	 * @return Auth
 	 */
-	public function setIdentityKey(string $identityKey): Auth
+	public function setIdentityKey($identityKey)
 	{
 		$this->identityKey = $identityKey;
 
@@ -201,7 +201,7 @@ class Auth extends Component
 	/**
 	 * @return string
 	 */
-	public function getUsernameKey(): string
+	public function getUsernameKey()
 	{
 		return $this->usernameKey;
 	}
@@ -210,7 +210,7 @@ class Auth extends Component
 	 * @param string $usernameKey
 	 * @return Auth
 	 */
-	public function setUsernameKey(string $usernameKey): Auth
+	public function setUsernameKey($usernameKey)
 	{
 		$this->usernameKey = $usernameKey;
 
@@ -220,7 +220,7 @@ class Auth extends Component
 	/**
 	 * @return string
 	 */
-	public function getPasswordKey(): string
+	public function getPasswordKey()
 	{
 		return $this->passwordKey;
 	}
@@ -229,7 +229,7 @@ class Auth extends Component
 	 * @param string $passwordKey
 	 * @return Auth
 	 */
-	public function setPasswordKey(string $passwordKey): Auth
+	public function setPasswordKey($passwordKey)
 	{
 		$this->passwordKey = $passwordKey;
 
