@@ -1,0 +1,166 @@
+<?php
+
+namespace Phalcon\Mvc\Model\Traits;
+
+
+use Apps\Core\Collection;
+use Phalcon\Mvc\Model\Criteria;
+use Phalcon\Mvc\Model\Relation;
+
+trait InteractsWithPivotTable
+{
+
+	public function attach($relationAlias, $ids, array $attributes = [], $touch = true)
+	{
+		$relationship = $this->getRelation($relationAlias);
+
+		$intModel = $relationship->getIntermediateModel();
+		$intField = $this->castFieldToString($relationship->getIntermediateFields());
+		$intRefField = $this->castFieldToString($relationship->getIntermediateReferencedFields());
+		$primaryKeyValue = $this->getPrimaryKeyValue($relationship);
+
+		$ids = $this->parseIds($ids);
+
+		if (!is_array($ids)){
+			$ids = [$ids];
+		}
+
+		foreach ($ids as $id){
+
+			$data = array_merge($attributes, [
+				$intField    => $primaryKeyValue,
+				$intRefField => $id
+			]);
+
+
+
+			$m = new $intModel($data);
+			if ($m->save() === false) {
+                dd($m->getMessages());
+            }
+		}
+
+	}
+
+	public function detach($relationAlias, $ids = null, $touch = true)
+	{
+		$relationship = $this->getRelation($relationAlias);
+		$query = $this->newPivotQuery($relationship);
+
+		if (!is_null($ids)) {
+
+			$ids = $this->parseIds($ids);
+
+			if (!is_array($ids)){
+				$ids = [$ids];
+			}
+
+			if (empty($ids)) {
+				return 0;
+			}
+
+			$query->inWhere($this->castFieldToString($relationship->getIntermediateReferencedFields()), $ids);
+
+		}
+
+		// Once we have all of the conditions set on the statement, we are ready
+		// to run the delete on the pivot table. Then, if the touch parameter
+		// is true, we will go ahead and touch all related models to sync.
+		$results = $query->execute()->delete();
+
+//		if ($touch) {
+//			$this->touchIfTouching();
+//		}
+
+		return $results;
+	}
+
+	public function sync($relationAlias, $ids, $detaching = true)
+	{
+		$relationship = $this->getRelation($relationAlias);
+
+		$intRefField = $this->castFieldToString($relationship->getIntermediateReferencedFields());
+		$ids = $this->parseIds($ids);
+		$current = array_pluck($this->newPivotQuery($relationship)->execute()->toArray(), $intRefField);
+
+		$detach = array_diff($current, $ids);
+		if ($detaching && count($detach) > 0) {
+			$this->detach($relationAlias, $detach);
+		}
+
+		$attach = array_diff($ids, $current);
+		$this->attach($relationAlias, $attach);
+
+	}
+
+	/**
+	 * @param $relationAlias
+	 * @return Relation
+	 */
+	protected function getRelation($relationAlias)
+	{
+		if (!is_string($relationAlias)){
+			return $relationAlias;
+		}
+
+		return $this->getModelsManager()->getRelationByAlias(static::class, $relationAlias);
+	}
+
+	/**
+	 * @param $relation
+	 * @return Criteria
+	 */
+	protected function newPivotQuery($relation)
+	{
+		$relation = $this->getRelation($relation);
+		$cls = $relation->getIntermediateModel();
+		$query = $cls::query()->where(
+			$this->castFieldToString($relation->getIntermediateFields()) . "= :field1:",
+			["field1" => $this->getPrimaryKeyValue($relation)]
+		);
+		return $query;
+
+	}
+
+	protected function getPrimaryKeyValue($relation)
+	{
+		$relation = $this->getRelation($relation);
+		if ($relation instanceof Relation){
+			return $this->readAttribute($this->castFieldToString($relation->getFields()));
+		}
+	}
+
+	public function getPrimaryKeyName($relation)
+	{
+		$relation = $this->getRelation($relation);
+		return $this->castFieldToString($relation->getFields());
+	}
+
+	protected function castFieldToString($field)
+	{
+		if (is_array($field)){
+			$field = $field[0];
+		}
+
+		return $field;
+	}
+
+	protected function parseIds($value)
+	{
+//		if ($value instanceof Model) {
+//			return [$value->getKey()];
+//		}
+
+//		if ($value instanceof Collection) {
+//			return $value->modelKeys();
+//		}
+
+		if ($value instanceof Collection) {
+			return $value->toArray();
+		}
+
+		return (array) $value;
+	}
+
+
+}

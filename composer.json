@@ -1,0 +1,23 @@
+{
+    "name": "erisrayanesh/phalcon",
+    "description": "The PhalconPhp framework extender",
+    "type": "library",
+    "license": "GPL",
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.0",
+        "ext-phalcon": "~3.2",
+        "phalcon/incubator": "^3.2",
+        "swiftmailer/swiftmailer": "^5.4",
+        "symfony/var-dumper": "3.4.*",
+        "nesbot/carbon": "~1.21"
+    },
+    "autoload": {
+        "files": [
+            "src/Phalcon/Support/Helpers.php"
+        ],
+        "psr-4": {
+            "Phalcon\\": "src/Phalcon/"
+        }
+    }
+}
