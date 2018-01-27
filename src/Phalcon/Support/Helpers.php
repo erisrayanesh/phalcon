@@ -35,7 +35,7 @@ function logger($data)
 
 	$data = value($data);
 
-	if ($data instanceof \Apps\Core\Interfaces\Arrayable) {
+	if ($data instanceof \Phalcon\Support\Interfaces\Arrayable) {
 		$data = $data->toArray();
 	}
 
@@ -47,7 +47,7 @@ function logger($data)
 }
 
 /**
- * @return \Apps\Core\Components\Locale
+ * @return \Phalcon\Translate\Locale
  */
 function locale()
 {
@@ -235,11 +235,11 @@ if (! function_exists('collect')) {
 	/**
 	 * Creates new collection from array
 	 * @param $items
-	 * @return \Apps\Core\Collection
+	 * @return \Phalcon\Support\Collection
 	 */
 	function collect($items)
 	{
-		return new \Apps\Core\Collection($items);
+		return new \Phalcon\Support\Collection($items);
 	}
 }
 
@@ -462,7 +462,7 @@ function array_collapse($array)
 {
 	$results = [];
 	foreach ($array as $values) {
-		if ($values instanceof \Apps\Core\Collection) {
+		if ($values instanceof \Phalcon\Support\Collection) {
 			$values = $values->all();
 		} elseif (! is_array($values)) {
 			continue;
@@ -545,7 +545,7 @@ if (! function_exists('data_get')) {
 		$key = is_array($key) ? $key : explode('.', $key);
 		while (! is_null($segment = array_shift($key))) {
 			if ($segment === '*') {
-				if ($target instanceof \Apps\Core\Collection) {
+				if ($target instanceof \Phalcon\Support\Collection) {
 					$target = $target->all();
 				} elseif (! is_array($target)) {
 					return value($default);
@@ -628,25 +628,6 @@ function class_has_trait($object, $name)
 	return in_array($name, $traits);
 }
 
-
-function getTableColumnSortIcon($dir, $class = null)
-{
-	if (is_null($dir)){
-		return "";
-	}
-
-	if ($dir == "asc"){
-		return '<i class="fa fa-sort-amount-up ' . $class . '"></i>';
-	}
-
-	if ($dir == "desc"){
-		return '<i class="fa fa-sort-amount-down ' . $class . '"></i>';
-	}
-
-	return "";
-
-}
-
 function request_only($list)
 {
 
@@ -688,7 +669,7 @@ function request_except($list)
 /**
  * @param $controller
  * @param array $options
- * @return \Apps\Core\RouterGroup
+ * @return \Phalcon\Mvc\Router\GroupRecuresive
  */
 function resourceRoute($controller, array $options = [])
 {
@@ -696,69 +677,7 @@ function resourceRoute($controller, array $options = [])
 	return $res->get();
 }
 
-/**
- * @param string $key
- * @return Config
- */
-function getSettingsFile($key = null)
-{
-	$file = require (BASE_PATH . DS . "config" . DS . "settings.php");
 
-	if (!is_null($key)){
-		return $file->get($key);
-	}
-
-	return $file;
-}
-
-function getSetting($key, $default = null)
-{
-	try {
-
-		$category = 'general';
-		$name = $key;
-		if (str_contains($key, ".")) {
-			$parts = explode(".", $key);
-			if (!empty($parts[0]) && $parts[0] != ".") {
-				$category = $parts[0];
-			}
-			if (!empty($parts[1]) && $parts[1] != ".") {
-				$name = $parts[1];
-			}
-		}
-
-
-		if (empty($name)) {
-			throw new \Exception();
-		}
-
-		$file = config("settings.$category.fields.$name");
-		if (!$file){
-			throw new \Exception();
-		}
-
-		if (is_null($default) && $file->get("default")){
-			$default = $file->value;
-		}
-
-		$setting = \Apps\Settings::findFirst([
-			"conditions" => "category = :category: and name = :name:",
-			"bind" => [
-				'category' => $category,
-				'name' => $name
-			]
-		]);
-
-		if (!$setting){
-			throw new \Exception();
-		}
-
-		return $setting->value;
-
-	} catch (\Exception $exc) {
-		return $default;
-	}
-}
 
 function getPresenceOfValidator($errorName)
 {
