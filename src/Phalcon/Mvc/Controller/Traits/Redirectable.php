@@ -98,7 +98,7 @@ trait Redirectable
 
 	}
 
-	protected function redirectOperationFailed($url)
+	protected function redirectOperationFailed($url = null)
 	{
 		if (!is_null($url)){
 			return redirect($url, "error", ucfirst($this->getRedirectMessage("operation_failed")));
