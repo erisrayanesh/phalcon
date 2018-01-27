@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Core;
+namespace Phalcon\Mvc\Model\Dataset;
 
 
 class DatasetSort

@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Core;
+namespace Phalcon\Mvc\Model\Dataset;
 
 use Phalcon\Paginator\Adapter\Model as PaginatorModel;
 
