@@ -677,47 +677,6 @@ function resourceRoute($controller, array $options = [])
 	return $res->get();
 }
 
-
-
-function getPresenceOfValidator($errorName)
-{
-    return new \Phalcon\Validation\Validator\PresenceOf([
-        "message" => t("VALIDATION.REQUIRED", ["name" => $errorName])
-    ]);
-}
-
-function getStringLengthValidator($options)
-{
-    return new \Phalcon\Validation\Validator\StringLength($options);
-}
-
-function getDateTimeStringLengthValidator($errorName)
-{
-    return getStringLengthValidator([
-        "max"            => 19,
-        "min"            => 19,
-        "messageMaximum" => t("VALIDATION.MAX_LENGTH", ["name" => $errorName, 'length' => '19']),
-        "messageMinimum" => t("VALIDATION.MIN_LENGTH", ["name" => $errorName, 'length' => '19']),
-    ]);
-}
-
-function getEmailValidator($errorName)
-{
-	return new \Phalcon\Validation\Validator\Email([
-		"message" => t("VALIDATION.EMAIL", ["name" => $errorName])
-	]);
-}
-
-function getUniqunessValidator($erroName, $model)
-{
-	$options = [
-		"model" => $model,
-		"message" => t("VALIDATION.UNIQUE", ["name" => $erroName])
-	];
-
-	return new \Phalcon\Validation\Validator\Uniqueness($options);
-}
-
 function getUserLocale()
 {
 
