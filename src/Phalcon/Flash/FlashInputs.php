@@ -64,7 +64,7 @@ class FlashInputs extends Component
 			return $this;
 		}
 
-		$errors = $this->session->get($this->errorsVar);
+		$errors = $this->getErrors();
 		$errors[] = [$key, $message];
 		$this->session->set($this->errorsVar, $errors);
 
@@ -93,6 +93,36 @@ class FlashInputs extends Component
 	public function forgetErrors()
 	{
 		$this->session->set($this->errorsVar, []);
+	}
+
+	public function getErrors()
+	{
+		return $this->session->get($this->errorsVar);
+	}
+
+	public function hasErrors($key)
+	{
+		return $this->findFirstError($key) !== false;
+	}
+
+	public function getError($key, $default = null)
+	{
+		$index = $this->findFirstError($key);
+		if ($index !== false){
+			$errors = $this->getErrors();
+			return $errors[$index][1];
+		}
+		return $default;
+	}
+
+	protected function findFirstError($key)
+	{
+		foreach ($this->getErrors() as $index => $err){
+			if ($err[0] == $key){
+				return $index;
+			}
+		}
+		return false;
 	}
 
 
