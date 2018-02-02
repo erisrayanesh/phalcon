@@ -3,7 +3,7 @@
 namespace Phalcon\Mvc\Controller\Traits;
 
 
-trait Authorizable
+trait AuthorizesRequests
 {
 
 	protected function authorize($name)

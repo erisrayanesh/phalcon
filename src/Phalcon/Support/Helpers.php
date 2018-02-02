@@ -189,18 +189,22 @@ function csrf_token()
 	return DI()->get("security")->getToken();
 }
 
-function redirect($location, $withKey = null, $with = null)
+function flash_error($errorKey = null, $error = null)
 {
 
-	if (!is_array($withKey) && !is_null($with)){
-		$withKey = [$withKey => $with];
+//	if ($errorKey instanceof \Phalcon\Validation\Message\Group){
+//		foreach ($err)
+//	}
+
+	if (!is_array($errorKey) && !is_null($error)){
+		$errorKey = [$errorKey => $error];
 	}
 
-	if (is_null($withKey)){
-		$withKey = [];
+	if (is_null($errorKey)){
+		$errorKey = [];
 	}
 
-	foreach ($withKey as $key => $msg){
+	foreach ($errorKey as $key => $msg){
 		if (method_exists(flashSession(), $key)){
 
 			if (!is_array($msg)){
@@ -212,8 +216,13 @@ function redirect($location, $withKey = null, $with = null)
 			}
 		}
 	}
+}
 
-	return response()->redirect($location);
+function redirect($location, $withKey = null, $with = null)
+{
+	flash_error($withKey, $with);
+	$response = new \Phalcon\Http\Response();
+	return $response->redirect($location);
 }
 
 function redirect_back($withKey = null, $with = null)
@@ -664,6 +673,23 @@ function request_except($list)
 		$values[$item] = request()->get($item);
 	}
 	return $values;
+}
+
+function request_expects_json()
+{
+	return (request()->isAjax() && ! $this->request_is_pjax()) || $this->request_wants_json();
+}
+
+function request_wants_json()
+{
+	$acceptable = request()->getAcceptableContent();
+
+	return isset($acceptable[0]) && str_contains($acceptable[0], ['/json', '+json']);
+}
+
+function request_is_pjax()
+{
+	return request()->getHeader('X-PJAX') == true;
 }
 
 /**
