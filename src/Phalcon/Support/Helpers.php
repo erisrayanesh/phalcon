@@ -676,7 +676,7 @@ function request_except($list)
 
 function request_expects_json()
 {
-	return (request()->isAjax() && ! $this->request_is_pjax()) || $this->request_wants_json();
+	return (request()->isAjax() && ! request_is_pjax()) || request_wants_json();
 }
 
 function request_wants_json()
