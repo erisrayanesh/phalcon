@@ -681,7 +681,7 @@ function request_expects_json()
 
 function request_wants_json()
 {
-	$acceptable = request()->getAcceptableContent();
+	$acceptable = request()->getBestAccept()();
 
 	return isset($acceptable[0]) && str_contains($acceptable[0], ['/json', '+json']);
 }
