@@ -226,7 +226,7 @@ function redirect($location, $withKey = null, $with = null)
 
 function redirect_back($withKey = null, $with = null)
 {
-	return redirect(old("_url"), $withKey, $with);
+	return redirect(trim(old("_url"), ['\/', '\\']), $withKey, $with);
 }
 
 function redirect_route($name, $data = null, $withKey = null, $with = null)
