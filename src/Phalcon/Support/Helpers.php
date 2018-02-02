@@ -221,8 +221,7 @@ function flash_error($errorKey = null, $error = null)
 function redirect($location, $withKey = null, $with = null)
 {
 	flash_error($withKey, $with);
-	$response = new \Phalcon\Http\Response();
-	return $response->redirect($location);
+	return response()->redirect($location);
 }
 
 function redirect_back($withKey = null, $with = null)
