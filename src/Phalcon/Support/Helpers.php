@@ -192,9 +192,14 @@ function csrf_token()
 function flash_error($errorKey = null, $error = null)
 {
 
-//	if ($errorKey instanceof \Phalcon\Validation\Message\Group){
-//		foreach ($err)
-//	}
+	if ($errorKey instanceof \Phalcon\Validation\Message\Group){
+		$error = '<ul>';
+		foreach ($errorKey as $err){
+			$error .= "<li>$err</li>";
+		}
+		$error .= '</ul>';
+		$errorKey = "error";
+	}
 
 	if (!is_array($errorKey) && !is_null($error)){
 		$errorKey = [$errorKey => $error];
