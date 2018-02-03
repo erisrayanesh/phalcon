@@ -8,13 +8,9 @@ use Phalcon\Auth\AuthorizationException;
 trait AuthorizesRequests
 {
 
-	protected function authorize($name)
+	protected function authorize($ability, $arguments = [])
 	{
-//		$ret = false;
-//		if (!$ret){
-//			throw new AuthorizationException();
-//		}
-
+		return auth()->guard()->authorize($ability, $arguments);
 	}
 
 

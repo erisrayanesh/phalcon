@@ -332,6 +332,13 @@ if (! function_exists('str_limit')) {
 	}
 }
 
+if (! function_exists('str_parse_callback')) {
+	function str_parse_callback($callback, $default = null, $needles = "::")
+	{
+		return str_contains($callback, $needles) ? explode($needles, $callback, 2) : [$callback, $default];
+	}
+}
+
 
 /**
  * @return \Phalcon\Security\Random
