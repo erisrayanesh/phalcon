@@ -95,36 +95,4 @@ class FlashInputs extends Component
 		$this->session->set($this->errorsVar, []);
 	}
 
-	public function getErrors()
-	{
-		return $this->session->get($this->errorsVar);
-	}
-
-	public function hasError($key)
-	{
-		return $this->findFirstError($key) !== false;
-	}
-
-	public function getError($key, $default = null)
-	{
-		$index = $this->findFirstError($key);
-		if ($index !== false){
-			$errors = $this->getErrors();
-			return $errors[$index][1];
-		}
-		return $default;
-	}
-
-	protected function findFirstError($key)
-	{
-		foreach ($this->getErrors() as $index => $err){
-			logger($err);
-			if ($err[0] == $key){
-				return $index;
-			}
-		}
-		return false;
-	}
-
-
 }
