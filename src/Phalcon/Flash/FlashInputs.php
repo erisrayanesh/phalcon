@@ -100,7 +100,7 @@ class FlashInputs extends Component
 		return $this->session->get($this->errorsVar);
 	}
 
-	public function hasErrors($key)
+	public function hasError($key)
 	{
 		return $this->findFirstError($key) !== false;
 	}
@@ -118,6 +118,7 @@ class FlashInputs extends Component
 	protected function findFirstError($key)
 	{
 		foreach ($this->getErrors() as $index => $err){
+			logger($err);
 			if ($err[0] == $key){
 				return $index;
 			}
