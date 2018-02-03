@@ -3,23 +3,22 @@
 namespace Phalcon\Mvc\Controller\Traits;
 
 
+use Phalcon\Auth\AuthorizationException;
+
 trait AuthorizesRequests
 {
 
 	protected function authorize($name)
 	{
-		$ret = true;
-
+		$ret = false;
 		if (!$ret){
-			$ret = false;
-			$this->onAuthorizationFailed($name);
+			throw new AuthorizationException();
 		}
 
-		return $ret;
 	}
 
 
-	protected function onAuthorizationFailed($name)
+	protected function buildAuthorizationFailedResponse($name)
 	{
 
 	}

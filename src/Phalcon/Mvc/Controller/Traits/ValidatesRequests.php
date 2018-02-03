@@ -44,7 +44,7 @@ trait ValidatesRequests
 	}
 
 
-	protected function appendRulesToValidatior(Validation $validator, array $rules)
+	protected function appendRulesToValidatior(Validation &$validator, array $rules)
 	{
 		foreach ($rules as $rule) {
 			$validator->add($rule[0], $rule[1]);

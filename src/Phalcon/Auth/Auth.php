@@ -1,7 +1,9 @@
 <?php
 namespace Phalcon\Auth;
 
+use Phalcon\Acl\Acl;
 use Phalcon\Mvc\User\Component;
+use Phalcon\Acl\Adapter\Memory as AclMemory;
 
 class Auth extends Component
 {
@@ -23,6 +25,11 @@ class Auth extends Component
 	 * @var Authenticatable
 	 */
 	protected $user;
+
+	/**
+	 * @var AclMemory
+	 */
+	protected $acl;
 
 	/**
 	 * Auth constructor.
@@ -236,5 +243,20 @@ class Auth extends Component
 		return $this;
 	}
 
+	/**
+	 * Returns the ACL list
+	 *
+	 * @return AclMemory
+	 */
+	public function getAcl()
+	{
+		// Check if the ACL is already created
+		if (!$this->acl instanceof AclMemory) {
+			$this->acl = new AclMemory();
+			$this->acl->setDefaultAction(\Phalcon\Acl::DENY);
+		}
+
+		return $this->acl;
+	}
 
 }

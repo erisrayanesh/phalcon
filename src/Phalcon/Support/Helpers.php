@@ -151,7 +151,7 @@ function dd($var)
 	die(1);
 }
 
-function validator($rules, $data = [], $sendErrors = true)
+function validator($rules, $data = [])
 {
 	$validator = new \Phalcon\Validation();
 
@@ -161,9 +161,6 @@ function validator($rules, $data = [], $sendErrors = true)
 
 	if (!empty($data)){
 		$messages = $validator->validate($data);
-		if($sendErrors) {
-		    inputs()->addErrors($messages);
-        }
 		return $messages;
 	}
 

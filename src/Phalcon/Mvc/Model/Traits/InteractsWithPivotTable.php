@@ -32,12 +32,13 @@ trait InteractsWithPivotTable
 				$intRefField => $id
 			]);
 
-
-
 			$m = new $intModel($data);
-			if ($m->save() === false) {
-                dd($m->getMessages());
-            }
+			$m->save();
+
+			/*if ($m->save() === false) {
+				//TODO: Needs discussion
+				continue;
+            }*/
 		}
 
 	}
