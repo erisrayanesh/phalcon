@@ -10,10 +10,10 @@ trait AuthorizesRequests
 
 	protected function authorize($name)
 	{
-		$ret = false;
-		if (!$ret){
-			throw new AuthorizationException();
-		}
+//		$ret = false;
+//		if (!$ret){
+//			throw new AuthorizationException();
+//		}
 
 	}
 
