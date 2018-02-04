@@ -1,10 +1,10 @@
 <?php
 
-require_once "Helpers" . DS . "ArrayHelpers.php";
-require_once "Helpers" . DS . "RequestHelpers.php";
-require_once "Helpers" . DS . "ResponseHelpers.php";
-require_once "Helpers" . DS . "ServiceHelpers.php";
-require_once "Helpers" . DS . "StringHelpers.php";
+require_once "Helpers" . DIRECTORY_SEPARATOR . "ArrayHelpers.php";
+require_once "Helpers" . DIRECTORY_SEPARATOR . "RequestHelpers.php";
+require_once "Helpers" . DIRECTORY_SEPARATOR . "ResponseHelpers.php";
+require_once "Helpers" . DIRECTORY_SEPARATOR . "ServiceHelpers.php";
+require_once "Helpers" . DIRECTORY_SEPARATOR . "StringHelpers.php";
 
 function validator($rules, $data = [])
 {
