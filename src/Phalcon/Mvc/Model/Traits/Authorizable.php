@@ -15,7 +15,7 @@ trait Authorizable
 	 */
 	public function can($ability, $arguments = [])
 	{
-		return acl()->forUser($this)->check($ability, $arguments);
+		return auth()->guard()->forUser($this)->check($ability, $arguments);
 	}
 
 	/**
@@ -27,7 +27,7 @@ trait Authorizable
 	 */
 	public function cant($ability, $arguments = [])
 	{
-		return ! $this->can($ability, $arguments);
+		return !auth()->guard()->forUser($this)->check($ability, $arguments);
 	}
 
 	/**

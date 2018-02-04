@@ -35,9 +35,9 @@ trait UserRegistration
 			$filter = getSanitizer();
 
 			$user = new Users([
-				'fname' => $filter->sanitize($values['fname'],  'striptags'),
-				'lname' => $filter->sanitize($values['lname'],  'striptags'),
-				'email' => $filter->sanitize($values['email'], 'email'),
+				'fname' => strtolower($filter->sanitize($values['fname'],  'striptags')),
+				'lname' => strtolower($filter->sanitize($values['lname'],  'striptags')),
+				'email' => strtolower($filter->sanitize($values['email'], 'email')),
 				'password' => security()->hash($values['password']),
 				'active' => strtoupper(getSecurityRandom()->base58(5)),
 				'country_id' => $filter->sanitize($values['country_id'], 'int'),
