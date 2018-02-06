@@ -30,11 +30,12 @@ if (! function_exists('collect')) {
 	 */
 	function collect($items)
 	{
+
 		if ($items instanceof \Phalcon\Mvc\Model\Resultset){
+			$array = [];
 			foreach ($items as $item){
 				$array[] = $item;
 			}
-
 			$items = $array;
 		}
 
