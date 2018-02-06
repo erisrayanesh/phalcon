@@ -44,7 +44,7 @@ trait HasAttributes
 		return parent::__isset($attribute);
 	}
 
-	public static function find($parameters = null)
+	public static function findAndCollect($parameters = null)
 	{
 		$resultset = parent::find($parameters);
 
