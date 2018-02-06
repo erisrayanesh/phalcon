@@ -259,7 +259,9 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 
 	public function toArray()
 	{
-		return $this->items;
+		return array_map(function ($value) {
+			return $this->getArrayableItems($value);
+		}, $this->items);
 	}
 
 	public function toJson($options = 0)
@@ -383,23 +385,28 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 		};
 	}
 
-	protected function getArrayableItems($items)
+	protected function getArrayable($value)
 	{
-		if (is_array($items)) {
-			return $items;
-		} elseif ($items instanceof self) {
-			return $items->all();
-		} elseif ($items instanceof \Arrayable) {
-			return $items->toArray();
-		} elseif ($items instanceof \Jsonable) {
-			return json_decode($items->toJson(), true);
-		} elseif ($items instanceof \JsonSerializable) {
-			return $items->jsonSerialize();
-		} elseif ($items instanceof \Traversable) {
-			return iterator_to_array($items);
+		if (is_array($value)) {
+			return $value;
+		} elseif ($value instanceof self) {
+			return $value->all();
+		} elseif ($value instanceof \Arrayable) {
+			return $value->toArray();
+		} elseif ($value instanceof \Jsonable) {
+			return json_decode($value->toJson(), true);
+		} elseif ($value instanceof \JsonSerializable) {
+			return $value->jsonSerialize();
+		} elseif ($value instanceof \Traversable) {
+			return iterator_to_array($value);
 		}
-		return (array) $items;
+
+		return $value;
 	}
 
+	protected function getArrayableItems($items)
+	{
+		return (array) $this->getArrayable($items);
+	}
 
 }

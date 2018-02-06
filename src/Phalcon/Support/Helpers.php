@@ -6,6 +6,20 @@ require_once "Helpers" . DIRECTORY_SEPARATOR . "ResponseHelpers.php";
 require_once "Helpers" . DIRECTORY_SEPARATOR . "ServiceHelpers.php";
 require_once "Helpers" . DIRECTORY_SEPARATOR . "StringHelpers.php";
 
+
+if (! function_exists('value')) {
+	/**
+	 * Return the default value of the given value.
+	 *
+	 * @param  mixed  $value
+	 * @return mixed
+	 */
+	function value($value)
+	{
+		return $value instanceof \Closure ? $value() : $value;
+	}
+}
+
 function validator($rules, $data = [])
 {
 	$validator = new \Phalcon\Validation();
@@ -21,6 +35,7 @@ function validator($rules, $data = [])
 
 	return $validator;
 }
+
 
 if (! function_exists('collect')) {
 	/**
