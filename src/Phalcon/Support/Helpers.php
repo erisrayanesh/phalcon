@@ -30,6 +30,14 @@ if (! function_exists('collect')) {
 	 */
 	function collect($items)
 	{
+		if ($items instanceof \Phalcon\Mvc\Model\Resultset){
+			foreach ($items as $item){
+				$array[] = $item;
+			}
+
+			$items = $array;
+		}
+
 		return new \Phalcon\Support\Collection($items);
 	}
 }

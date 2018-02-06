@@ -43,4 +43,15 @@ trait HasAttributes
 		}
 		return parent::__isset($attribute);
 	}
+
+	public static function find($parameters = null)
+	{
+		$resultset = parent::find($parameters);
+
+		if ($resultset instanceof \Phalcon\Mvc\Model\Resultset){
+			$resultset = collect($resultset);
+		}
+
+		return $resultset;
+	}
 }
