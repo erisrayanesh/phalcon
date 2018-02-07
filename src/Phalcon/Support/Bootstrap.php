@@ -55,7 +55,7 @@ class Bootstrap
         $this->appPath = $applicationPath;
 
         if (count($providers) == 0){
-			$providers = $config->application->providers ?: [];
+			$providers = $config->application->providers->toArray() ?: [];
 		}
         $this->providers = $providers;
 
@@ -130,8 +130,8 @@ class Bootstrap
 
 	protected function initServiceProviders()
 	{
-		if (is_array($this->providers)) {
-			$this->initServices((array) $this->providers);
+		if (count($this->providers)) {
+			$this->initServices($this->providers);
 		}
 	}
 
