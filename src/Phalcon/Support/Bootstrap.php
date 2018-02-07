@@ -131,7 +131,7 @@ class Bootstrap
 	protected function initServiceProviders()
 	{
 		if (is_array($this->providers)) {
-			$this->initServices($this->providers);
+			$this->initServices((array) $this->providers);
 		}
 	}
 
