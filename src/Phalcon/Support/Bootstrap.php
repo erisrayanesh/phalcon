@@ -8,7 +8,7 @@ use Phalcon\DiInterface;
 use Phalcon\Http\ResponseInterface;
 use Phalcon\Loader;
 use Phalcon\Mvc\Application;
-use App\Providers\ServiceProviderInterface;
+
 
 class Bootstrap
 {
@@ -165,6 +165,8 @@ class Bootstrap
 	protected function initApplication()
 	{
 		$this->app = new Application($this->di);
+
+
 		$this->app->setEventsManager($this->di->getShared('eventsManager'));
 		//$this->app->setDI($this->di);
 	}
