@@ -45,7 +45,7 @@ class Bootstrap
      *
      * @param $applicationPath
      */
-    public function __construct($applicationPath, Config $config, array $providers)
+    public function __construct($applicationPath, Config $config, array $providers = [])
     {
         if (!is_dir($applicationPath)) {
             throw new \InvalidArgumentException('The $applicationPath must be a valid application path');
@@ -53,6 +53,10 @@ class Bootstrap
 
         $this->di = new Di();
         $this->appPath = $applicationPath;
+
+        if (count($providers) == 0){
+			$providers = $config->application->providers ?: [];
+		}
         $this->providers = $providers;
 
         $this->di->setShared('bootstrap', $this);
