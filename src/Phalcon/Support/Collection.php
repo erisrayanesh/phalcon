@@ -260,7 +260,7 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 	public function toArray()
 	{
 		return array_map(function ($value) {
-			return $this->getArrayableItems($value);
+			return $this->getArrayable($value);
 		}, $this->items);
 	}
 

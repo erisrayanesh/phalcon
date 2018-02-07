@@ -3,6 +3,8 @@
 namespace Phalcon\Mvc\Model\Dataset;
 
 
+use Phalcon\Support\Collection;
+
 class DatasetSort
 {
 
