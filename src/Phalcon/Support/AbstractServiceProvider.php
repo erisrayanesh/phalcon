@@ -2,7 +2,6 @@
 
 namespace Phalcon\Support;
 
-use Phalcon\Di\ServiceProviderInterface;
 use Phalcon\DiInterface;
 use Phalcon\Mvc\User\Component;
 
