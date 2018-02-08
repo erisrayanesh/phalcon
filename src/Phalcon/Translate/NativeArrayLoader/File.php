@@ -16,9 +16,33 @@ class File extends Loader
 
 	protected $cacheDir;
 
+	protected $cache = true;
+
+	protected $fileExtension = "php";
+
+	protected $contentType = "array";
+
 	public function load($language)
 	{
-		return $this->readCacheFile($language);
+
+		if (!$this->isCache()){
+			return array_dot($this->getDefinitions($language));
+		}
+
+		$definitions = [];
+
+		if ($this->isCacheFileAvailable($language)){
+			$definitions = $this->getDefinitionsFromCache($language);
+		}
+
+		if (empty($definitions)){
+			// get original definitions
+			$definitions = array_dot($this->getDefinitions($language));
+			// cache the original definitions
+			$this->cacheToFile($language, $definitions);
+		}
+
+		return $definitions;
 	}
 
 	/**
@@ -59,23 +83,60 @@ class File extends Loader
 		return $this;
 	}
 
-	protected function readCacheFile($language)
+	/**
+	 * @return bool
+	 */
+	public function isCache()
 	{
-		$definitions = [];
-
-		if (!$this->isCacheFileAvailable($language)){
-			// get original definitions
-			$definitions = array_dot($this->getDefinitions($language));
-			// cache the original definitions
-			$this->cacheToFile($language, $definitions);
-		}
-
-		if (empty($definitions)){
-			$definitions = $this->getDefinitionsFromCache($language);
-		}
-
-		return $definitions;
+		return $this->cache;
 	}
+
+	/**
+	 * @param bool $cache
+	 * @return File
+	 */
+	public function setCache($cache)
+	{
+		$this->cache = (bool) $cache;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getFileExtension()
+	{
+		return $this->fileExtension;
+	}
+
+	/**
+	 * @param string $fileExtension
+	 * @return File
+	 */
+	public function setFileExtension($fileExtension)
+	{
+		$this->fileExtension = $fileExtension;
+		return $this;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getContentType()
+	{
+		return $this->contentType;
+	}
+
+	/**
+	 * @param string $contentType
+	 * @return File
+	 */
+	public function setContentType($contentType)
+	{
+		$this->contentType = $contentType;
+		return $this;
+	}
+
 
 	protected function cacheToFile($language, $data)
 	{
@@ -85,7 +146,7 @@ class File extends Loader
 	protected function isCacheFileAvailable($language)
 	{
 		$cache = $this->getCacheFilePath($language);
-		$dir = $this->baseDir . $language;
+		$dir = $this->getBaseDir() . $language;
 
 		if (!file_exists($cache)){
 			return false;
@@ -96,8 +157,8 @@ class File extends Loader
 
 	protected function getDefinitions($language)
 	{
-		$dir = $this->baseDir . DIRECTORY_SEPARATOR . $language;
-		$baseFile = $dir . DIRECTORY_SEPARATOR . $language . ".php";
+		$dir = $this->getBaseDir() . DIRECTORY_SEPARATOR . $language;
+		$baseFile = $dir . DIRECTORY_SEPARATOR . $language . ".{$this->getFileExtension()}";
 
 		if (file_exists($baseFile)){
 			$translations = require $baseFile;
@@ -114,16 +175,22 @@ class File extends Loader
 			//$fileinfo instanceof \SplFileInfo;
 
 			// skip hidden files
-			if($fileinfo->isDot() || !$fileinfo->isFile() || $fileinfo->getExtension() !== 'php') continue;
+			if($fileinfo->isDot() || !$fileinfo->isFile() || $fileinfo->getExtension() !== $this->getFileExtension()) continue;
 
 			$fileData = include $fileinfo->getPathname();
 
-			if ($fileData instanceof Arrayable){
-				$fileData = $fileData->toArray();
+			if ($this->getContentType() == "array"){
+				if ($fileData instanceof Arrayable){
+					$fileData = $fileData->toArray();
+				}
+			}
+
+			if ($this->getContentType() == "json" and is_string($fileData)){
+				$fileData = json_decode($fileData, true);
 			}
 
 			if (is_array($fileData)){
-				$translations[strtoupper($fileinfo->getBasename('.php'))] = $fileData;
+				$translations[strtoupper($fileinfo->getBasename(".{$this->getFileExtension()}"))] = $fileData;
 			}
 		}
 
@@ -137,7 +204,7 @@ class File extends Loader
 
 	protected function getCacheFilePath($language)
 	{
-		return $this->cacheDir . DIRECTORY_SEPARATOR . $language . ".php";
+		return $this->cacheDir . DIRECTORY_SEPARATOR . $language . ".json";
 	}
 
 }
