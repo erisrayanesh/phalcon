@@ -21,5 +21,7 @@ class ExceptionHandler extends Component
 			return $e->getResponse();
 		}
 
+		throw $e;
+
 	}
 }
