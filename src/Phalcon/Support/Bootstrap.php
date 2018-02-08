@@ -27,18 +27,17 @@ class Bootstrap
     protected $providers;
 
     /**
-     * The Service Providers.
-     * @var ServiceProviderInterface[]
-     */
-//    protected $serviceProviders = [];
-
-    /**
      * The Application.
      * @var Application
      */
     protected $app;
 
     protected $loader;
+
+	/**
+	 * @var ExceptionHandler
+	 */
+    protected $exceptionHandler;
 
     /**
      * Bootstrap constructor.
@@ -64,11 +63,7 @@ class Bootstrap
 
         $this->di->setShared('config', $config);
 
-        $this->initLoader();
-
-        $this->initServiceProviders();
-
-        $this->initApplication();
+		$this->loader = new Loader();
 
     }
 
@@ -92,6 +87,32 @@ class Bootstrap
         return $this->appPath;
     }
 
+	/**
+	 * @return mixed
+	 */
+	public function getLoader()
+	{
+		return $this->loader;
+	}
+
+	/**
+	 * @return ExceptionHandler
+	 */
+	public function getExceptionHandler()
+	{
+		return $this->exceptionHandler;
+	}
+
+	/**
+	 * @param ExceptionHandler $exceptionHandler
+	 * @return Bootstrap
+	 */
+	public function setExceptionHandler(ExceptionHandler $exceptionHandler)
+	{
+		$this->exceptionHandler = $exceptionHandler;
+		return $this;
+	}
+
     /**
      * Runs the Application
      *
@@ -99,6 +120,12 @@ class Bootstrap
      */
     public function run()
     {
+		$this->initLoader();
+
+		$this->initServiceProviders();
+
+		$this->initApplication();
+
         return $this->handleRequest();
     }
 
@@ -110,21 +137,22 @@ class Bootstrap
     protected function handleRequest()
     {
 		try {
-			$response = $this->app->handle();
+			return $this->app->handle();
+		} catch (\Exception $exception){
 
-		} catch (ValidationException $exception){
-			$response = $exception->getResponse();
-		} catch (AuthorizationException $exception){
-			$response = redirect_route('admin.index', null, "error", t("ACCESS_DENIED"));
+			if ($this->getExceptionHandler() == null){
+				$this->setExceptionHandler(new ExceptionHandler($this->di));
+			}
+
+			return $this->getExceptionHandler()->render($exception);
 		}
     }
 
     protected function initLoader()
 	{
-		$this->loader = new Loader();
 		$this->loader->registerNamespaces([
 			'Apps'          => $this->appPath,
-		]);
+		], true);
 		$this->loader->register();
 	}
 
@@ -157,17 +185,12 @@ class Bootstrap
 	protected function initService(ServiceProviderInterface $serviceProvider)
 	{
 		$serviceProvider->register();
-//		$this->serviceProviders[$serviceProvider->getName()] = $serviceProvider;
-
 		return $this;
 	}
 
 	protected function initApplication()
 	{
 		$this->app = new Application($this->di);
-
-
 		$this->app->setEventsManager($this->di->getShared('eventsManager'));
-		//$this->app->setDI($this->di);
 	}
 }
