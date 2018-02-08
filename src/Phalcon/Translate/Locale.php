@@ -156,7 +156,7 @@ class Locale extends Component
 	{
 		$this->cache = new NativeArray(
 			[
-				'content' => $this->loadApaters($language),
+				'content' => $this->loadAdapters($language),
 			]
 		);
 	}
