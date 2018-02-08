@@ -1,40 +1,40 @@
 <?php
 namespace Phalcon\Translate;
 
+use Phalcon\Config;
 use Phalcon\Support\Interfaces\Arrayable;
 use Phalcon\Mvc\User\Component;
 use Phalcon\Translate\Adapter\NativeArray;
+use Phalcon\Translate\NativeArrayLoader\NativeArrayLoaderInterface;
 
 class Locale extends Component
 {
-	protected $baseDir = "";
 
-	protected $languages = [];
-	protected $defaultLocale;
+	/**
+	 * @var array
+	 */
+	protected $adapters;
+
+	protected $languages;
+
+	protected $defaultLocale = "en_US";
+
+	protected $locale = "en_US";
 
 	protected $cookieVar = 'app-locale';
-	protected $locale;
 
 	/**
 	 * @var NativeArray
 	 */
 	protected $cache;
 
-	protected $cacheDir;
-
 	/**
 	 * Locale constructor.
-	 * @param string $baseDir Directory where the language files exist
-	 * @param array $languages List of available languages
-	 * @param string $locale Current user language
-	 * @param string $defaultLocale Alternative language
+	 * @param \Phalcon\DiInterface $dependencyInjector
 	 */
-	public function __construct($baseDir, $cacheDir, $languages = [], $defaultLocale = null)
+	public function __construct(\Phalcon\DiInterface $dependencyInjector)
 	{
-		$this->baseDir = $baseDir;
-		$this->cacheDir = $cacheDir;
-		$this->languages = $languages;
-		$this->defaultLocale = $defaultLocale;
+		$this->setDI($dependencyInjector);
 	}
 
 	public function init()
@@ -58,43 +58,48 @@ class Locale extends Component
 		}
 	}
 
-	public function getTranslator($language)
-	{
-		$dir = $this->baseDir .  $language;
-
-		if (!file_exists($dir)){
-			throw new \Exception("Language directory '$language' not found in '{$this->baseDir}'");
-		}
-
-		return new NativeArray(
-			[
-				'content' => $this->readCacheFile($language),
-			]
-		);
-	}
-
 	public function languageExists($language)
 	{
 		return array_key_exists($language, $this->languages);
 	}
 
-    /**
-     * @return array
-     */
-    public function getLanguages()
-    {
-        return $this->languages;
-    }
 
-    /**
-     * @param array $languages
-     * @return Locale
-     */
-    public function setLanguages($languages)
-    {
-        $this->languages = $languages;
-        return $this;
-    }
+
+	/**
+	 * @return array
+	 */
+	public function getAdapters()
+	{
+		return $this->adapters;
+	}
+
+	/**
+	 * @param array $adapters
+	 * @return Locale
+	 */
+	public function addAdapter($adapter)
+	{
+		$this->adapters[] = $adapter;
+		return $this;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getLanguages()
+	{
+		return $this->languages;
+	}
+
+	/**
+	 * @param array $languages
+	 * @return Locale
+	 */
+	public function setLanguages($languages)
+	{
+		$this->languages = $languages;
+		return $this;
+	}
 
 	/**
 	 * @return string
@@ -137,96 +142,35 @@ class Locale extends Component
 			$locale = $this->request->getBestLanguage();
 		}
 
-
 		if (!$this->languageExists($locale)){
 			return;
 		}
 
 		$this->locale = $locale;
 		$this->cookies->set($this->getCookieVar(), $locale);
-		$this->cacheToMemory($locale);
+		$this->cache($locale);
 
 	}
 
-	protected function cacheToMemory($language)
+	protected function cache($language)
 	{
-		return $this->cache = $this->getTranslator($language);
+		$this->cache = new NativeArray(
+			[
+				'content' => $this->loadApaters($language),
+			]
+		);
 	}
 
-	protected function cacheToFile($language, $data)
+	protected function loadAdapters($language)
 	{
-		return file_put_contents($this->cacheDir . "lang" . DS . $language . ".php", json_encode($data));
-	}
-
-	protected function isCacheFileAvailable($language)
-	{
-		$cache = $this->cacheDir . "lang" . DS . $language . ".php";
-		$dir = $this->baseDir . $language;
-
-		if (!file_exists($cache)){
-			return false;
-		}
-
-		return filemtime($cache) >= filemtime($dir);
-	}
-
-	protected function readCacheFile($language)
-	{
-		$definitions = [];
-
-		if (!$this->isCacheFileAvailable($language)){
-			// get original definitions
-			$definitions = array_dot($this->getDefinitions($language));
-			// cache the original definitions
-			$this->cacheToFile($language, $definitions);
-		}
-
-		if (empty($definitions)){
-			$definitions = $this->getDefinitionsFromCache($language);
-		}
-
-		return $definitions;
-	}
-
-	protected function getDefinitions($language)
-	{
-		$dir = $this->baseDir . DS . $language;
-		$baseFile = $dir . DS . $language . ".php";
-
-		if (file_exists($baseFile)){
-			$translations = require $baseFile;
-		}
-
-		$files = new \DirectoryIterator($dir);
-
-		if (!$files){
-			throw new \Exception("getFileList: Failed opening directory $dir for reading");
-		}
-
-		foreach($files as $fileinfo) {
-
-			//$fileinfo instanceof \SplFileInfo;
-
-			// skip hidden files
-			if($fileinfo->isDot() || !$fileinfo->isFile() || $fileinfo->getExtension() !== 'php') continue;
-
-			$fileData = include $fileinfo->getPathname();
-
-			if ($fileData instanceof Arrayable){
-				$fileData = $fileData->toArray();
-			}
-
-			if (is_array($fileData)){
-				$translations[strtoupper($fileinfo->getBasename('.php'))] = $fileData;
+		$content = [];
+		foreach ($this->getAdapters() as $adapter){
+			if ($adapter instanceof NativeArrayLoaderInterface){
+				$content = array_merge($content, $adapter->load());
 			}
 		}
-
-		return $translations;
 	}
 
-	protected function getDefinitionsFromCache($language)
-	{
-		return json_decode(file_get_contents($this->cacheDir . "lang" . DS . $language . ".php"), true);
-	}
+
 
 }
