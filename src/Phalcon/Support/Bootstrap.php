@@ -106,12 +106,12 @@ class Bootstrap
 	}
 
 	/**
-	 * @param ExceptionHandler $exceptionHandler
+	 * @param string $exceptionHandler
 	 * @return Bootstrap
 	 */
-	public function setExceptionHandler(ExceptionHandler $exceptionHandler)
+	public function setExceptionHandler($exceptionHandler)
 	{
-		$this->exceptionHandler = $exceptionHandler;
+		$this->exceptionHandler = new $exceptionHandler($this->getDi());
 		return $this;
 	}
 
