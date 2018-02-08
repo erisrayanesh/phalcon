@@ -166,7 +166,7 @@ class Locale extends Component
 		$content = [];
 		foreach ($this->getAdapters() as $adapter){
 			if ($adapter instanceof NativeArrayLoaderInterface){
-				$content = array_merge($content, $adapter->load());
+				$content = array_merge($content, $adapter->load($language));
 			}
 		}
 	}
