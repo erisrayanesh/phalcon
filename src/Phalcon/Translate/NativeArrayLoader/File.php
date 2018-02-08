@@ -137,7 +137,7 @@ class File extends Loader
 
 	protected function getCacheFilePath($language)
 	{
-		return $this->cacheDir . "lang" . DIRECTORY_SEPARATOR . $language . ".php";
+		return $this->cacheDir . DIRECTORY_SEPARATOR . $language . ".php";
 	}
 
 }
