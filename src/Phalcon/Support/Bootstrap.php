@@ -65,6 +65,8 @@ class Bootstrap
 
 		$this->loader = new Loader();
 
+		$this->setExceptionHandler(ExceptionHandler::class);
+
     }
 
     /**
@@ -139,11 +141,6 @@ class Bootstrap
 		try {
 			return $this->app->handle();
 		} catch (\Exception $exception){
-
-			if ($this->getExceptionHandler() == null){
-				$this->setExceptionHandler(new ExceptionHandler($this->di));
-			}
-
 			return $this->getExceptionHandler()->render($exception);
 		}
     }
