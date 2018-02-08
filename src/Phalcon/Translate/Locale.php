@@ -60,7 +60,7 @@ class Locale extends Component
 
 	public function languageExists($language)
 	{
-		return array_key_exists($language, $this->languages);
+		return in_array($language, $this->languages);
 	}
 
 
