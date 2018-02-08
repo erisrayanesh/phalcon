@@ -169,6 +169,7 @@ class Locale extends Component
 				$content = array_merge($content, $adapter->load($language));
 			}
 		}
+		return $content;
 	}
 
 
