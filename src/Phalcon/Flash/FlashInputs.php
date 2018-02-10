@@ -95,4 +95,9 @@ class FlashInputs extends Component
 		$this->session->set($this->errorsVar, []);
 	}
 
+	public function getErrors()
+	{
+		return $this->session->set($this->errorsVar);
+	}
+
 }
