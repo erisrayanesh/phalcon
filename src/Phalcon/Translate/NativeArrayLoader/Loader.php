@@ -11,7 +11,4 @@ abstract class Loader implements NativeArrayLoaderInterface
 	{
 		$this->di = $dependencyInjector;
 	}
-
-
-
 }
