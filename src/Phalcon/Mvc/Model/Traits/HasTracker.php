@@ -119,7 +119,7 @@ trait HasTracker
 
 	public function getUserID()
 	{
-		return null;
+		return auth()->check()? auth()->user()->id : 0;
 	}
 
 	public function enableSoftDeleteTracker($field = 'deleted_by')
