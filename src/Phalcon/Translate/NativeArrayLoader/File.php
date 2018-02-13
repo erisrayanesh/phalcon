@@ -177,6 +177,9 @@ class File extends Loader
 			// skip hidden files
 			if($fileinfo->isDot() || !$fileinfo->isFile() || $fileinfo->getExtension() !== $this->getFileExtension()) continue;
 
+			// skip language file
+			if ($fileinfo->getFilename() == $language . ".{$this->getFileExtension()}") continue;
+
 			$fileData = include $fileinfo->getPathname();
 
 			if ($this->getContentType() == "array"){

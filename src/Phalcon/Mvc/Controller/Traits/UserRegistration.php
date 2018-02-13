@@ -38,7 +38,7 @@ trait UserRegistration
 				'fname' => strtolower($filter->sanitize($values['fname'],  'striptags')),
 				'lname' => strtolower($filter->sanitize($values['lname'],  'striptags')),
 				'email' => strtolower($filter->sanitize($values['email'], 'email')),
-				'password' => security()->hash($values['password']),
+				'password' => security()->hash($values['password'] . $this->getPasswordSalt()),
 				'active' => strtoupper(getSecurityRandom()->base58(5)),
 				'country_id' => $filter->sanitize($values['country_id'], 'int'),
 				'mobile' => $filter->sanitize($values['mobile'], 'int'),
@@ -53,6 +53,11 @@ trait UserRegistration
 			return false;
 		}
 
+	}
+
+	protected function getPasswordSalt()
+	{
+		return 'jFr!!A&+71w1Ms9~8';
 	}
 
 	protected function onRegistrationFailed($data)

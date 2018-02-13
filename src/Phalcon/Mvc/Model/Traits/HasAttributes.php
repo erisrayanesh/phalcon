@@ -11,8 +11,8 @@ trait HasAttributes
 	public function toArray($columns = null)
 	{
 		$arr = parent::toArray($columns);
-		foreach ($this->appends as $appended){
-			$arr[$appended] = $this->{$appended};
+		foreach ($this->appends as $attribute){
+			$arr[$attribute] = $this->getAppendedAttributeValue($attribute);
 		}
 		return $arr;
 	}
@@ -28,9 +28,8 @@ trait HasAttributes
 
 	public function readAttribute($attribute)
 	{
-		if ($this->hasAppended($attribute)){
-			$method = "get" . camelize($attribute);
-			return call_user_func([$this, $method]);
+		if ($this->__isset($attribute)){
+			return $this->getAppendedAttributeValue ($attribute);
 		}
 
 		return parent::readAttribute($attribute);
@@ -42,6 +41,11 @@ trait HasAttributes
 			return true;
 		}
 		return parent::__isset($attribute);
+	}
+
+	protected function getAppendedAttributeValue($attribute)
+	{
+		$this->__get($attribute);
 	}
 
 	public static function findAndCollect($parameters = null)

@@ -53,7 +53,7 @@ trait AuthenticatesUsers
 
 			// Check the password
 			if (!security()->checkHash(
-					$credentials[$this->getPasswordKey()],
+					$credentials[$this->getPasswordKey()] . $this->getPasswordSalt(),
 					$user->{$this->getPasswordKey()})) {
 
 				if ($this->isLoginThrottlingEnabled()){
@@ -111,6 +111,11 @@ trait AuthenticatesUsers
 			$this->getUsernameKey(),
 			$this->getPasswordKey()
 		]);
+	}
+
+	protected function getPasswordSalt()
+	{
+		return 'jFr!!A&+71w1Ms9~8';
 	}
 
 	protected function validateLoginCredentials($credentials)

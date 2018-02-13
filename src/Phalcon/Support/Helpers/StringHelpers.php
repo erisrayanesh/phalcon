@@ -65,3 +65,14 @@ if (! function_exists('str_parse_callback')) {
 		return str_contains($callback, $needles) ? explode($needles, $callback, 2) : [$callback, $default];
 	}
 }
+
+if (!function_exists('str_to_slug')){
+	function str_to_slug($string, $separator = "-")
+	{
+		$string = strtolower($string);
+		$string = str_replace('‌',' ',$string);
+		$string = mb_ereg_replace('([^آ-ی۰-۹a-z0-9]|-)+', $separator, $string);
+		$string = strtolower($string);
+		return trim($string, $separator);
+	}
+}
