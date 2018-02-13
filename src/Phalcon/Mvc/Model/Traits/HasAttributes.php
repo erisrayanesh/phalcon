@@ -45,7 +45,7 @@ trait HasAttributes
 
 	protected function getAppendedAttributeValue($attribute)
 	{
-		$this->__get($attribute);
+		return $this->__get($attribute);
 	}
 
 	public static function findAndCollect($parameters = null)
