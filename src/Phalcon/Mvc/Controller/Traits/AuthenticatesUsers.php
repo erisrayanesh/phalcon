@@ -52,9 +52,9 @@ trait AuthenticatesUsers
 			}
 
 			// Check the password
-			if (!security()->checkHash(
-					$credentials[$this->getPasswordKey()] . $this->getPasswordSalt(),
-					$user->{$this->getPasswordKey()})) {
+			$password = $credentials[$this->getPasswordKey()] . $this->getPasswordSalt();
+			$hashPassword = $user->{$this->getPasswordKey()};
+			if (!security()->checkHash($password, $hashPassword)) {
 
 				if ($this->isLoginThrottlingEnabled()){
 					$this->registerFailedLogin($user->id);

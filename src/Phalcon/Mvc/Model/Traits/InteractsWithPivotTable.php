@@ -3,8 +3,8 @@
 namespace Phalcon\Mvc\Model\Traits;
 
 
-use Apps\Core\Collection;
 use Phalcon\Mvc\Model\Criteria;
+use Phalcon\Mvc\Model\Query;
 use Phalcon\Mvc\Model\Relation;
 
 trait InteractsWithPivotTable
@@ -91,6 +91,27 @@ trait InteractsWithPivotTable
 
 		$attach = array_diff($ids, $current);
 		$this->attach($relationAlias, $attach);
+
+	}
+
+	public function withPivot($relationAlias, $arguments = null)
+	{
+
+		$relationship = $this->getRelation($relationAlias);
+		$intRefField = $this->castFieldToString($relationship->getIntermediateReferencedFields());
+		$refField = $this->castFieldToString($relationship->getReferencedFields());
+
+		$results = [];
+		foreach ($this->getRelated($relationAlias, $arguments) as $item) {
+			$model = $this->newPivotQuery($relationship)
+				->andWhere($intRefField . " = :arg1:", [
+					"arg1" => $item->readAttribute($refField)
+				])->execute()->getFirst();
+			$item->writeAttribute('pivot',  $model);
+			$results[] = $item;
+		}
+
+		return $results;
 
 	}
 

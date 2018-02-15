@@ -14,6 +14,17 @@ trait HasAttributes
 		foreach ($this->appends as $attribute){
 			$arr[$attribute] = $this->getAppendedAttributeValue($attribute);
 		}
+
+		if (isset($this->pivot)) {
+			$value = $this->pivot;
+
+			if ($this->pivot instanceof Model){
+				$value = $this->pivot->toArray();
+			}
+
+			$arr["pivot"] = $value;
+		};
+
 		return $arr;
 	}
 
