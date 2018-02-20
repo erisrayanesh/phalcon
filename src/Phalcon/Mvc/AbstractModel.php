@@ -3,7 +3,7 @@
 namespace Phalcon\Mvc;
 
 
-use Phalcon\Mvc\Model\HasEagerLoading;
+use Phalcon\Mvc\Model\Traits\HasEagerLoading;
 use Phalcon\Mvc\Model\Traits\HasAttributes;
 use Phalcon\Mvc\Model\Traits\HasTimestamps;
 use Phalcon\Mvc\Model\Traits\HasTracker;

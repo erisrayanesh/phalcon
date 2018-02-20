@@ -1,4 +1,6 @@
-<?php namespace Phalcon\Mvc\Model;
+<?php
+
+namespace Phalcon\Mvc\Model\Traits;
 
 use Phalcon\Mvc\Model\EagerLoading\Loader;
 
