@@ -37,10 +37,9 @@ abstract class AbstractModel extends Model
 	{
 		$this->initializing();
 
-		$traits = class_uses($this);
-		foreach ($traits as $trait) {
-			$items = explode('\\', $trait);
-			$method = 'init' . camelize(end($items));
+		$class = static::class;
+		foreach (class_uses_recursive($class) as $trait) {
+			$method = 'init' . class_basename($trait);
 			if (method_exists($this, $method)) {
 				call_user_func([$this, $method]);
 			}

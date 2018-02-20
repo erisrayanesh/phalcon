@@ -15,7 +15,7 @@ trait ValidatesRequests
 	{
 		$validator = $this->getValidationFactory();
 
-		$this->appendRulesToValidatior($validator, $rules);
+		$this->appendRulesToValidator($validator, $rules);
 
 		$messages = $validator->validate($values);
 
@@ -33,7 +33,8 @@ trait ValidatesRequests
 	protected function buildFailedValidationResponse(Group $messages)
 	{
 		if (request_expects_json()) {
-			$jsonResponse = new Response('', 422);
+			$jsonResponse = new Response();
+			$jsonResponse->setStatusCode(422, 'Unprocessable Entity');
 			$jsonResponse->setJsonContent($this->formatValidationMessagesForJson($messages));
 			return $jsonResponse;
 		}
@@ -44,7 +45,7 @@ trait ValidatesRequests
 	}
 
 
-	protected function appendRulesToValidatior(Validation &$validator, array $rules)
+	protected function appendRulesToValidator(Validation &$validator, array $rules)
 	{
 		foreach ($rules as $rule) {
 			$validator->add($rule[0], $rule[1]);
