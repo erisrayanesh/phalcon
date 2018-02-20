@@ -11,28 +11,6 @@ trait HasAttributes
 
 	protected $appends = [];
 
-	public function toArray($columns = null)
-	{
-		$arr = parent::toArray($columns);
-		foreach ($this->appends as $attribute){
-			$arr[$attribute] = $this->getAppendedAttributeValue($attribute);
-		}
-
-		$arr = array_merge($arr, $this->getRelationsToArray());
-
-		if (isset($this->pivot)) {
-			$value = $this->pivot;
-
-			if ($value instanceof Model){
-				$value = $value->toArray();
-			}
-
-			$arr["pivot"] = $value;
-		};
-
-		return $arr;
-	}
-
 	public function hasAppended($attribute)
 	{
 		$method = "get" . camelize($attribute);
@@ -70,31 +48,13 @@ trait HasAttributes
 		return $resultset;
 	}
 
-	protected function getAppendedAttributeValue($attribute)
+	public function getAllAppendedAttributeValues()
 	{
-		return $this->__get($attribute);
-	}
-
-	protected function getRelationsToArray()
-	{
-
-		if (!is_array($this->_related)){
-			return [];
+		$arr = [];
+		foreach ($this->appends as $attribute){
+			$arr[$attribute] = $this->__get($attribute);
 		}
-
-		$results = [];
-		foreach ($this->_related as $key => $related) {
-			if (is_array($related) || $related instanceof Simple) {
-				foreach ($related as $model) {
-					$results[$key][] = $model->toArray();
-				}
-			}
-			if ($related instanceof Model) {
-				$results[$key] = $related->toArray();
-			}
-		}
-		return $results;
-
+		return $arr;
 	}
 
 

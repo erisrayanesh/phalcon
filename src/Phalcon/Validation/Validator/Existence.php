@@ -90,10 +90,6 @@ class Existence extends Validator
 			throw new ValidationException('Validator require column option to be set');
 		}
 
-		if (!$this->hasOption('value')) {
-			throw new ValidationException('Validator require value option to be set');
-		}
-
 		$this->db = $db;
 	}
 
@@ -108,7 +104,6 @@ class Existence extends Validator
 	{
 		$table = $this->db->escapeIdentifier($this->getOption('table'));
 		$column = $this->db->escapeIdentifier($this->getOption('column'));
-		$value = $this->db->escapeIdentifier($this->getOption('value'));
 
 		$result = $this->db->fetchOne(
 			sprintf('SELECT COUNT(*) AS count FROM %s WHERE %s = ?', $table, $column),
