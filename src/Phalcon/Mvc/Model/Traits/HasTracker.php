@@ -28,6 +28,11 @@ trait HasTracker
 
 	public function initHasTracker()
 	{
+
+		if (!isset($this->tracker) || !$this->tracker){
+			return;
+		}
+
 		$behavior = [];
 
 		if ($this->getCreatedByField() !== null){

@@ -21,6 +21,11 @@ trait HasTimestamps
 
 	public function initHasTimestamps()
 	{
+
+		if (!isset($this->timestamps) || !$this->timestamps){
+			return;
+		}
+
 		$behavior = [];
 
 		if ($this->getCreatedAtField() !== null){
