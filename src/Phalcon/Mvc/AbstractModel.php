@@ -92,6 +92,43 @@ abstract class AbstractModel extends Model
 		return $this;
 	}
 
+	/**
+	 * @return bool
+	 */
+	public function hasTimestamps()
+	{
+		return $this->timestamps;
+	}
+
+	/**
+	 * @param bool $timestamps
+	 * @return AbstractModel
+	 */
+	public function setTimestamps($timestamps)
+	{
+		$this->timestamps = (bool) $timestamps;
+		return $this;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function hasTracker()
+	{
+		return $this->tracker;
+	}
+
+	/**
+	 * @param bool $tracker
+	 * @return AbstractModel
+	 */
+	public function setTracker($tracker)
+	{
+		$this->tracker = (bool) $tracker;
+		return $this;
+	}
+
+
 	protected function getRelationsToArray()
 	{
 
