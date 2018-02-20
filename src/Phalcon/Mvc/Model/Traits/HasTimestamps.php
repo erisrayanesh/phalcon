@@ -42,9 +42,9 @@ trait HasTimestamps
 			];
 		}
 
-		$this->addBehavior(
-			new Timestampable($behavior)
-		);
+		if (!empty($behavior)){
+			$this->addBehavior(new Timestampable($behavior));
+		}
 
 		if ($this->isSoftDeleteTimestampEnabled()){
 			$this->addBehavior(

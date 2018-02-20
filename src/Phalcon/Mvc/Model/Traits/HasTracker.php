@@ -3,6 +3,7 @@
 namespace Phalcon\Mvc\Model\Traits;
 
 
+use Phalcon\Mvc\Model\Behavior\SoftDelete;
 use Phalcon\Mvc\Model\Behavior\Timestampable;
 
 trait HasTracker
@@ -48,9 +49,9 @@ trait HasTracker
 			];
 		}
 
-		$this->addBehavior(
-			new Timestampable($behavior)
-		);
+		if (!empty($behavior)) {
+			$this->addBehavior(new Timestampable($behavior));
+		}
 
 		if ($this->isSoftDeleteTrackerEnabled()){
 			$this->addBehavior(
