@@ -97,22 +97,37 @@ trait InteractsWithPivotTable
 	public function withPivot($relationAlias, $arguments = null)
 	{
 
-		$relationship = $this->getRelation($relationAlias);
-		$intRefField = $this->castFieldToString($relationship->getIntermediateReferencedFields());
-		$refField = $this->castFieldToString($relationship->getReferencedFields());
-
-		$results = [];
-		foreach ($this->getRelated($relationAlias, $arguments) as $item) {
-			$model = $this->newPivotQuery($relationship)
-				->andWhere($intRefField . " = :arg1:", [
-					"arg1" => $item->readAttribute($refField)
-				])->execute()->getFirst();
-			$item->writeAttribute('pivot',  $model);
-			$results[] = $item;
+		if (!is_array($relationAlias)){
+			$relationAlias = [$relationAlias];
 		}
 
-		return $results;
+		foreach ($relationAlias as $alias){
 
+			$relationship = $this->getRelation($alias);
+
+			if ($relationship->getType() !== Relation::HAS_MANY_THROUGH){
+				return;
+			}
+
+			$intRefField = $this->castFieldToString($relationship->getIntermediateReferencedFields());
+			$refField = $this->castFieldToString($relationship->getReferencedFields());
+
+			//add relation to model
+			if (!isset($this->{$alias})){
+				$this->{$alias} = $this->getRelated($alias, $arguments);
+			}
+
+			//iterate through relation models to add pivots
+			foreach ($this->{$alias} as $item) {
+				$model = $this->newPivotQuery($relationship)
+					->andWhere($intRefField . " = :arg1:", [
+						"arg1" => $item->readAttribute($refField)
+					])->execute()->getFirst();
+				$item->writeAttribute('pivot',  $model);
+			}
+		}
+
+		return $this;
 	}
 
 	/**

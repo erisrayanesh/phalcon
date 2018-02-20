@@ -3,6 +3,9 @@
 namespace Phalcon\Mvc\Model\Traits;
 
 
+use Phalcon\Mvc\Model;
+use Phalcon\Mvc\Model\Resultset\Simple;
+
 trait HasAttributes
 {
 
@@ -15,11 +18,13 @@ trait HasAttributes
 			$arr[$attribute] = $this->getAppendedAttributeValue($attribute);
 		}
 
+		$arr = array_merge($arr, $this->getRelationsToArray());
+
 		if (isset($this->pivot)) {
 			$value = $this->pivot;
 
-			if ($this->pivot instanceof Model){
-				$value = $this->pivot->toArray();
+			if ($value instanceof Model){
+				$value = $value->toArray();
 			}
 
 			$arr["pivot"] = $value;
@@ -54,11 +59,6 @@ trait HasAttributes
 		return parent::__isset($attribute);
 	}
 
-	protected function getAppendedAttributeValue($attribute)
-	{
-		return $this->__get($attribute);
-	}
-
 	public static function findAndCollect($parameters = null)
 	{
 		$resultset = parent::find($parameters);
@@ -69,4 +69,33 @@ trait HasAttributes
 
 		return $resultset;
 	}
+
+	protected function getAppendedAttributeValue($attribute)
+	{
+		return $this->__get($attribute);
+	}
+
+	protected function getRelationsToArray()
+	{
+
+		if (!is_array($this->_related)){
+			return [];
+		}
+
+		$results = [];
+		foreach ($this->_related as $key => $related) {
+			if (is_array($related) || $related instanceof Simple) {
+				foreach ($related as $model) {
+					$results[$key][] = $model->toArray();
+				}
+			}
+			if ($related instanceof Model) {
+				$results[$key] = $related->toArray();
+			}
+		}
+		return $results;
+
+	}
+
+
 }
