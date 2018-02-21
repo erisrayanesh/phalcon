@@ -20,14 +20,14 @@ trait HasAttributes
 		return false;
 	}
 
-	public function readAttribute($attribute)
-	{
-		if ($this->__isset($attribute)){
-			return $this->getAppendedAttributeValue ($attribute);
-		}
-
-		return parent::readAttribute($attribute);
-	}
+//	public function readAttribute($attribute)
+//	{
+//		if ($this->__isset($attribute)){
+//			return $this->getAppendedAttributeValue ($attribute);
+//		}
+//
+//		return parent::readAttribute($attribute);
+//	}
 
 	public function __isset($attribute)
 	{

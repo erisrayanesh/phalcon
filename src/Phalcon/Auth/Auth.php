@@ -50,6 +50,7 @@ class Auth extends Component
 	public function logout()
 	{
 		$this->unsetSessionIdentity();
+		session()->regenerateId();
 	}
 
 	protected function setSessionIdentity($id, $name)
@@ -62,46 +63,46 @@ class Auth extends Component
 
 	protected function unsetSessionIdentity()
 	{
-		$this->session->remove($this->getSessionKey());
+		session()->remove($this->getSessionKey());
 		$this->user = null;
 	}
 
-    /**
-     * Returns the current identity
-     *
-     * @return array
-     */
-    public function getSessionIdentity()
-    {
-        return $this->session->get($this->getSessionKey());
-    }
+	/**
+	 * Returns the current identity
+	 *
+	 * @return array
+	 */
+	public function getSessionIdentity()
+	{
+		return session()->get($this->getSessionKey());
+	}
 
-    /**
-     * Returns the current identity
-     *
-     * @return string
-     */
-    public function getSessionIdentityName()
-    {
-        $identity = $this->session->get($this->getSessionKey());
-        return $identity['name'];
-    }
+	/**
+	 * Returns the current identity
+	 *
+	 * @return string
+	 */
+	public function getSessionIdentityName()
+	{
+		$identity = session()->get($this->getSessionKey());
+		return $identity['name'];
+	}
 
-    public function check()
+	public function check()
 	{
 		return $this->user() !== null;
 	}
 
-    /**
-     * Get the entity related to user in the active identity
-     *
-     * @return Authenticatable
-     * @throws Exception
-     */
-    public function user()
-    {
-        return $this->user;
-    }
+	/**
+	 * Get the entity related to user in the active identity
+	 *
+	 * @return Authenticatable
+	 * @throws Exception
+	 */
+	public function user()
+	{
+		return $this->user;
+	}
 
 	public function init()
 	{
