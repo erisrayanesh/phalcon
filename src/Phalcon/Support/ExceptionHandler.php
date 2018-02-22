@@ -51,6 +51,5 @@ trait ExceptionHandler
 
 		response()->setStatusCode($exception->getCode());
 		view($this->errorsViewDir . "/" . $exception->getCode(), ["exception" => $exception]);
-		return response();
 	}
 }
