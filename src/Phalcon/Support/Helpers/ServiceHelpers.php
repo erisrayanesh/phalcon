@@ -157,3 +157,22 @@ function csrf_token()
 {
 	return DI()->get("security")->getToken();
 }
+
+function getView($view, array $params = null)
+{
+
+	$renderView = clone view();
+
+	if (!empty($params) && is_array($params)) {
+		$renderView->setVars($params);
+	}
+
+	$renderView->reset();
+	$renderView->pick($view);
+	$renderView->start();
+	$renderView->render(DI()->get('dispatcher')->getControllerName(), DI()->get('dispatcher')->getActionName());
+	$renderView->finish();
+
+	return $renderView;
+
+}
