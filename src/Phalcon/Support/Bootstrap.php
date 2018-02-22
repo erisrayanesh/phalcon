@@ -37,7 +37,7 @@ class Bootstrap
 	/**
 	 * @var ExceptionHandler
 	 */
-    protected $exceptionHandler;
+//    protected $exceptionHandler;
 
     /**
      * Bootstrap constructor.
@@ -65,7 +65,7 @@ class Bootstrap
 
 		$this->loader = new Loader();
 
-		$this->setExceptionHandler(ExceptionHandler::class);
+//		$this->setExceptionHandler(ExceptionHandler::class);
 
     }
 
@@ -100,20 +100,20 @@ class Bootstrap
 	/**
 	 * @return ExceptionHandler
 	 */
-	public function getExceptionHandler()
-	{
-		return $this->exceptionHandler;
-	}
+//	public function getExceptionHandler()
+//	{
+//		return $this->exceptionHandler;
+//	}
 
 	/**
 	 * @param string $exceptionHandler
 	 * @return Bootstrap
 	 */
-	public function setExceptionHandler($exceptionHandler)
-	{
-		$this->exceptionHandler = new $exceptionHandler($this->getDi());
-		return $this;
-	}
+//	public function setExceptionHandler($exceptionHandler)
+//	{
+//		$this->exceptionHandler = new $exceptionHandler($this->getDi());
+//		return $this;
+//	}
 
     /**
      * Runs the Application
@@ -138,18 +138,18 @@ class Bootstrap
      */
     protected function handleRequest()
     {
-		try {
+//		try {
 			return $this->app->handle();
-		} catch (\Exception $exception){
-			return $this->getExceptionHandler()->render($exception);
-		}
+//		} catch (\Exception $exception){
+//			return $this->getExceptionHandler()->render($exception);
+//		}
     }
 
     protected function initLoader()
 	{
-		$this->loader->registerNamespaces([
-			'Apps'          => $this->appPath,
-		], true);
+//		$this->loader->registerNamespaces([
+//			'Apps'          => $this->appPath,
+//		], true);
 		$this->loader->register();
 	}
 

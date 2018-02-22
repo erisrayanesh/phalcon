@@ -4,22 +4,15 @@ namespace Phalcon\Support;
 
 use Phalcon\Http\Response;
 use Phalcon\Mvc\Dispatcher;
-use Phalcon\Mvc\User\Component;
 use Phalcon\Validation\Exceptions\ValidationException;
 use \Phalcon\Http\Response\Exception as HttpResponseException;
 
-class ExceptionHandler extends Component
+trait ExceptionHandler
 {
 
 	protected $errorsViewDir = "errors";
 
-	public function __construct(\Phalcon\DiInterface $dependencyInjector)
-	{
-		$this->setDI($dependencyInjector);
-	}
-
-
-	public function render(Dispatcher $dispatcher, \Exception $e)
+	public function handle(Dispatcher $dispatcher, \Exception $e)
 	{
 
 		if ($e instanceof \Phalcon\Mvc\Dispatcher\Exception) {
