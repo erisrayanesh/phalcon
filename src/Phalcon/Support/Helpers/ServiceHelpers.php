@@ -16,10 +16,22 @@ function config($name, $default = null)
 //    return DI()->getConfig()->get($name, $default);
 }
 
-function view($name, $params)
+/**
+ * @param null $name
+ * @param null $params
+ * @return \Phalcon\Mvc\View
+ */
+function view($name = null, $params = null)
 {
-	DI()->get("view")->setVars($params);
-	DI()->get("view")->pick($name);
+	if (!empty($params)){
+		DI()->get("view")->setVars($params);
+	}
+
+	if (!empty($name)){
+		DI()->get("view")->pick($name);
+	}
+
+	return DI()->get("view");
 }
 
 /**

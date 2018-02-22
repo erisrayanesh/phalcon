@@ -61,3 +61,8 @@ function redirect_route($name, $data = null, $withKey = null, $with = null)
 {
 	return redirect(route($name, $data), $withKey, $with);
 }
+
+function abort($code)
+{
+	throw new \Phalcon\Http\Response\Exception('', $code);
+}
