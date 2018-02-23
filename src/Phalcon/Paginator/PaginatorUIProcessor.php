@@ -100,7 +100,10 @@ abstract class PaginatorUIProcessor
 
 	public function append($data)
 	{
-		$this->appendix = http_build_query($data);
+		if (is_array($data)){
+			$data = http_build_query($data);
+		}
+		$this->appendix = $data;
 		return $this;
 	}
 

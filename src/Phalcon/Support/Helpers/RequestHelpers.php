@@ -1,6 +1,6 @@
 <?php
 
-function route($name, $data = null)
+function route($name, $data = null, $query = null)
 {
 	if (is_null($data)){
 		$data = [];
@@ -11,7 +11,7 @@ function route($name, $data = null)
 	}
 
 	$data["for"] = $name;
-	return url()->get($data);
+	return url()->get($data, $query);
 }
 
 function request_only($list)
