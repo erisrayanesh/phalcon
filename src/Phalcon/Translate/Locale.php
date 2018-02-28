@@ -74,7 +74,7 @@ class Locale extends Component
 	}
 
 	/**
-	 * @param array $adapters
+	 * @param array $adapter
 	 * @return Locale
 	 */
 	public function addAdapter($adapter)

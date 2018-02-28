@@ -35,6 +35,8 @@ trait ExceptionHandler
 			return $e->getResponse();
 		}
 
+		//TODO: throwing the exception causes cyclic routing.
+		// The dispatcher tries to redispatch the exception handler controller to handle the exception
 		throw $e;
 
 	}
@@ -45,7 +47,7 @@ trait ExceptionHandler
 		if (request_expects_json()){
 			$response = new Response();
 			$response->setStatusCode($exception->getCode());
-			$response->setJsonContent(["message" => $exception->getMessage()]);
+			$response->setJsonContent(["error" => $response->getHeaders()->get('Status'), "message" => $exception->getMessage()]);
 			return $response;
 		}
 

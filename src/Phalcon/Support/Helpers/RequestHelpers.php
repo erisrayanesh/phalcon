@@ -61,7 +61,14 @@ function request_wants_json()
 {
 	$acceptable = request()->getBestAccept();
 
-	return isset($acceptable[0]) && str_contains($acceptable[0], ['/json', '+json']);
+	if (is_array($acceptable)) {
+		foreach ($acceptable as $acc) {
+			$acceptable = $acc;
+			break;
+		}
+	}
+
+	return str_contains($acceptable, ['/json', '+json']);
 }
 
 function request_is_pjax()
