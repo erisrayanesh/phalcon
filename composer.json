@@ -23,7 +23,8 @@
         "ext-phalcon": "~3.2",
         "swiftmailer/swiftmailer": "^5.4",
         "symfony/var-dumper": "3.4.*",
-        "nesbot/carbon": "~1.21"
+        "nesbot/carbon": "~1.21",
+        "league/flysystem": "^1.0"
     },
     "autoload": {
         "files": [

@@ -43,14 +43,32 @@ class FileSystem extends Component
 	public function get($key = null)
 	{
 		if (!empty($key) && isset($this->adapters[$key])){
-			return $this->adapters[$key];
+			$adapter = $this->adapters[$key];
 		}
 
 		if (isset($this->adapters[$this->getDefault()])){
-			return $this->adapters[$this->getDefault()];
+			$adapter = $this->adapters[$this->getDefault()];
+		}
+
+		if (!empty($adapter)){
+			return new League\Flysystem\Filesystem($adapter);
 		}
 
 		return null;
+	}
+
+	/**
+	 * @param null $key
+	 * @return AdapterInterface|null
+	 */
+	public function __get($key)
+	{
+		return $this->get($key);
+	}
+
+	public function __set($key, $adapter)
+	{
+		$this->adapters[$key] = $adapter;
 	}
 
 	public function __call($name, $arguments)
