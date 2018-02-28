@@ -4,6 +4,7 @@ namespace Phalcon\FileSystem;
 
 use Phalcon\Mvc\User\Component;
 use League\Flysystem\AdapterInterface;
+use League\Flysystem\Filesystem as BaseFileSystem;
 
 class FileSystem extends Component
 {
@@ -51,7 +52,7 @@ class FileSystem extends Component
 		}
 
 		if (!empty($adapter)){
-			return new League\Flysystem\Filesystem($adapter);
+			return new BaseFileSystem($adapter);
 		}
 
 		return null;
