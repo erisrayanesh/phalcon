@@ -136,6 +136,9 @@ function storage($key = null)
 	return DI()->get('filesystem')->get($key);
 }
 
+/**
+ * @return \Phalcon\FileSystem\FileSystem
+ */
 function files()
 {
 	return DI()->get('files');
