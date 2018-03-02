@@ -127,10 +127,24 @@ function security()
 	return DI()->get("security");
 }
 
+/**
+ * @param string $key
+ * @return League\Flysystem\AdapterInterface
+ */
+function storage($key = null)
+{
+	return DI()->get('filesystem')->get($key);
+}
+
+function files()
+{
+	return DI()->get('files');
+}
+
 if (! function_exists('t')) {
 	function t($key, array $placeholders = [])
 	{
-		return DI()->get("locale")->_($key, $placeholders);
+		return locale()->_($key, $placeholders);
 	}
 }
 
