@@ -64,8 +64,8 @@ final class EagerLoad
         
         $relation = $this->relation;
 
-        $alias                = $relation->getOptions();
-        $alias                = strtolower($alias['alias']);
+		$options              = $relation->getOptions();
+        $alias                = strtolower($options['alias']);
         $relField             = $relation->getFields();
         $relReferencedModel   = $relation->getReferencedModel();
         $relReferencedField   = $relation->getReferencedFields();
@@ -136,6 +136,14 @@ final class EagerLoad
         } else {
             $builder->inWhere("[{$relReferencedField}]", $bindValues);
         }
+
+		if (isset($options['params'])){
+			$params = $options['params'];
+			if (isset($params['conditions'])) {
+				$bind = isset($params['bind'])? $params['bind'] : null;
+				$builder->where($params['conditions'], $bind);
+			}
+		}
 
         if ($this->constraints) {
             call_user_func($this->constraints, $builder);
