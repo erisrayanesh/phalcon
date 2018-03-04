@@ -143,7 +143,7 @@ function array_accessible($value)
 	return is_array($value) || $value instanceof \ArrayAccess;
 }
 
-function array_first(callable $callback = null, $default = null)
+function array_first(array $array, callable $callback = null, $default = null)
 {
 	if (is_null($callback)) {
 		if (empty($array)) {
@@ -162,7 +162,7 @@ function array_first(callable $callback = null, $default = null)
 	return value($default);
 }
 
-function array_last($array, callable $callback = null, $default = null)
+function array_last(array $array, callable $callback = null, $default = null)
 {
 	if (is_null($callback)) {
 		return empty($array) ? value($default) : end($array);
