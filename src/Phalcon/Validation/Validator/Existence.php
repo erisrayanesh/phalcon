@@ -104,7 +104,7 @@ class Existence extends Validator
 	{
 		$table = $this->db->escapeIdentifier($this->getOption('table'));
 		$column = $this->db->escapeIdentifier($this->getOption('column'));
-		$condition = $this->db->escapeIdentifier($this->getOption('condition'));
+		$condition = $this->getOption('condition');
 
 		$result = $this->db->fetchOne(
 			sprintf('SELECT COUNT(*) AS count FROM %s WHERE %s = ? ' . $condition, $table, $column),
