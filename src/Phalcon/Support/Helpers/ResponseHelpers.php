@@ -57,9 +57,9 @@ function redirect_back($withKey = null, $with = null)
 	return redirect(trim(old("_url"), '\/\\'), $withKey, $with);
 }
 
-function redirect_route($name, $data = null, $withKey = null, $with = null)
+function redirect_route($name, $data = null, $query = null, $withKey = null, $with = null)
 {
-	return redirect(route($name, $data), $withKey, $with);
+	return redirect(route($name, $data, $query), $withKey, $with);
 }
 
 function abort($code)
