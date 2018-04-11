@@ -114,6 +114,9 @@ function auth()
 	return DI()->get("auth");
 }
 
+/**
+ * @return \Phalcon\Mvc\Router
+ */
 function router()
 {
 	return DI()->get("router");
