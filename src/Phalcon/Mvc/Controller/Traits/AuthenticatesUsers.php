@@ -35,7 +35,7 @@ trait AuthenticatesUsers
 		}
 
 		auth()->logout();
-		$this->onAfterLogout();
+		return $this->onAfterLogout();
 	}
 
 	protected function attemptLogin($credentials)
