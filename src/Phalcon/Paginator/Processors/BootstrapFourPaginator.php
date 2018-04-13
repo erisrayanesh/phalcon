@@ -35,11 +35,13 @@ class BootstrapFourPaginator extends PaginatorUIProcessor
 
 
 		if ($this->numbers){
-			for ($i = $this->getPaginate()->first; $i <= $this->getPaginate()->last; $i++){
+
+//			for ($i = $this->getPaginate()->first; $i <= $this->getPaginate()->last; $i++){
+			foreach ($this->getPages() as $page){
 				$output .= $this->createItem (
-					!$this->isCurrentPage($i),
-					!$this->isCurrentPage($i)? $this->getPageLink($i) : "#",
-					$i
+					!$page['is_current'],
+					!$page['is_current']? $page['url'] : "#",
+					$page['num']
 				);
 			}
 		}

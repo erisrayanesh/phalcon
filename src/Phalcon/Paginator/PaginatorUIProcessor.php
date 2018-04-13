@@ -12,6 +12,7 @@ abstract class PaginatorUIProcessor
 		"prev" => "previous",
 		"last" => "last",
 		"numbers" => true,
+		"max_pages" => 5,
 		"var" => "page",
 	];
 
@@ -101,6 +102,10 @@ abstract class PaginatorUIProcessor
 	public function append($data)
 	{
 		if (is_array($data)){
+
+			//remove existing page variable
+			array_forget($data, $this->var);
+
 			$data = http_build_query($data);
 		}
 		$this->appendix = $data;
@@ -111,6 +116,67 @@ abstract class PaginatorUIProcessor
 	{
 		$this->appendix = '';
 		return $this;
+	}
+
+	public function getPages()
+	{
+		$pages = [];
+
+		if ($this->getPaginate()->last <= 1) {
+			return $pages;
+		}
+
+		if ($this->getPaginate()->last <= $this->max_pages) {
+
+			for ($i = 1; $i <= $this->getPaginate()->last; $i++) {
+				$pages[] = $this->getPage($i, $this->isCurrentPage($i));
+			}
+
+		} else {
+
+			$current = $this->getCurrentPage();
+
+			$left = floor($this->max_pages / 2);
+
+			$leftStart = $current - $left;
+
+			if ($leftStart < 1){
+				$leftStart = 1;
+			}
+
+			$rightEnd = $leftStart + $this->max_pages;
+
+			if ($rightEnd > $this->getPaginate()->last){
+				$leftStart = ($this->getPaginate()->last + 1)  - $this->max_pages;
+				$rightEnd = $this->getPaginate()->last + 1;
+			}
+
+			for ($i = $leftStart; $i < $rightEnd; $i++){
+				$pages[] = $this->getPage($i, $this->isCurrentPage($i));
+			}
+
+
+		}
+
+		return $pages;
+	}
+
+	protected function getPage($pageNumber, $isCurrent = false)
+	{
+		return [
+			'num' => $pageNumber,
+			'url' => $this->getPageLink($pageNumber),
+			'is_current' => $isCurrent,
+		];
+	}
+
+	protected function getPageGap()
+	{
+		return [
+			'num' => "...",
+			'url' => null,
+			'is_current' => false,
+		];
 	}
 
 
@@ -178,7 +244,7 @@ abstract class PaginatorUIProcessor
 
 	public function isCurrentPage($page)
 	{
-		return $this->getPaginate()->current == $page;
+		return $this->getCurrentPage() == $page;
 	}
 
 	public function getTotalItems()
