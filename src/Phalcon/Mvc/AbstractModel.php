@@ -3,6 +3,7 @@
 namespace Phalcon\Mvc;
 
 
+use Phalcon\Mvc\Model\Resultset\Advanced;
 use Phalcon\Mvc\Model\Traits\HasEagerLoading;
 use Phalcon\Mvc\Model\Traits\HasAttributes;
 use Phalcon\Mvc\Model\Traits\HasTimestamps;
@@ -134,6 +135,10 @@ abstract class AbstractModel extends Model
 		return $this;
 	}
 
+	public function getResultsetClass()
+	{
+		return Advanced::class;
+	}
 
 	protected function getRelationsToArray()
 	{
