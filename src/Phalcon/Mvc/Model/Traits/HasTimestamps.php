@@ -14,7 +14,7 @@ trait HasTimestamps
 
 	public $deleted_at_field = null;
 
-	public $timestamps_timezone = "Europe/London";
+	public $timestamps_timezone = "UTC";
 
 	public $timestamps_format = "Y-m-d H:i:s";
 
