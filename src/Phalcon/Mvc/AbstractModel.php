@@ -140,6 +140,14 @@ abstract class AbstractModel extends Model
 		return Advanced::class;
 	}
 
+
+	public function has($relationship, $condition, $cal)
+	{
+
+	}
+
+
+
 	protected function getRelationsToArray()
 	{
 
@@ -160,6 +168,75 @@ abstract class AbstractModel extends Model
 		}
 		return $results;
 
+	}
+
+	/**
+	 * @param $relationAlias
+	 * @return Relation
+	 */
+	protected function getRelation($relationAlias)
+	{
+		if (!is_string($relationAlias)){
+			return $relationAlias;
+		}
+
+		return $this->getModelsManager()->getRelationByAlias(static::class, $relationAlias);
+	}
+
+	/**
+	 * @param $relation
+	 * @return Criteria
+	 */
+	protected function newPivotQuery($relation)
+	{
+		$relation = $this->getRelation($relation);
+		$cls = $relation->getIntermediateModel();
+		$query = $cls::query()->where(
+			$this->castFieldToString($relation->getIntermediateFields()) . "= :field1:",
+			["field1" => $this->getPrimaryKeyValue($relation)]
+		);
+		return $query;
+
+	}
+
+	protected function getPrimaryKeyValue($relation)
+	{
+		$relation = $this->getRelation($relation);
+		if ($relation instanceof Relation){
+			return $this->readAttribute($this->castFieldToString($relation->getFields()));
+		}
+	}
+
+	public function getPrimaryKeyName($relation)
+	{
+		$relation = $this->getRelation($relation);
+		return $this->castFieldToString($relation->getFields());
+	}
+
+	protected function castFieldToString($field)
+	{
+		if (is_array($field)){
+			$field = $field[0];
+		}
+
+		return $field;
+	}
+
+	protected function parseIds($value)
+	{
+//		if ($value instanceof Model) {
+//			return [$value->getKey()];
+//		}
+
+//		if ($value instanceof Collection) {
+//			return $value->modelKeys();
+//		}
+
+		if ($value instanceof Collection) {
+			return $value->toArray();
+		}
+
+		return (array) $value;
 	}
 
 
