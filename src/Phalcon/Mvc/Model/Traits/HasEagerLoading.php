@@ -122,4 +122,5 @@ trait HasEagerLoading
 
         return call_user_func_array('Phalcon\Mvc\Model\EagerLoading\Loader::fromModel', $arguments);
     }
+
 }

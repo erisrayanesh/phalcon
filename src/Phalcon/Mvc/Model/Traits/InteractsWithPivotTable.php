@@ -112,19 +112,26 @@ trait InteractsWithPivotTable
 			$intRefField = $this->castFieldToString($relationship->getIntermediateReferencedFields());
 			$refField = $this->castFieldToString($relationship->getReferencedFields());
 
-			//add relation to model
-			if (!isset($this->{$alias})){
-				$this->{$alias} = $this->getRelated($alias, $arguments);
+			//load relation if is not loaded
+			if (!is_object($this->{$alias})){
+				$this->load($alias, $arguments);
 			}
 
 			//iterate through relation models to add pivots
+
+			$items = [];
 			foreach ($this->{$alias} as $item) {
 				$model = $this->newPivotQuery($relationship)
 					->andWhere($intRefField . " = :arg1:", [
 						"arg1" => $item->readAttribute($refField)
 					])->execute()->getFirst();
 				$item->writeAttribute('pivot',  $model);
+				$items[] = $item;
 			}
+
+			$this->{$alias} = $items;
+			$this->_related[$alias] = $items;
+
 		}
 
 		return $this;

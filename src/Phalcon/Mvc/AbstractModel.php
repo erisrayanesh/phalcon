@@ -3,7 +3,10 @@
 namespace Phalcon\Mvc;
 
 
+use Phalcon\Mvc\Model\Criteria;
+use Phalcon\Mvc\Model\Relation;
 use Phalcon\Mvc\Model\Resultset\Advanced;
+use Phalcon\Mvc\Model\Resultset\Simple;
 use Phalcon\Mvc\Model\Traits\HasEagerLoading;
 use Phalcon\Mvc\Model\Traits\HasAttributes;
 use Phalcon\Mvc\Model\Traits\HasTimestamps;
@@ -141,16 +144,24 @@ abstract class AbstractModel extends Model
 	}
 
 
-	public function has($relationship, $condition, $cal)
+	public function has($relationship, $condition = ">", $value = 0)
 	{
-
+		$relation = $this->getRelation($relationship);
 	}
 
 
+	protected function getRelationsAlias()
+	{
+		$relations = $this->getModelsManager()->getRelations(static::class);
+		$result = [];
+		foreach ($relations as $relation) {
+			$result[] = $relation->getOption('alias');
+		}
+		return $result;
+	}
 
 	protected function getRelationsToArray()
 	{
-
 		if (!is_array($this->_related)){
 			return [];
 		}
@@ -232,7 +243,7 @@ abstract class AbstractModel extends Model
 //			return $value->modelKeys();
 //		}
 
-		if ($value instanceof Collection) {
+		if ($value instanceof \Phalcon\Support\Collection) {
 			return $value->toArray();
 		}
 

@@ -6,6 +6,20 @@ use Phalcon\Mvc\Model\Resultset\Simple;
 
 class Advanced extends Simple
 {
+
+	protected $with = null;
+
+	protected function with($with)
+	{
+		$this->with = $with;
+		return $this;
+	}
+
+	protected function getWith()
+	{
+		return $this->with;
+	}
+
 	public function toArray($renameColumns = true)
 	{
 
@@ -22,6 +36,10 @@ class Advanced extends Simple
 		}
 
 		foreach ($this as $key => $model) {
+
+			if (!empty($this->getWith())){
+				$model->load($this->getWith());
+			}
 
 			$record = $model->toArray();
 
@@ -61,4 +79,5 @@ class Advanced extends Simple
 
 		return $renamed;
 	}
+
 }
