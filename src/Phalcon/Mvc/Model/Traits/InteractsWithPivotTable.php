@@ -2,9 +2,6 @@
 
 namespace Phalcon\Mvc\Model\Traits;
 
-
-use Phalcon\Mvc\Model\Criteria;
-use Phalcon\Mvc\Model\Query;
 use Phalcon\Mvc\Model\Relation;
 
 trait InteractsWithPivotTable
@@ -101,6 +98,7 @@ trait InteractsWithPivotTable
 			$relationAlias = [$relationAlias];
 		}
 
+
 		foreach ($relationAlias as $alias){
 
 			$relationship = $this->getRelation($alias);
@@ -113,12 +111,12 @@ trait InteractsWithPivotTable
 			$refField = $this->castFieldToString($relationship->getReferencedFields());
 
 			//load relation if is not loaded
-			if (!is_object($this->{$alias})){
-				$this->load($alias, $arguments);
+			if (!property_exists($this, $alias)){
+				$resultset = $this->getRelated($alias, $arguments);
+				$this->{$alias} = $resultset;
 			}
 
 			//iterate through relation models to add pivots
-
 			$items = [];
 			foreach ($this->{$alias} as $item) {
 				$model = $this->newPivotQuery($relationship)

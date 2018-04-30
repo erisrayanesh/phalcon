@@ -9,13 +9,13 @@ class Advanced extends Simple
 
 	protected $with = null;
 
-	protected function with($with)
+	public function with($with)
 	{
 		$this->with = $with;
 		return $this;
 	}
 
-	protected function getWith()
+	public function getWith()
 	{
 		return $this->with;
 	}
