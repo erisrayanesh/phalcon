@@ -124,6 +124,9 @@ trait InteractsWithPivotTable
 						"arg1" => $item->readAttribute($refField)
 					])->execute()->getFirst();
 				$item->writeAttribute('pivot',  $model);
+
+				//important! remove pivot key from related models
+				unset($item->_related['pivot']);
 				$items[] = $item;
 			}
 
