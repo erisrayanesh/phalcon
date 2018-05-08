@@ -103,7 +103,7 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 
 	public function first(callable $callback = null, $default = null)
 	{
-		return array_first($callback, $default);
+		return array_first($this->items, $callback, $default);
 	}
 
 	public function last(callable $callback = null, $default = null)
