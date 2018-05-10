@@ -136,7 +136,7 @@ trait HasTracker
 
 	public function isSoftDeleteTrackerEnabled()
 	{
-		$this->getDeleteByField() !== null;
+		return $this->getDeleteByField() !== null;
 	}
 
 

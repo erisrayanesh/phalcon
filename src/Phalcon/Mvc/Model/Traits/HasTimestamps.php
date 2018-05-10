@@ -126,7 +126,7 @@ trait HasTimestamps
 
 	public function isSoftDeleteTimestampEnabled()
 	{
-		$this->getDeletedAtField() !== null;
+		return $this->getDeletedAtField() !== null;
 	}
 
 
