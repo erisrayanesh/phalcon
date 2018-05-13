@@ -54,6 +54,37 @@ class Advanced extends Simple
 		return $records;
 	}
 
+	public function max($column)
+	{
+		$max = 0;
+		foreach ($this as $item) {
+			if ($item->{$column} > $item){
+				$max = $item->{$column};
+			}
+		}
+		return $max;
+	}
+
+	public function min($column)
+	{
+		$min = 0;
+		foreach ($this as $item) {
+			if ($item->{$column} < $item){
+				$min = $item->{$column};
+			}
+		}
+		return $min;
+	}
+
+	public function sum($column)
+	{
+		$sum = 0;
+		foreach ($this as $item) {
+			$sum += $item->{$column};
+		}
+		return $sum;
+	}
+
 	protected function mapColumns($record)
 	{
 		$columnMap = $this->_columnMap;
