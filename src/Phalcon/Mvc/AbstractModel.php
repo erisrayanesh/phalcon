@@ -143,6 +143,31 @@ abstract class AbstractModel extends Model
 		return Advanced::class;
 	}
 
+	public function restore()
+	{
+		if (method_exists('isSoftDeleteTimestampEnabled')){
+			if ($this->isSoftDeleteTimestampEnabled()){
+				$this->{$this->getDeletedAtField()} = null;
+			}
+		}
+
+		if (method_exists('isSoftDeleteTrackerEnabled')){
+			if ($this->isSoftDeleteTrackerEnabled()){
+				$this->{$this->getDeletedByField()} = null;
+			}
+		}
+
+		$this->save();
+	}
+
+	public function isTrashed()
+	{
+		if (method_exists('isSoftDeleteTimestampEnabled')){
+			if ($this->isSoftDeleteTimestampEnabled()){
+				return $this->{$this->getDeletedAtField()} != null;
+			}
+		}
+	}
 
 	public function has($relationship, $condition = ">", $value = 0)
 	{
