@@ -145,13 +145,13 @@ abstract class AbstractModel extends Model
 
 	public function restore()
 	{
-		if (method_exists('isSoftDeleteTimestampEnabled')){
+		if (method_exists($this,'isSoftDeleteTimestampEnabled')){
 			if ($this->isSoftDeleteTimestampEnabled()){
 				$this->{$this->getDeletedAtField()} = null;
 			}
 		}
 
-		if (method_exists('isSoftDeleteTrackerEnabled')){
+		if (method_exists($this,'isSoftDeleteTrackerEnabled')){
 			if ($this->isSoftDeleteTrackerEnabled()){
 				$this->{$this->getDeletedByField()} = null;
 			}
@@ -162,7 +162,7 @@ abstract class AbstractModel extends Model
 
 	public function isTrashed()
 	{
-		if (method_exists('isSoftDeleteTimestampEnabled')){
+		if (method_exists($this,'isSoftDeleteTimestampEnabled')){
 			if ($this->isSoftDeleteTimestampEnabled()){
 				return $this->{$this->getDeletedAtField()} != null;
 			}
