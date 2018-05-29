@@ -78,5 +78,5 @@ function request_is_pjax()
 
 function previous_request_url()
 {
-	return old("_url", "/");
+	return trim(old("_url"), '\/\\');
 }
