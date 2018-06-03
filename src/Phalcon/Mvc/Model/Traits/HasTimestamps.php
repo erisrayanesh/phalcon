@@ -62,7 +62,7 @@ trait HasTimestamps
 			);
 		}
 
-        return $this;
+		return $this;
 
 	}
 
@@ -81,7 +81,7 @@ trait HasTimestamps
 	public function setCreatedAtField($created_at_field)
 	{
 		$this->created_at_field = $created_at_field;
-        return $this;
+		return $this;
 	}
 
 	/**
@@ -115,13 +115,13 @@ trait HasTimestamps
 	public function setDeletedAtField($deleted_at_field)
 	{
 		$this->deleted_at_field = $deleted_at_field;
-        return $this;
+		return $this;
 	}
 
 	public function enableSoftDeleteTimestamp($field = 'deleted_at')
 	{
 		$this->setDeletedAtField($field ?: 'deleted_at');
-        return $this;
+		return $this;
 	}
 
 	public function isSoftDeleteTimestampEnabled()
@@ -131,9 +131,9 @@ trait HasTimestamps
 
 
 	public function withoutTrashed()
-    {
-        return " and {$this->getDeletedAtField()} = null";
-    }
+	{
+		return " and {$this->getDeletedAtField()} = null";
+	}
 
 	/**
 	 * @return string
@@ -149,7 +149,7 @@ trait HasTimestamps
 	public function setTimestampsTimezone($timestamps_timezone)
 	{
 		$this->timestamps_timezone = $timestamps_timezone;
-        return $this;
+		return $this;
 	}
 
 	/**
@@ -166,7 +166,7 @@ trait HasTimestamps
 	public function setTimestampsFormat($timestamps_format)
 	{
 		$this->timestamps_format = $timestamps_format;
-        return $this;
+		return $this;
 	}
 
 	//================================================

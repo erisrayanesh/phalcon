@@ -24,7 +24,7 @@ trait HasTracker
 
 	public $updated_by_field = "updated_by";
 
-	public $delete_by_field = "deleted_by";
+	public $deleted_by_field = null;
 
 	public function initHasTracker()
 	{
@@ -62,14 +62,14 @@ trait HasTracker
 			$this->addBehavior(
 				new SoftDelete(
 					[
-						'field' => $this->getDeleteByField(),
+						'field' => $this->getDeletedByField(),
 						'value' => $this->getUserID(),
 					]
 				)
 			);
 		}
 
-        return $this;
+		return $this;
 	}
 
 	/**
@@ -81,12 +81,13 @@ trait HasTracker
 	}
 
 	/**
-	 * @param string $created_by_field
+	 * @param $created_by_field
+	 * @return $this
 	 */
 	public function setCreatedByField($created_by_field)
 	{
 		$this->created_by_field = $created_by_field;
-        return $this;
+		return $this;
 	}
 
 	/**
@@ -98,29 +99,31 @@ trait HasTracker
 	}
 
 	/**
-	 * @param string $updated_by_field
+	 * @param $updated_by_field
+	 * @return $this
 	 */
 	public function setUpdatedByField($updated_by_field)
 	{
 		$this->updated_by_field = $updated_by_field;
-        return $this;
+		return $this;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getDeleteByField()
+	public function getDeletedByField()
 	{
-		return $this->delete_by_field;
+		return $this->deleted_by_field;
 	}
 
 	/**
-	 * @param string $delete_by_field
+	 * @param $deleted_by_field
+	 * @return $this
 	 */
-	public function setDeleteByField($delete_by_field)
+	public function setDeletedByField($deleted_by_field)
 	{
-		$this->delete_by_field = $delete_by_field;
-        return $this;
+		$this->deleted_by_field = $deleted_by_field;
+		return $this;
 	}
 
 	public function getUserID()
@@ -130,13 +133,13 @@ trait HasTracker
 
 	public function enableSoftDeleteTracker($field = 'deleted_by')
 	{
-		$this->setDeleteByField($field ?: 'deleted_by');
-        return $this;
+		$this->setDeletedByField($field ?: 'deleted_by');
+		return $this;
 	}
 
 	public function isSoftDeleteTrackerEnabled()
 	{
-		return $this->getDeleteByField() !== null;
+		return $this->getDeletedByField() !== null;
 	}
 
 
