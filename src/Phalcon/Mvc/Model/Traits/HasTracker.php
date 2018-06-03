@@ -130,7 +130,7 @@ trait HasTracker
 
 	public function enableSoftDeleteTracker($field = 'deleted_by')
 	{
-		$this->getDeleteByField($field ?: 'deleted_by');
+		$this->setDeleteByField($field ?: 'deleted_by');
         return $this;
 	}
 
