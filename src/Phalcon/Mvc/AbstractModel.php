@@ -167,6 +167,7 @@ abstract class AbstractModel extends Model
 				return $this->{$this->getDeletedAtField()} != null;
 			}
 		}
+		return false;
 	}
 
 	public function has($relationship, $condition = ">", $value = 0)
