@@ -286,7 +286,7 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 
 	public function count()
 	{
-		return $this->count($this->items);
+		return count($this->items);
 	}
 
 	public function getIterator()
