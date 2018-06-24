@@ -142,6 +142,7 @@ class Locale extends Component
 			$locale = $this->request->getBestLanguage();
 		}
 
+		//check locale again because getBestLanguage may return undefined locale
 		if (!$this->languageExists($locale)){
 			return;
 		}
