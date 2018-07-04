@@ -85,6 +85,11 @@ class Advanced extends Simple
 		return $sum;
 	}
 
+	public function pluck($value, $key = null)
+	{
+		return array_pluck($this->toArray(),$value, $key);
+	}
+
 	protected function mapColumns($record)
 	{
 		$columnMap = $this->_columnMap;
