@@ -134,7 +134,13 @@ final class EagerLoad
                 $builder->inWhere("[{$relReferencedField}]", array_keys($bindValues));
             }
         } else {
-            $builder->inWhere("[{$relReferencedField}]", $bindValues);
+        	// To synchronize the query with the ModelManager::getRelationRecords,
+			// if the $bindValues has only one item, then use andWhere instead of inWhere
+			if (count($bindValues) == 1){
+				$builder->andWhere("[" . $relReferencedModel . "].[" . $relReferencedField . "] = :APR0:", ["APR0" => $bindValues[0]]);
+			} else {
+				$builder->inWhere("[{$relReferencedField}]", $bindValues);
+			}
         }
 
 		if (isset($options['params'])){
