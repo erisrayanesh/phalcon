@@ -141,7 +141,7 @@ if (! function_exists('class_basename')) {
 /**
  * @param $controller
  * @param array $options
- * @return \Phalcon\Mvc\Router\GroupRecuresive
+ * @return \Phalcon\Mvc\Router\GroupRecursive
  */
 function resourceRoute($controller, array $options = [])
 {

@@ -3,7 +3,7 @@
 namespace Phalcon\Mvc\Router;
 
 
-class GroupRecuresive extends Group
+class GroupRecursive extends Group
 {
 
 	/**
@@ -20,13 +20,11 @@ class GroupRecuresive extends Group
 		parent::__construct($paths);
 	}
 
-	public function addGroup(GroupRecuresive $group)
+	public function addGroup(GroupRecursive $group)
 	{
 		$module = $this->getModule();
 		$namespace = $this->getNamespace();
-
 		foreach ($group->getRoutes() as $route){
-
 			$paths = $route->getPaths();
 
 			if ($module != null && array_get($paths, 'module') == null){
@@ -37,13 +35,11 @@ class GroupRecuresive extends Group
 				$paths['namespace'] = $namespace;
 			}
 
-//			$route instanceof Route;
 			$route->reConfigure($this->getPrefix() . $route->getPattern(), $paths);
-			$route->setName($this->getName().$group->getName().$route->getName());
 			$this->_routes[] = $route;
 		}
-	}
 
+	}
 
 	/**
 	 * @return string
@@ -71,5 +67,15 @@ class GroupRecuresive extends Group
 	{
 		return array_get($this->getPaths(), 'namespace', null);
 	}
+
+	public function getRoutes()
+	{
+		$routes = parent::getRoutes();
+		foreach ($routes as $route) {
+			$route->setName($this->getName().$route->getName());
+		}
+		return $routes;
+	}
+
 
 }
