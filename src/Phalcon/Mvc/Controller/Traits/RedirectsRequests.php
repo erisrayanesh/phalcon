@@ -63,12 +63,12 @@ trait RedirectsRequests
 
 	protected function redirectDeletedSuccess($url = null)
 	{
-		return $this->redirectDelete(["success", ucfirst($this->getRedirectMessage("delete_success"))], $url);
+		return $this->redirectDelete(["success" => ucfirst($this->getRedirectMessage("delete_success"))], $url);
 	}
 
 	protected function redirectDeleteFailed($url = null)
 	{
-		return $this->redirectDelete(["error", ucfirst($this->getRedirectMessage("delete_failed"))], $url);
+		return $this->redirectDelete(["error" => ucfirst($this->getRedirectMessage("delete_failed"))], $url);
 	}
 
 	//Redirect on Not found
@@ -109,6 +109,5 @@ trait RedirectsRequests
 	{
 		return "";
 	}
-
 
 }
