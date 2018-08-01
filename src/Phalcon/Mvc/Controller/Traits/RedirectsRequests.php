@@ -57,9 +57,8 @@ trait RedirectsRequests
 
 	protected function redirectDelete($messages = null, $url = null)
 	{
-		$redirect = redirect(is_null($url)? $this->getControllerRoute() : $url);
-		redirect($redirect, $messages);
-		return $redirect;
+		$redirect = is_null($url)? $this->getControllerRoute() : $url;
+		return redirect($redirect, $messages);
 	}
 
 	protected function redirectDeletedSuccess($url = null)
