@@ -149,6 +149,9 @@ final class EagerLoad
 				$bind = isset($params['bind'])? $params['bind'] : null;
 				$builder->where($params['conditions'], $bind);
 			}
+			if (isset($params['order'])) {
+				$builder->orderBy($params['order']);
+			}
 		}
 
         if ($this->constraints) {
