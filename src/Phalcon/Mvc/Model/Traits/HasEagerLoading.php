@@ -76,12 +76,18 @@ trait HasEagerLoading
             $lastArg    = $numArgs - 1;
             $parameters = null;
 
-            if ($numArgs >= 2 && is_array($arguments[$lastArg])) {
+//            if ($numArgs >= 2 && is_array($arguments[$lastArg])) {
+            if ($numArgs >= 2) {
                 $parameters = $arguments[$lastArg];
 
                 unset($arguments[$lastArg]);
 
-                if (isset($parameters['columns'])) {
+                if (is_callable($parameters)){
+                	$parameters = call_user_func($parameters);
+				}
+
+//                if (isset($parameters['columns'])) {
+                if (is_array($parameters) && isset($parameters['columns'])) {
                     throw new \LogicException('Results from database must be full models, do not use `columns` key');
                 }
             }
