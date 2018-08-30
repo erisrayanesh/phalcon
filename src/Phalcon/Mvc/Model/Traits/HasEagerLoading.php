@@ -32,23 +32,7 @@ trait HasEagerLoading
     {
         $arguments = func_get_args();
 
-        if (!empty($arguments)) {
-            $numArgs    = count($arguments);
-            $lastArg    = $numArgs - 1;
-            $parameters = null;
-
-            if ($numArgs >= 2 && is_array($arguments[$lastArg])) {
-                $parameters = $arguments[$lastArg];
-
-                unset($arguments[$lastArg]);
-
-                if (isset($parameters['columns'])) {
-                    throw new \LogicException('Results from database must be full models, do not use `columns` key');
-                }
-            }
-        } else {
-            throw new \BadMethodCallException(sprintf('%s requires at least one argument', __METHOD__));
-        }
+        $parameters = static::prepareParameters($arguments);
 
         $ret = static::find($parameters);
 
@@ -71,29 +55,7 @@ trait HasEagerLoading
     {
         $arguments = func_get_args();
 
-        if (!empty($arguments)) {
-            $numArgs    = count($arguments);
-            $lastArg    = $numArgs - 1;
-            $parameters = null;
-
-//            if ($numArgs >= 2 && is_array($arguments[$lastArg])) {
-            if ($numArgs >= 2) {
-                $parameters = $arguments[$lastArg];
-
-                unset($arguments[$lastArg]);
-
-                if (is_callable($parameters)){
-                	$parameters = call_user_func($parameters);
-				}
-
-//                if (isset($parameters['columns'])) {
-                if (is_array($parameters) && isset($parameters['columns'])) {
-                    throw new \LogicException('Results from database must be full models, do not use `columns` key');
-                }
-            }
-        } else {
-            throw new \BadMethodCallException(sprintf('%s requires at least one argument', __METHOD__));
-        }
+        $parameters = static::prepareParameters($arguments);
 
         if ($ret = static::findFirst($parameters)) {
             array_unshift($arguments, $ret);
@@ -128,5 +90,35 @@ trait HasEagerLoading
 
         return call_user_func_array('Phalcon\Mvc\Model\EagerLoading\Loader::fromModel', $arguments);
     }
+
+    private static function prepareParameters ($arguments)
+	{
+		$parameters = null;
+
+		if (!empty($arguments)) {
+			$numArgs    = count($arguments);
+			$lastArg    = $numArgs - 1;
+
+//            if ($numArgs >= 2 && is_array($arguments[$lastArg])) {
+			if ($numArgs >= 2) {
+				$parameters = $arguments[$lastArg];
+
+				unset($arguments[$lastArg]);
+
+				if (is_callable($parameters)){
+					$parameters = call_user_func($parameters);
+				}
+
+//                if (isset($parameters['columns'])) {
+				if (is_array($parameters) && isset($parameters['columns'])) {
+					throw new \LogicException('Results from database must be full models, do not use `columns` key');
+				}
+			}
+		} else {
+			throw new \BadMethodCallException(sprintf('%s requires at least one argument', __METHOD__));
+		}
+
+		return $parameters;
+	}
 
 }
