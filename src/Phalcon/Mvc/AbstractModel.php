@@ -77,13 +77,6 @@ abstract class AbstractModel extends Model
 		return $arr;
 	}
 
-	public static function whereIn($arr)
-	{
-		return implode(',', array_map(function($value){
-			return is_string($value)? "'$value'" : $value;
-		}, $arr));
-	}
-
 	/**
 	 * @return array
 	 */
