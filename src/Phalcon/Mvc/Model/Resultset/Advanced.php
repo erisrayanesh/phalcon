@@ -87,7 +87,7 @@ class Advanced extends Simple
 
 	public function pluck($value, $key = null)
 	{
-		return array_pluck($this->toArray(),$value, $key);
+		return collect(array_pluck($this->toArray(), $value, $key));
 	}
 
 	protected function mapColumns($record)
