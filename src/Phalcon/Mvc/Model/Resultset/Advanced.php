@@ -86,7 +86,7 @@ class Advanced extends Resultset
 				 * Set records as dirty state PERSISTENT by default
 				 * Performs the standard hydration based on objects
 				 */
-				if (globals_get("orm.late_state_binding")) {
+				if (ini_get("orm.late_state_binding")) {
 
 					if ($this->_model instanceof \Phalcon\Mvc\Model) {
 						$modelName = get_class($this->_model);
@@ -94,9 +94,9 @@ class Advanced extends Resultset
 						$modelName = "Phalcon\\Mvc\\Model";
 					}
 
-					$activeRow = $modelName::cloneResultMap($this->_model, row, columnMap, Model::DIRTY_STATE_PERSISTENT, $this->_keepSnapshots);
+					$activeRow = $modelName::cloneResultMap($this->_model, $row, $columnMap, Model::DIRTY_STATE_PERSISTENT, $this->_keepSnapshots);
 				} else {
-					$activeRow = Model::cloneResultMap($this->_model, row, columnMap, Model::DIRTY_STATE_PERSISTENT, $this->_keepSnapshots);
+					$activeRow = Model::cloneResultMap($this->_model, $row, $columnMap, Model::DIRTY_STATE_PERSISTENT, $this->_keepSnapshots);
 				}
 				break;
 

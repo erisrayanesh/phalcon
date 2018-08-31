@@ -1,6 +1,7 @@
 <?php namespace Phalcon\Mvc\Model\EagerLoading;
 
 use Phalcon\Di;
+use Phalcon\Mvc\Model\ResultsetInterface;
 use Phalcon\Mvc\ModelInterface;
 use Phalcon\Mvc\Model\Relation;
 use Phalcon\Mvc\Model\Resultset\Simple;
@@ -154,7 +155,7 @@ MSG;
      * @param mixed ...$arguments
      * @return Simple
      */
-    public static function fromResultset(Simple $subject)
+    public static function fromResultset(ResultsetInterface $subject)
     {
         $reflection = new \ReflectionClass(__CLASS__);
         $instance   = $reflection->newInstanceArgs(func_get_args());
