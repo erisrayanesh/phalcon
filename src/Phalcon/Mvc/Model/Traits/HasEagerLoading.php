@@ -66,6 +66,15 @@ trait HasEagerLoading
         return $ret;
     }
 
+	public static function findFirstWithOrFail()
+	{
+		$retVal = static::findFirstWith(func_get_args());
+		if (!empty($retVal)){
+			return $retVal;
+		}
+		throw new ModelNotFoundException();
+	}
+
     /**
      * <code>
      * <?php

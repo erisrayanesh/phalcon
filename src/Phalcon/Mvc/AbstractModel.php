@@ -3,7 +3,11 @@
 namespace Phalcon\Mvc;
 
 
+use Phalcon\Di;
+use Phalcon\DiInterface;
 use Phalcon\Mvc\Model\Criteria;
+use Phalcon\Mvc\Model\CriteriaBuilder;
+use Phalcon\Mvc\Model\Exceptions\ModelNotFoundException;
 use Phalcon\Mvc\Model\Relation;
 use Phalcon\Mvc\Model\Resultset\Advanced;
 use Phalcon\Mvc\Model\Resultset\Simple;
@@ -50,6 +54,41 @@ abstract class AbstractModel extends Model
 		}
 
 		$this->initialized();
+	}
+
+	public static function findFirstOrFail($parameters = null)
+	{
+		$retVal = static::findFirst($parameters);
+		if (!empty($retVal)){
+			return $retVal;
+		}
+		throw new ModelNotFoundException();
+	}
+
+	public static function query(DiInterface $dependencyInjector = null)
+	{
+		$criteria = null;
+
+		/**
+		 * Use the global dependency injector if there is no one defined
+		 */
+		if (!$dependencyInjector instanceof DiInterface) {
+			$dependencyInjector = Di::getDefault();
+		}
+
+		/**
+		 * Gets Criteria instance from DI container
+		 */
+		if ($dependencyInjector instanceof DiInterface) {
+			$criteria = $dependencyInjector->get("Phalcon\\Mvc\\Model\\CriteriaBuilder");
+		} else {
+			$criteria = new CriteriaBuilder();
+			$criteria->setDI($dependencyInjector);
+		}
+
+		$criteria->setModelName(get_called_class());
+
+		return $criteria;
 	}
 
 	public function toArray($columns = null)
