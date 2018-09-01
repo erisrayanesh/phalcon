@@ -33,7 +33,7 @@ MSG;
         $arguments = array_slice(func_get_args(), 1);
 
         if (!$from instanceof ModelInterface) {
-            if (!$from instanceof Simple) {
+            if (!$from instanceof ResultsetInterface) {
                 if (($fromType = gettype($from)) !== 'array') {
                     if (null !== $from && $fromType !== 'boolean') {
                         $error = true;
