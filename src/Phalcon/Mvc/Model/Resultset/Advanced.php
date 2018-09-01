@@ -108,6 +108,10 @@ class Advanced extends Resultset
 				break;
 		}
 
+		if ($activeRow instanceof \Phalcon\Mvc\Model && !empty($this->getWith())){
+			$activeRow->load($this->getWith());
+		}
+
 		$this->_activeRow = $activeRow;
 
 		return $activeRow;
@@ -169,9 +173,9 @@ class Advanced extends Resultset
 	public function toArray($renameColumns = true)
 	{
 
-		$records = $this->_rows;
+		$records = [];
 
-		if (!is_array($records)) {
+		if (!is_array($this->_rows)) {
 			$result = $this->_result;
 			if ($this->_row !== null) {
 				// re-execute query if required and fetchAll rows

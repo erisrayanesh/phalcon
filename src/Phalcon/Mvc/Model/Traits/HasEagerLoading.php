@@ -95,6 +95,10 @@ trait HasEagerLoading
     {
         $arguments = func_get_args();
 
+        if (empty($arguments)){
+        	$this;
+		}
+
         array_unshift($arguments, $this);
 
         return call_user_func_array('Phalcon\Mvc\Model\EagerLoading\Loader::fromModel', $arguments);
