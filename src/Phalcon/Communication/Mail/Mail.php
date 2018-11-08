@@ -108,7 +108,8 @@ class Mail extends Component
                     $mailSettings->smtp->security
                 )
                 ->setUsername($mailSettings->smtp->username)
-                ->setPassword($mailSettings->smtp->password);
+                ->setPassword($mailSettings->smtp->password)
+				->setStreamOptions($mailSettings->smtp->ssl);
             }
 
             // Create the Mailer using your created Transport
