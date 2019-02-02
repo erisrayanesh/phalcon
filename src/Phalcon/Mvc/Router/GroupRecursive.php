@@ -11,18 +11,22 @@ class GroupRecursive extends Group
 	 */
 	protected $name = '';
 
-	public function __construct($paths = null, \Closure $closure = null)
+	public static function make($paths = null, \Closure $closure = null)
+	{
+		$group = new static($paths);
+		if (!is_null($closure)){
+			$closure($group);
+		}
+		return $group;
+	}
+
+	public function __construct($paths = null)
 	{
 		if (is_array($paths)){
 			$this->setName(array_pull($paths, "name", ''));
 			$this->setPrefix(array_pull($paths, "prefix", ''));
 		}
 		parent::__construct($paths);
-
-		if (!is_null($closure)){
-			$closure($this);
-		}
-
 	}
 
 	public function addGroup(GroupRecursive $group)
