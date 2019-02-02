@@ -23,6 +23,9 @@
         "ext-phalcon": "~3.2",
         "league/flysystem": "1.*"
     },
+    "require-dev": {
+        "filp/whoops": "^2.1",
+    },
     "autoload": {
         "files": [
             "src/Phalcon/Support/Helpers.php"
