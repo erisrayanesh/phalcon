@@ -1,15 +1,13 @@
 <?php
 
-function dd($var)
-{
-	array_map(function ($x) {
-//		$string = (new \Phalcon\Debug\Dump(null, true))->variable($x);
-//
-//		echo (PHP_SAPI == 'cli' ? strip_tags($string) . PHP_EOL : $string);
-		dump($x);
-	}, func_get_args());
-
-	die(1);
+if (!function_exists('dd')){
+	function dd($var)
+	{
+		array_map(function ($x) {
+			dump($x);
+		}, func_get_args());
+		die(1);
+	}
 }
 
 function flash_error($errorKey = null, $error = null)
