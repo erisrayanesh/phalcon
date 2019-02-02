@@ -24,7 +24,7 @@
         "league/flysystem": "1.*"
     },
     "require-dev": {
-        "filp/whoops": "^2.1",
+        "filp/whoops": "^2.1"
     },
     "autoload": {
         "files": [
