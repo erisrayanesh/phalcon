@@ -29,6 +29,11 @@ class GroupRecursive extends Group
 		parent::__construct($paths);
 	}
 
+	public function group($paths = null, \Closure $closure = null)
+	{
+		$this->addGroup(self::make($paths, $closure));
+	}
+
 	public function addGroup(GroupRecursive $group)
 	{
 		$module = $this->getModule();

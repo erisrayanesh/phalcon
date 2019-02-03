@@ -72,7 +72,7 @@ trait ExceptionHandler
 			$handler = new \Whoops\Handler\PrettyPageHandler();
 			$handler->handleUnconditionally(true);
 			$handler->addDataTable('Application (Request)', array(
-				'URI'         => request()->getScheme().'://' . request()->getServer('HTTP_HOST') . request()->server('REQUEST_URI'),
+				'URI'         => request()->getScheme().'://' . request()->getServer('HTTP_HOST') . request()->getServer('REQUEST_URI'),
 				'Request URI' => request()->getServer('REQUEST_URI'),
 				'Path Info'   => request()->getServer('PATH_INFO'),
 				'HTTP Method' => request()->getMethod(),
