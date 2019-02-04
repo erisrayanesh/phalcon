@@ -22,7 +22,6 @@ class AuthManager extends Component
 
 	}
 
-
 	public function guard($name = null)
 	{
 		$name = $name ?: $this->getDefaultDriver();

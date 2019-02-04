@@ -2,16 +2,21 @@
 
 namespace Phalcon\Auth;
 
+use Phalcon\Auth\Access\AuthorizationException;
+
 class Access
 {
 
 	protected $abilities = [];
 
-	protected $user;
+	/**
+	 * @var callable
+	 */
+	protected $userResolver;
 
-	public function __construct($user, $abilities = [])
+	public function __construct(callable $userResolver, $abilities = [])
 	{
-		$this->user = $user;
+		$this->userResolver = $userResolver;
 		$this->abilities = $abilities;
 	}
 
@@ -43,13 +48,15 @@ class Access
 		return !$this->allows($ability, $arguments);
 	}
 
-	public function check($ability, $arguments = [])
+	public function check($abilities, $arguments = [])
 	{
-		try {
-			return (bool) $this->find($ability, $arguments);
-		} catch (AuthorizationException $e) {
-			return false;
-		}
+		return collect($abilities)->every(function ($ability) use ($arguments){
+			try {
+				return (bool) $this->find($ability, $arguments);
+			} catch (AuthorizationException $e) {
+				return false;
+			}
+		});
 	}
 
 	public function authorize($ability, $arguments = [])
@@ -65,19 +72,21 @@ class Access
 
 	public function forUser($user)
 	{
-		return new static($user, $this->abilities);
+		$callback = function () use ($user) {
+			return $user;
+		};
+
+		return new static($callback, $this->abilities);
 	}
 
-	public function getUser()
+	public function getUserResolver()
 	{
-		return $this->user;
+		return $this->userResolver;
 	}
 
 	protected function find($ability, $arguments = [])
 	{
-		if (!$user = $this->getUser()){
-			return false;
-		}
+		$user = $this->resolveUser();
 
 		$arguments = !is_array($arguments) ? [$arguments] : $arguments;
 
@@ -85,7 +94,7 @@ class Access
 			return false;
 		};
 
-		if (isset($this->abilities[$ability])) {
+		if ($this->has($ability)) {
 			$callback = $this->abilities[$ability];
 		}
 
@@ -101,5 +110,9 @@ class Access
 		};
 	}
 
+	protected function resolveUser()
+	{
+		return call_user_func($this->userResolver);
+	}
 
 }

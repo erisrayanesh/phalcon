@@ -14,9 +14,9 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 	 * Collection constructor.
 	 * @param array $items
 	 */
-	public function __construct(array $items = [])
+	public function __construct($items = [])
 	{
-		$this->items = $items;
+		$this->items = $this->getArrayableItems($items);
 	}
 
 	public function has($key)
@@ -243,6 +243,23 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 		return $this;
 	}
 
+	public function every($key, $operator = null, $value = null)
+	{
+		if (func_num_args() === 1) {
+			$callback = $this->valueRetriever($key);
+
+			foreach ($this->items as $k => $v) {
+				if (! $callback($v, $k)) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		return $this->every($this->operatorForWhere(...func_get_args()));
+	}
+
 	function jsonSerialize()
 	{
 		return array_map(function ($value) {
@@ -260,7 +277,7 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 	public function toArray()
 	{
 		return array_map(function ($value) {
-			return $this->getArrayable($value);
+			return $this->getArrayableItems($value);
 		}, $this->items);
 	}
 
@@ -355,6 +372,17 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 		return ! is_string($value) && is_callable($value);
 	}
 
+	protected function valueRetriever($value)
+	{
+		if ($this->useAsCallable($value)) {
+			return $value;
+		}
+
+		return function ($item) use ($value) {
+			return data_get($item, $value);
+		};
+	}
+
 	protected function operatorForWhere($key, $operator, $value = null)
 	{
 		if (func_num_args() == 2) {
@@ -385,7 +413,7 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 		};
 	}
 
-	protected function getArrayable($value)
+	protected function getArrayableItems($value)
 	{
 		if (is_array($value)) {
 			return $value;
@@ -401,12 +429,7 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 			return iterator_to_array($value);
 		}
 
-		return $value;
-	}
-
-	protected function getArrayableItems($items)
-	{
-		return (array) $this->getArrayable($items);
+		return (array) $value;
 	}
 
 }

@@ -8,5 +8,5 @@ use Phalcon\Mvc\Model\Traits\Authorizable as ModelAuthorizable;
 
 class User extends AbstractModel implements Authenticatable, Authorizable
 {
-	use ModelAuthorizable, ModelAuthenticatable;
+	use ModelAuthenticatable, ModelAuthorizable;
 }

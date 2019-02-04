@@ -28,8 +28,9 @@ abstract class AbstractModel extends Model
 
 	protected $guarded = [];
 
-	protected $timestamps = true;
-	protected $tracker = true;
+	public $timestamps = true;
+
+	public $tracker = true;
 
 	public function initializing()
 	{

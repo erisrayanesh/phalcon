@@ -3,66 +3,106 @@
 namespace Phalcon\Auth\UserResolvers;
 
 use Phalcon\Auth\Authenticatable;
+use Phalcon\Mvc\Model;
+use Phalcon\Support\Interfaces\Arrayable;
 
 class ModelResolver implements UserResolver
 {
+
+	/**
+	 * @var Model
+	 */
+	protected $model;
+
+	public function __construct(Model $model)
+	{
+		$this->model = $model;
+	}
+
 	public function findById($identifier)
 	{
-		// TODO: Implement findById() method.
+		$model = $this->createModel();
+		$method = "findFirstBy" . camelize($model->getAuthIdentifierName());
+		return $model->{$method}($identifier);
 	}
 
 	public function findByToken($identifier, $token)
 	{
-		// TODO: Implement findByToken() method.
+		$model = $this->findById($identifier);
+
+		if (!$model) {
+			return null;
+		}
+
+		$rememberToken = $model->getRememberToken();
+
+		return $rememberToken && hash_equals($rememberToken, $token) ? $model : null;
 	}
 
 	public function updateRememberToken(Authenticatable $user, $token)
 	{
-		// TODO: Implement updateRememberToken() method.
+		$user->setRememberToken($token);
+
+		$timestamps = $user->timestamps;
+
+		$user->timestamps = false;
+
+		$user->save();
+
+		$user->timestamps = $timestamps;
 	}
 
 	public function findByCredentials(array $credentials)
 	{
-		// TODO: Implement findByCredentials() method.
+		if (empty($credentials) || (count($credentials) === 1 && array_key_exists('password', $credentials))) {
+			return;
+		}
+
+		$class = $this->getClearedModelName();
+		$query = $class::query();
+
+		foreach ($credentials as $key => $value) {
+			if (str_contains('password', $key)) {
+				continue;
+			}
+
+			if (is_array($value) || $value instanceof Arrayable) {
+				$query->whereIn($key, $value->toArray());
+			} else {
+				$query->where("$key = :$key:", [$key => $value]);
+			}
+		}
+
+		return $query->execute()->getFirst();
 	}
 
 	public function validateCredentials(Authenticatable $user, array $credentials)
 	{
-		// TODO: Implement validateCredentials() method.
+		$plain = $credentials['password'];
+		return security()->checkHash($plain, $user->getAuthPassword());
 	}
 
-
-	/**
-	 * @return string
-	 */
-	public function getUserModel()
+	public function getModel()
 	{
-		return $this->userModel;
+		return $this->model;
 	}
 
-	/**
-	 * @param string $userModel
-	 * @return Auth
-	 */
-	public function setUserModel($userModel)
+	public function setModel($model)
 	{
-		$this->userModel = $userModel;
+		$this->model = $model;
+
 		return $this;
 	}
 
-	public function findUserById($id)
+	public function getClearedModelName()
 	{
-		$instance = $this->getUserInstance();
-		$method = "findFirstBy" . camelize($this->getIdentityKey());
-		return $instance->{$method}($id);
+		return '\\'.ltrim($this->model, '\\');
 	}
 
-	public function findUserByUsername($username)
+	public function createModel()
 	{
-		$instance = $this->getUserInstance();
-		$method = "findFirstBy" . camelize($this->getUsernameKey());
-		return $instance->{$method}($username);
+		$class = $this->getClearedModelName();
+		return new $class;
 	}
-
 
 }
