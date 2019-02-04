@@ -1,8 +1,8 @@
 <?php
 
-namespace Phalcon\Auth\Access;
+namespace Phalcon\Auth;
 
-class Guard
+class Access
 {
 
 	protected $abilities = [];

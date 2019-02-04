@@ -43,8 +43,9 @@ class Bootstrap
      * Bootstrap constructor.
      *
      * @param $applicationPath
+	 * @param array $providers
      */
-    public function __construct($applicationPath, Config $config, array $providers = [])
+    public function __construct($applicationPath, array $providers = [])
     {
         if (!is_dir($applicationPath)) {
             throw new \InvalidArgumentException('The $applicationPath must be a valid application path');
@@ -53,20 +54,12 @@ class Bootstrap
         $this->di = new Di();
         $this->appPath = $applicationPath;
 
-        if (count($providers) == 0){
-			$providers = $config->application->providers->toArray() ?: [];
-		}
         $this->providers = $providers;
 
         $this->di->setShared('bootstrap', $this);
         Di::setDefault($this->di);
 
-        $this->di->setShared('config', $config);
-
 		$this->loader = new Loader();
-
-//		$this->setExceptionHandler(ExceptionHandler::class);
-
     }
 
     /**
@@ -113,16 +106,6 @@ class Bootstrap
         return $this->handleRequest();
     }
 
-    /**
-     * Get application output.
-     *
-     * @return ResponseInterface
-     */
-    protected function handleRequest()
-    {
-		return $this->app->handle();
-    }
-
     protected function initLoader()
 	{
 		$this->loader->register();
@@ -164,5 +147,15 @@ class Bootstrap
 	{
 		$this->app = new Application($this->di);
 		$this->app->setEventsManager($this->di->getShared('eventsManager'));
+	}
+
+	/**
+	 * Get application output.
+	 *
+	 * @return ResponseInterface
+	 */
+	protected function handleRequest()
+	{
+		return $this->app->handle();
 	}
 }

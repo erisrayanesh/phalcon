@@ -26,15 +26,41 @@ class FileSystemManager extends Component
 		return $this->adapters;
 	}
 
+	public function setAdapters(array $adapters)
+	{
+		$this->adapters = $adapters;
+		return $this;
+	}
+
 	/**
 	 * @param string $key
 	 * @param $adapter
 	 * @return FileSystemManager
 	 */
-	public function addAdapter($key, AdapterInterface $adapter)
+	public function addAdapter($key, $adapter)
 	{
 		$this->adapters[$key] = $adapter;
 		return $this;
+	}
+
+	public function getAdapter($key = null)
+	{
+		if (!empty($key) && isset($this->adapters[$key])){
+			return $this->adapters[$key];
+		}
+
+		return null;
+	}
+
+	public function resolveAdapter($key)
+	{
+		$adapter = $this->getAdapter($key);
+
+		if ($adapter instanceof \Closure){
+			$this->adapters[$key] = $adapter;
+		}
+
+		return $adapter;
 	}
 
 	/**
@@ -43,19 +69,7 @@ class FileSystemManager extends Component
 	 */
 	public function get($key = null)
 	{
-		if (!empty($key) && isset($this->adapters[$key])){
-			$adapter = $this->adapters[$key];
-		}
-
-		if (isset($this->adapters[$this->getDefault()])){
-			$adapter = $this->adapters[$this->getDefault()];
-		}
-
-		if (!empty($adapter)){
-			return new BaseFileSystem($adapter);
-		}
-
-		return null;
+		return $this->resolveAdapter($key);
 	}
 
 	/**
@@ -84,11 +98,8 @@ class FileSystemManager extends Component
 			return call_user_func_array([$default, $name], $arguments);
 		}
 
-		foreach ($this->getAdapters() as $adapter) {
-			return call_user_func_array([$adapter, $name], $arguments);
-		}
+		throw new \RuntimeException("Method $name does not exist in {$this->getDefault()} file system driver");
 	}
-
 
 	/**
 	 * @return string

@@ -20,8 +20,6 @@ trait ThrottlesLogins
 
 	protected  function registerFailedLogin($user_id)
 	{
-		security()->hash(rand());
-
 		$this->createLoginAttempt(request()->getClientAddress(), request()->getUserAgent(), $user_id);
 	}
 
@@ -29,8 +27,6 @@ trait ThrottlesLogins
 	{
 		$this->createLoginAttempt(request()->getClientAddress(), request()->getUserAgent(), $user_id, true);
 	}
-
-
 
 	protected function getFailedLoginAttemptsCount($credentials, $ip)
 	{

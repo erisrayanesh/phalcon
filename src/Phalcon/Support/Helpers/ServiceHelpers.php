@@ -83,6 +83,14 @@ function request()
 }
 
 /**
+ * @return \Phalcon\Http\Response\Cookies
+ */
+function cookies()
+{
+	return DI()->get("cookies");
+}
+
+/**
  * @return \Phalcon\Http\Response
  */
 function response()

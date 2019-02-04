@@ -58,7 +58,7 @@ trait ExceptionHandler
 
 	protected function renderUnhandledException(\Exception $exception)
 	{
-		(config('debug')?
+		($this->isDebugMode()?
 			$this->renderExceptionWithWhoops($exception) :
 			$this->renderFriendlyError($exception))->send();
 	}
@@ -100,5 +100,10 @@ trait ExceptionHandler
 			$response->setContent("Whoops! Something went wrong");
 		}
 		return $response;
+	}
+
+	protected function isDebugMode()
+	{
+		return true;
 	}
 }
