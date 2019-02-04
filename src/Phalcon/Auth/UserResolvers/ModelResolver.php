@@ -1,6 +1,6 @@
 <?php
 
-namespace Phalcon\Auth\Providers;
+namespace Phalcon\Auth\UserResolvers;
 
 use Phalcon\Auth\Authenticatable;
 
