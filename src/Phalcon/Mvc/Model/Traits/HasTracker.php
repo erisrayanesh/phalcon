@@ -20,6 +20,8 @@ trait HasTracker
 	//ALTER TABLE `projects` ADD `created_by` INT UNSIGNED NOT NULL AFTER `created_at`, ADD `updated_by` INT UNSIGNED NOT NULL AFTER `updated_at`, ADD `deleted_by` INT UNSIGNED NOT NULL AFTER `deleted_at`;
 	//ALTER TABLE `projects` ADD FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE, ADD FOREIGN KEY (`updated_by`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE, ADD FOREIGN KEY (`deleted_by`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
+	public $tracker = true;
+
 	public $created_by_field = "created_by";
 
 	public $updated_by_field = "updated_by";

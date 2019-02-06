@@ -8,6 +8,8 @@ use Phalcon\Mvc\Model\Behavior\SoftDelete;
 
 trait HasTimestamps
 {
+	public $timestamps = true;
+
 	public $created_at_field = "created_at";
 
 	public $updated_at_field = "updated_at";
