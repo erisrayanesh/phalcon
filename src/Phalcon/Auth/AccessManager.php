@@ -2,9 +2,10 @@
 
 namespace Phalcon\Auth;
 
-use Phalcon\Auth\Access\AuthorizationException;
+use Phalcon\Mvc\User\Component;
+use Phalcon\Auth\AuthorizationException;
 
-class Access
+class AccessManager extends Component
 {
 
 	protected $abilities = [];

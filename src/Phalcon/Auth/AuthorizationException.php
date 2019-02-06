@@ -1,6 +1,6 @@
 <?php
 
-namespace Phalcon\Auth\Access;
+namespace Phalcon\Auth;
 
 class AuthorizationException extends \Exception
 {

@@ -10,9 +10,18 @@ function DI()
  * @param null $default
  * @return \Phalcon\Config|mixed
  */
-function config($name, $default = null)
+function config()
 {
-	return DI()->getConfig()->path($name, $default);
+	$args = func_get_args();
+	$config = DI()->getConfig();
+
+	if (empty($args)) {
+		return $config;
+	}
+
+	return call_user_func_array([$config, 'path'], $args);
+
+//	return DI()->getConfig()->path($name, $default);
 //    return DI()->getConfig()->get($name, $default);
 }
 
@@ -88,6 +97,14 @@ function request()
 function cookies()
 {
 	return DI()->get("cookies");
+}
+
+/**
+ * @return \Phalcon\Auth\AccessManager
+ */
+function access()
+{
+	return DI()->get("access");
 }
 
 /**

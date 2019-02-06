@@ -6,7 +6,7 @@ use Phalcon\Auth\Authenticatable;
 use Phalcon\Mvc\Model;
 use Phalcon\Support\Interfaces\Arrayable;
 
-class ModelResolver implements UserResolver
+class Model implements UserResolver
 {
 
 	/**
