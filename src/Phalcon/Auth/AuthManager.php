@@ -40,7 +40,7 @@ class AuthManager extends Component
 
 	public function guard($name = null)
 	{
-		$name = $name ?: $this->getDefaultDriver();
+		$name = $name ?: $this->getDefaultGuard();
 
 		if (isset($this->guards[$name]) && !is_array($this->guards[$name])){
 			return $this->guards[$name];
@@ -111,7 +111,7 @@ class AuthManager extends Component
 
 		switch ($driver) {
 			case 'session':
-				return $this->createSessionDriver($config);
+				return $this->createSessionDriver($name, $config);
 			default:
 				throw new \InvalidArgumentException("Auth guard driver {$driver} for guard {$name} is not defined.");
 		}

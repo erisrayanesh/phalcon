@@ -3,7 +3,7 @@
 namespace Phalcon\Auth\UserResolvers;
 
 use Phalcon\Auth\Authenticatable;
-use Phalcon\Mvc\Model;
+use Phalcon\Mvc\Model as MvcModel;
 use Phalcon\Support\Interfaces\Arrayable;
 
 class Model implements UserResolver
@@ -14,7 +14,7 @@ class Model implements UserResolver
 	 */
 	protected $model;
 
-	public function __construct(Model $model)
+	public function __construct(MvcModel $model)
 	{
 		$this->model = $model;
 	}
