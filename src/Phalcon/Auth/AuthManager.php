@@ -46,7 +46,7 @@ class AuthManager extends Component
 			return $this->guards[$name];
 		}
 
-		return $this->guards[$name] = $this->resolveGuard($name);;
+		return $this->guards[$name] = $this->resolveGuard($name);
 	}
 
 	public function setGuard($name, $driver, array $provider)

@@ -111,7 +111,7 @@ class Session implements StatefulDriver, EventsAwareInterface
 
 		$this->clearUserDataFromStorage();
 
-		if (! is_null($this->user)) {
+		if (!is_null($this->user)) {
 			$this->cycleRememberToken($user);
 		}
 
@@ -131,7 +131,7 @@ class Session implements StatefulDriver, EventsAwareInterface
 			return $this->user;
 		}
 
-		$id = $this->session->get($this->getName());
+		$id = session()->get($this->getName());
 
 		if (!is_null($id) && $this->user = $this->userResolver->findById($id)) {
 			$this->fireAuthenticatedEvent($this->user);

@@ -132,7 +132,7 @@ function inputs()
 }
 
 /**
- * @return \Phalcon\Auth\Auth
+ * @return \Phalcon\Auth\AuthManager
  */
 function auth()
 {

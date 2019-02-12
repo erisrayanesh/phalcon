@@ -5,6 +5,7 @@ namespace Phalcon\Mvc\Controller\Traits;
 
 use Apps\LoginAttempts;
 use Apps\Users;
+use Phalcon\Validation\Exceptions\ValidationException;
 
 trait ThrottlesLogins
 {
@@ -18,14 +19,23 @@ trait ThrottlesLogins
 		return $this->getFailedLoginAttemptsCount($credentials, request()->getClientAddress()) >= $this->getMaxAttempts();
 	}
 
-	protected  function registerFailedLogin($user_id)
+	protected function registerFailedLogin($credentials = null)
 	{
-		$this->createLoginAttempt(request()->getClientAddress(), request()->getUserAgent(), $user_id);
+		$this->createLoginAttempt(request()->getClientAddress(), request()->getUserAgent(), $credentials);
 	}
 
-	protected function registerSuccessLogin($user_id)
+	protected function registerSuccessfulLogin($credentials, $forgetFailedAttempts = true)
 	{
-		$this->createLoginAttempt(request()->getClientAddress(), request()->getUserAgent(), $user_id, true);
+		if ($forgetFailedAttempts){
+			$this->forgetLoginAttempts($credentials);
+		}
+
+		$this->createLoginAttempt(request()->getClientAddress(), request()->getUserAgent(), $credentials, true);
+	}
+
+	protected function forgetLoginAttempts($credentials)
+	{
+		$this->clearLoginAttempts($credentials, request()->getClientAddress());
 	}
 
 	protected function getFailedLoginAttemptsCount($credentials, $ip)
@@ -40,14 +50,24 @@ trait ThrottlesLogins
 	 * @param int $user_id
 	 * @param bool $success
 	 */
-	protected function createLoginAttempt($ip, $userAgent, $user_id = 0, $success = false)
+	protected function createLoginAttempt($credentials, $ip, $userAgent, $successful = false)
+	{
+		return;
+	}
+
+	protected function clearLoginAttempts($credentials, $ip)
 	{
 		return;
 	}
 
 	protected function getMaxAttempts()
 	{
-		return null;
+		return 5;
+	}
+
+	protected function onLoginThrottled($credentials)
+	{
+		throw new ValidationException(validator([]));
 	}
 
 

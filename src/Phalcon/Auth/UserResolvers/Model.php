@@ -3,7 +3,6 @@
 namespace Phalcon\Auth\UserResolvers;
 
 use Phalcon\Auth\Authenticatable;
-use Phalcon\Mvc\Model as MvcModel;
 use Phalcon\Support\Interfaces\Arrayable;
 
 class Model implements UserResolver
@@ -14,7 +13,7 @@ class Model implements UserResolver
 	 */
 	protected $model;
 
-	public function __construct(MvcModel $model)
+	public function __construct($model)
 	{
 		$this->model = $model;
 	}
@@ -78,8 +77,7 @@ class Model implements UserResolver
 
 	public function validateCredentials(Authenticatable $user, array $credentials)
 	{
-		$plain = $credentials['password'];
-		return security()->checkHash($plain, $user->getAuthPassword());
+		return security()->checkHash($credentials['password'], $user->getAuthPassword());
 	}
 
 	public function getModel()

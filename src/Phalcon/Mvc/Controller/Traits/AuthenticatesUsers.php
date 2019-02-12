@@ -5,149 +5,103 @@ namespace Phalcon\Mvc\Controller\Traits;
 
 use Apps\Users;
 use Phalcon\Mvc\Model;
+use Phalcon\Validation\Exceptions\ValidationException;
 
 trait AuthenticatesUsers
 {
+	use ThrottlesLogins;
 
-	protected function login($credentials = null)
+	public function loginAction()
 	{
 
-		$credentials = $credentials ?: $this->getLoginCredentials();
+		$credentials = $this->getLoginCredentials();
 
-		if (!$this->validateLoginCredentials($credentials)){
-			return $this->onLoginFailed($credentials);
+		// Validates credential and if invalid then throws an ValidationException
+		$this->validateLogin($credentials);
+
+		if ($this->hasTooManyLoginAttempts($credentials)) {
+			return $this->onLoginThrottled($credentials);
 		}
 
-		if ($this->isLoginThrottlingEnabled()){
-			if ($this->hasTooManyLoginAttempts($credentials)){
-				return $this->onLoginThrottled($credentials);
-			}
+		if ($this->attemptLogin($credentials)){
+			return $this->sendLoginResponse($credentials);
 		}
 
-		return $this->attemptLogin($credentials);
+		$this->registerFailedLogin($credentials);
+
+		return $this->sendFailedLoginResponse($credentials);
 
 	}
 
-	protected function logout()
+	public function logoutAction()
 	{
-		if ($this->isUserRememberEnabled()){
-			$this->terminateRemember();
-		}
-
-		auth()->logout();
-		return $this->onAfterLogout();
+		$this->guard()->logout();
+		return $this->loggedOut();
 	}
 
-	protected function attemptLogin($credentials)
+	public function username()
 	{
-		try {
-			// Check if the user exist
-			$user = $this->findUser($credentials);
-
-			if ($user == false) {
-				if ($this->isLoginThrottlingEnabled()){
-					$this->registerFailedLogin(0);
-				}
-				throw new \Exception('user not found');
-			}
-
-			// Check the password
-			$password = $credentials[$this->getPasswordKey()] . $this->getPasswordSalt();
-			$hashPassword = $user->{$this->getPasswordKey()};
-			if (!security()->checkHash($password, $hashPassword)) {
-
-				if ($this->isLoginThrottlingEnabled()){
-					$this->registerFailedLogin($user->id);
-				}
-				throw new \Exception('Wrong username/password combination');
-			}
-
-			if ($this->isLoginThrottlingEnabled()){
-				$this->registerSuccessLogin($user->id);
-			}
-
-			auth()->login($user);
-
-			// Check if the remember me was selected
-			if (isset($credentials['remember']) && $this->isUserRememberEnabled()) {
-				$this->createRememberEnvironment($user);
-			}
-
-			return $this->onLoginSuccessful($user);
-
-		} catch (\Exception $exc) {
-			return $this->onLoginFailed($credentials);
-		}
+		return 'email';
 	}
 
-	protected function getUsernameKey()
+	public function shouldRemember()
 	{
-		return auth()->getUsernameKey();
-	}
-
-	protected function getPasswordKey()
-	{
-		return auth()->getPasswordKey();
-	}
-
-	protected function isLoginThrottlingEnabled()
-	{
-		return method_exists($this, 'hasTooManyLoginAttempts');
-	}
-
-	protected function isUserRememberEnabled()
-	{
-		return method_exists($this, 'createRememberEnvironment');
-	}
-
-	protected function findUser($credentials)
-	{
-		return auth()->findUserByUsername($credentials[$this->getUsernameKey()]);
+		return false;
 	}
 
 	protected function getLoginCredentials()
 	{
-		return request_only([
-			$this->getUsernameKey(),
-			$this->getPasswordKey()
-		]);
+		return request_only($this->username(), 'password');
 	}
 
-	protected function getPasswordSalt()
+	protected function attemptLogin($credentials)
 	{
-		return 'jFr!!A&+71w1Ms9~8';
+		return $this->guard()->attempt($credentials, $this->shouldRemember());
 	}
 
-	protected function validateLoginCredentials($credentials)
+	protected function guard()
 	{
-		return true;
+		return auth()->guard();
 	}
 
-	protected function onLoginFailed($credentials)
+	protected function validateLogin($credentials)
+	{
+		$validator = validator($this->getRules(), $credentials);
+		if ($validator->getMessages()->count() > 0){
+			throw new ValidationException($validator);
+		}
+	}
+
+	protected function getRules()
+	{
+		return [
+			[$this->username(), new \Phalcon\Validation\Validator\PresenceOf()],
+			["password", new \Phalcon\Validation\Validator\PresenceOf()],
+		];
+	}
+
+	protected function sendLoginResponse($credentials)
+	{
+		session()->regenerateId(false);
+		$this->registerSuccessfulLogin($credentials);
+		return $this->authenticated($this->guard()->user());
+	}
+
+	// INTERNAL EVENTS
+
+	protected function sendFailedLoginResponse($credentials)
+	{
+		throw new ValidationException(validator([]));
+	}
+
+	protected function authenticated($user)
 	{
 		return;
 	}
 
-	protected function onLoginSuccessful($user)
-	{
-		session()->regenerateId();
-		return $this->onAuthenticated($user);
-	}
-
-	protected function onAuthenticated($user)
+	protected function loggedOut()
 	{
 		return;
 	}
-
-	protected function onAfterLogout()
-	{
-		return;
-	}
-
-	protected function onLoginThrottled($credentials)
-	{
-		return;
-	}
-
 
 }

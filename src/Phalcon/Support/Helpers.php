@@ -20,22 +20,27 @@ if (! function_exists('value')) {
 	}
 }
 
-function validator($rules, $data = [])
-{
-	$validator = new \Phalcon\Validation();
+if (! function_exists('validator')) {
+	/**
+	 * @param $rules
+	 * @param array $data
+	 * @return \Phalcon\Validation
+	 */
+	function validator($rules, $data = [])
+	{
+		$validator = new \Phalcon\Validation();
 
-	foreach ($rules as $rule) {
-		$validator->add($rule[0], $rule[1]);
+		foreach ($rules as $rule) {
+			$validator->add($rule[0], $rule[1]);
+		}
+
+		if (!empty($data)) {
+			$validator->validate($data);
+		}
+
+		return $validator;
 	}
-
-	if (!empty($data)){
-		$messages = $validator->validate($data);
-		return $messages;
-	}
-
-	return $validator;
 }
-
 
 if (! function_exists('collect')) {
 	/**
@@ -58,26 +63,12 @@ if (! function_exists('collect')) {
 	}
 }
 
-/**
- * @return \Phalcon\Security\Random
- */
-function getSecurityRandom()
-{
-	return new \Phalcon\Security\Random();
-}
-
-/**
- * @return \Phalcon\Filter
- */
-function getSanitizer()
-{
-	return new Phalcon\Filter();
-}
-
-function class_has_trait($object, $name)
-{
-	$traits = class_uses_recursive($object);
-	return in_array($name, $traits);
+if (! function_exists('has_trait')) {
+	function has_trait($object, $name)
+	{
+		$traits = class_uses_recursive($object);
+		return in_array($name, $traits);
+	}
 }
 
 if (! function_exists('class_uses_recursive')) {
@@ -137,6 +128,48 @@ if (! function_exists('class_basename')) {
 	}
 }
 
+if (! function_exists('windows_os')) {
+	function windows_os()
+	{
+		return strtolower(substr(PHP_OS, 0, 3)) === 'win';
+	}
+}
+
+if (! function_exists('tap')) {
+	/**
+	 * Call the given Closure with the given value then return the value.
+	 *
+	 * @param  mixed  $value
+	 * @param  callable|null  $callback
+	 * @return mixed
+	 */
+	function tap($value, $callback = null)
+	{
+		if (is_null($callback)) {
+			return $value;
+		}
+
+		$callback($value);
+
+		return $value;
+	}
+}
+
+/**
+ * @return \Phalcon\Security\Random
+ */
+function getSecurityRandom()
+{
+	return new \Phalcon\Security\Random();
+}
+
+/**
+ * @return \Phalcon\Filter
+ */
+function getSanitizer()
+{
+	return new Phalcon\Filter();
+}
 
 /**
  * @param $controller
@@ -181,9 +214,4 @@ function cannot($ability, $arguments = [])
 	return cant($ability, $arguments);
 }
 
-if (! function_exists('windows_os')) {
-	function windows_os()
-	{
-		return strtolower(substr(PHP_OS, 0, 3)) === 'win';
-	}
-}
+
