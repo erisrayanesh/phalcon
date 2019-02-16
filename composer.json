@@ -8,7 +8,6 @@
         "framework",
         "erisrayanesh"
     ],
-    "type": "library",
     "license": "0BSD",
     "homepage": "http://www.erisrayanesh.com",
     "authors" : [
@@ -28,10 +27,10 @@
     },
     "autoload": {
         "files": [
-            "src/Phalcon/Support/Helpers.php"
+            "src/Support/Helpers.php"
         ],
         "psr-4": {
-            "Phalcon\\": "src/Phalcon/"
+            "Phalcon\\": "src/"
         }
     }
 }
