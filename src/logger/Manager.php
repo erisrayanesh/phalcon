@@ -32,7 +32,13 @@ class Manager
 		return $this->channel()->{$method}(...$parameters);
 	}
 
-	public function channel($name = null)
+	/**
+	 * Returns an instance of Logger
+	 * @param string|null $name Channel name
+	 * @return Logger
+	 * @throws \Exception
+	 */
+	public function channel(string $name = null)
 	{
 		$name = $name ?: $this->getDefaultChannel();
 
@@ -43,7 +49,7 @@ class Manager
 		return $this->channels[$name] = $this->resolveChannel($name);
 	}
 
-	public function setChannel($name, $config)
+	public function setChannel(string $name, $config)
 	{
 		if (! isset($config['driver'])){
 			throw new \Exception('Driver is not set');
@@ -56,12 +62,18 @@ class Manager
 		return $this->default;
 	}
 
-	public function setDefaultChannel($name)
+	public function setDefaultChannel(string $name)
 	{
 		$this->default = $name ?: $this->getDefaultChannel();
 	}
 
-	public function resolveChannel($name)
+	/**
+	 * Resolves the channel
+	 * @param string $name
+	 * @return Logger
+	 * @throws \Exception
+	 */
+	public function resolveChannel(string $name)
 	{
 		$config = $this->getChannelConfig($name);
 
@@ -70,7 +82,9 @@ class Manager
 		}
 
 		if (isset($this->channelBuilders[$driver = $config['driver']])) {
-			return $this->channelBuilders[$driver]($name, $config);
+			$logger = $this->createLogger($config);
+			$this->channelBuilders[$driver]($name, $logger, $config);
+			return $logger;
 		}
 
 		switch ($driver) {
@@ -81,6 +95,16 @@ class Manager
 			default:
 				throw new \InvalidArgumentException("Log driver {$driver} for channel {$name} is not defined.");
 		}
+	}
+
+	/**
+	 * Creates a LineFormatter instance
+	 * @param $config
+	 * @return LineFormatter
+	 */
+	public function createFileFormatter($config): LineFormatter
+	{
+		return new LineFormatter ($config['format'] ?? null , $config['date'] ?? null);
 	}
 
 	/**
@@ -121,9 +145,7 @@ class Manager
 		}
 
 		$file = new FileAdapter ($config['file'], $config);
-		$logger = new Logger();
-		$logger->setLogLevel($config['level'] ?? \Phalcon\Logger::DEBUG);
-		$logger->setFormatter($this->createFileFormatter($config));
+		$logger = $this->createLogger($config);
 		$logger->push($file);
 		return $logger;
 	}
@@ -158,16 +180,6 @@ class Manager
 		$logger->setLogLevel($config['level'] ?? \Phalcon\Logger::DEBUG);
 		$logger->setFormatter($this->createFileFormatter($config));
 		return $logger;
-	}
-
-	/**
-	 * Creates a LineFormatter instance
-	 * @param $config
-	 * @return LineFormatter
-	 */
-	protected function createFileFormatter($config): LineFormatter
-	{
-		return new LineFormatter ($config['format'] ?? null , $config['date'] ?? null);
 	}
 
 }
