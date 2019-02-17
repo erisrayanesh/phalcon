@@ -67,6 +67,7 @@ class Manager extends Component
 		$this->default = $name ?: $this->getDefaultGuard();
 	}
 
+
 	public function addGuardBuilder($name, callable $builder)
 	{
 		$this->guardBuilders[$name] = $builder;
@@ -81,22 +82,6 @@ class Manager extends Component
 		return $this;
 	}
 
-	public function createUserResolver($config = null)
-	{
-		if (isset($this->userResolverBuilders[$driver = ($config['driver'] ?? null)])) {
-			return call_user_func($this->userResolverBuilders[$driver], $config);
-		}
-
-		switch ($driver) {
-			case 'model':
-				return $this->createModelProvider($config);
-			default:
-				throw new \InvalidArgumentException(
-					"Authentication user provider {$driver} is not defined."
-				);
-		}
-	}
-
 	protected function resolveGuard($name)
 	{
 		$config = $this->getGuardConfig($name);
@@ -106,7 +91,7 @@ class Manager extends Component
 		}
 
 		if (isset($this->guardBuilders[$driver = $config['driver']])) {
-			return $this->callGuardBuilder($name, $config);
+			return $this->guardBuilders[$driver]($name, $config);
 		}
 
 		switch ($driver) {
@@ -131,10 +116,36 @@ class Manager extends Component
 		return $this->guards[$name];
 	}
 
-	protected function callGuardBuilder($name, $config)
+	public function createUserResolver($config = null)
 	{
-		return $this->guardBuilders[$config['driver']]($name, $config);
+		if (isset($this->userResolverBuilders[$driver = ($config['driver'] ?? null)])) {
+			return call_user_func($this->userResolverBuilders[$driver], $config);
+		}
+
+		switch ($driver) {
+			case 'model':
+				return $this->createModelProvider($config);
+			default:
+				throw new \InvalidArgumentException(
+					"Authentication user provider {$driver} is not defined."
+				);
+		}
 	}
+
+	public function addUserResolverBuilder($name, callable $builder)
+	{
+		$this->userResolverBuilders[$name] = $builder;
+		return $this;
+	}
+
+	public function addUserResolverBuilders($builders)
+	{
+		foreach ($builders as $key => $builder) {
+			$this->addUserResolverBuilder($key, $builder);
+		}
+		return $this;
+	}
+
 
 	protected function createSessionDriver($key, $config)
 	{
