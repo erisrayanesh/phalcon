@@ -6,7 +6,6 @@ require_once "Helpers" . DIRECTORY_SEPARATOR . "ResponseHelpers.php";
 require_once "Helpers" . DIRECTORY_SEPARATOR . "Facades.php";
 require_once "Helpers" . DIRECTORY_SEPARATOR . "StringHelpers.php";
 
-
 if (! function_exists('value')) {
 	/**
 	 * Return the default value of the given value.
@@ -163,13 +162,6 @@ function getSecurityRandom()
 	return new \Phalcon\Security\Random();
 }
 
-/**
- * @return \Phalcon\Filter
- */
-function getSanitizer()
-{
-	return new Phalcon\Filter();
-}
 
 /**
  * @param $controller

@@ -67,7 +67,6 @@ class Manager extends Component
 		$this->default = $name ?: $this->getDefaultGuard();
 	}
 
-
 	public function addGuardBuilder($name, callable $builder)
 	{
 		$this->guardBuilders[$name] = $builder;

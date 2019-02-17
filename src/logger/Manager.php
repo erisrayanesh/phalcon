@@ -68,12 +68,43 @@ class Manager
 	}
 
 	/**
+	 * @param array $channels List of expected channels
+	 * @return Logger
+	 */
+	public function stack(array $channels = [])
+	{
+		return $this->createStackDriver(compact('channels'));
+	}
+
+	/**
+	 * Creates a LineFormatter instance
+	 * @param $config
+	 * @return LineFormatter
+	 */
+	public function createFileFormatter($config = null): LineFormatter
+	{
+		return new LineFormatter ($config['format'] ?? null , $config['date'] ?? null);
+	}
+
+	/**
+	 * Adds a custom channel builder
+	 * @param string $channel Channel name
+	 * @param \Closure $callback
+	 * @return Manager
+	 */
+	public function addChannelBuilder(string $channel, \Closure $callback):Manager
+	{
+		$this->channelBuilders[$channel] = $callback->bindTo($this, $this);
+		return $this;
+	}
+
+	/**
 	 * Resolves the channel
 	 * @param string $name
 	 * @return Logger
 	 * @throws \Exception
 	 */
-	public function resolveChannel(string $name)
+	protected function resolveChannel(string $name)
 	{
 		$config = $this->getChannelConfig($name);
 
@@ -97,28 +128,6 @@ class Manager
 		}
 	}
 
-	/**
-	 * Creates a LineFormatter instance
-	 * @param $config
-	 * @return LineFormatter
-	 */
-	public function createFileFormatter($config): LineFormatter
-	{
-		return new LineFormatter ($config['format'] ?? null , $config['date'] ?? null);
-	}
-
-	/**
-	 * Adds a custom channel builder
-	 * @param string $channel Channel name
-	 * @param \Closure $callback
-	 * @return Manager
-	 */
-	public function addChannelBuilder(string $channel, \Closure $callback):Manager
-	{
-		$this->channelBuilders[$channel] = $callback->bindTo($this, $this);
-		return $this;
-	}
-
 	protected function getChannelConfig(string $name)
 	{
 		if (!isset($this->channels[$name])){
@@ -138,10 +147,10 @@ class Manager
 	 * @param $config
 	 * @return Logger
 	 */
-	protected function createSingleDriver($name, $config): Logger
+	protected function createSingleDriver($config): Logger
 	{
 		if (!isset($config['file'])){
-			throw new \InvalidArgumentException('File path not defined for channel ' . $name);
+			throw new \InvalidArgumentException('File path not defined for channel');
 		}
 
 		$file = new FileAdapter ($config['file'], $config);
@@ -157,10 +166,10 @@ class Manager
 	 * @return Logger
 	 * @throws \Exception
 	 */
-	protected function createRotatingDriver($name, $config):Logger
+	protected function createRotatingDriver($config):Logger
 	{
 		if (!isset($config['file'])){
-			throw new \InvalidArgumentException('File path not defined for channel ' . $name);
+			throw new \InvalidArgumentException('File path not defined for channel');
 		}
 
 		$file = new RotatingFile($config['file'], $config);
@@ -169,12 +178,34 @@ class Manager
 		return $logger;
 	}
 
+	protected function createStackDriver($config):Logger
+	{
+		if (!isset($config['channels'])){
+			throw new \InvalidArgumentException('Channels list not defined for channel');
+		}
+
+		if (!array_accessible($config['channels'])){
+			throw new \InvalidArgumentException('Channels attribute is not array for channel');
+		}
+
+		$logger = $this->createLogger($config);
+		$adapters = collect($config['channels'])->flatMap(function ($channel) {
+			return $this->channel($channel)->getLoggers();
+		})->all();
+
+		foreach ($adapters as $adapter) {
+			$logger->push($adapter);
+		}
+
+		return $logger;
+	}
+
 	/**
 	 * Creates a logger instance
 	 * @param $config
 	 * @return Logger
 	 */
-	protected function createLogger($config): Logger
+	protected function createLogger($config= null): Logger
 	{
 		$logger = new Logger();
 		$logger->setLogLevel($config['level'] ?? \Phalcon\Logger::DEBUG);

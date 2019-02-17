@@ -96,6 +96,16 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 		return $this->items;
 	}
 
+	/**
+	 * Collapse the collection of items into a single array.
+	 *
+	 * @return static
+	 */
+	public function collapse()
+	{
+		return new static(array_collapse($this->items));
+	}
+
 	public function reverse()
 	{
 		return new static(array_reverse($this->items));
@@ -230,6 +240,11 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 		$items = array_map($callback, $this->items, $keys);
 
 		return new static(array_combine($keys, $items));
+	}
+
+	public function flatMap(callable $callback)
+	{
+		return $this->map($callback)->collapse();
 	}
 
 	public function each(callable $callback)
