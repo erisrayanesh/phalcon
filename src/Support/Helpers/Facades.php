@@ -138,24 +138,25 @@ if (! function_exists('logger')) {
 	 * @param mixed $data
 	 * @return \Phalcon\Logger\Manager
 	 */
-	function logger($data = null)
+	function logger(...$data)
 	{
-
-		if (is_null($data)) {
-			return DI()->get("Logger");
+		if (empty($data)) {
+			return DI()->get("logger");
 		}
 
-		$data = value($data);
+		foreach ($data as $item) {
+			$item = value($item);
 
-		if ($data instanceof \Phalcon\Support\Interfaces\Arrayable) {
-			$data = $data->toArray();
+			if ($item instanceof \Phalcon\Support\Interfaces\Arrayable) {
+				$item = $item->toArray();
+			}
+
+			if (is_array($item)) {
+				$item = print_r($item, true);
+			}
+
+			return DI()->get("logger")->debug(strval($item));
 		}
-
-		if (is_array($data)) {
-			$data = print_r($data, true);
-		}
-
-		return DI()->get("Logger")->debug(strval($data));
 	}
 }
 
@@ -164,11 +165,31 @@ if (! function_exists('logs')) {
 	 * Get a log channel instance.
 	 *
 	 * @param  string  $channel
+	 * @param  mixed  $data
 	 * @return \Phalcon\Logger\Manager|\Phalcon\Logger\Multiple
+	 * @throws \Exception
 	 */
-	function logs($channel = null)
+	function logs($channel = null, ...$data)
 	{
-		return $channel ? logger()->channel($channel) : logger();
+		$ch = $channel ? logger()->channel($channel) : logger();
+
+		if (empty($data)) {
+			return $ch;
+		}
+
+		foreach ($data as $item) {
+			$item = value($item);
+
+			if ($item instanceof \Phalcon\Support\Interfaces\Arrayable) {
+				$item = $item->toArray();
+			}
+
+			if (is_array($item)) {
+				$item = print_r($item, true);
+			}
+
+			return $ch->debug(strval($item));
+		}
 	}
 }
 
