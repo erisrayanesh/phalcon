@@ -30,7 +30,7 @@ use Phalcon\Db\Column;
 
 /**
  * Phalcon\Session\Adapter\Database
- * Database adapter for Phalcon\Session
+ * Database Adapter for Phalcon\Session
  */
 class Database extends Adapter implements AdapterInterface
 {

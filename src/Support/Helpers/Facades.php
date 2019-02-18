@@ -142,7 +142,7 @@ if (! function_exists('logger')) {
 	{
 
 		if (is_null($data)) {
-			return DI()->get("logger");
+			return DI()->get("Logger");
 		}
 
 		$data = value($data);
@@ -155,7 +155,7 @@ if (! function_exists('logger')) {
 			$data = print_r($data, true);
 		}
 
-		return DI()->get("logger")->debug(strval($data));
+		return DI()->get("Logger")->debug(strval($data));
 	}
 }
 

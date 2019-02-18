@@ -22,12 +22,13 @@ class Manager extends Component
 	protected $channelBuilders = [];
 
 	/**
-	 * Dynamically call the default adapter instance.
-	 *
-	 * @param  string  $method
-	 * @param  array  $parameters
+	 * Dynamically call the default Adapter instance.
+	 * @param $method
+	 * @param $parameters
 	 * @return mixed
+	 * @throws \Exception
 	 */
+
 	public function __call($method, $parameters)
 	{
 		return $this->channel()->{$method}(...$parameters);
@@ -143,7 +144,7 @@ class Manager extends Component
 	}
 
 	/**
-	 * Creates a Logger instance including a File adapter
+	 * Creates a Logger instance including a File Adapter
 	 * @param $name
 	 * @param $config
 	 * @return Logger
@@ -161,7 +162,7 @@ class Manager extends Component
 	}
 
 	/**
-	 * Creates a Logger instance including a RotatingFile adapter
+	 * Creates a Logger instance including a RotatingFile Adapter
 	 * @param $name
 	 * @param $config
 	 * @return Logger
@@ -202,7 +203,7 @@ class Manager extends Component
 	}
 
 	/**
-	 * Creates a logger instance
+	 * Creates a Logger instance
 	 * @param $config
 	 * @return Logger
 	 */
