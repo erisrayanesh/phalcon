@@ -6,8 +6,9 @@ use Phalcon\Logger\Multiple as Logger;
 use Phalcon\Logger\Adapter\File as FileAdapter;
 use Phalcon\Logger\Adapter\RotatingFile;
 use Phalcon\Logger\Formatter\Line as LineFormatter;
+use Phalcon\Mvc\User\Component;
 
-class Manager
+class Manager extends Component
 {
 
 	protected $default;
