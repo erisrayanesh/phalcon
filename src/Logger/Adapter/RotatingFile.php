@@ -7,7 +7,7 @@ use Phalcon\Logger\FormatterInterface;
 use Phalcon\Logger\Formatter\Line as LineFormatter;
 
 /**
- * Class RotatingFile
+ * RotatingFile Adapter
  * @package Phalcon\Logger\Adapter
  */
 class RotatingFile extends Adapter
@@ -30,7 +30,7 @@ class RotatingFile extends Adapter
 	 * @param array|null $options
 	 * @throws \Exception
 	 */
-	public function __construct(string $name, array $options = null)
+	public function __construct(string $name, $options = null)
 	{
 		if (substr_count($name, '{date}') === 0) {
 			throw new \InvalidArgumentException(
