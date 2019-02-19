@@ -125,6 +125,8 @@ class Manager extends Component
 				return $this->createSingleDriver($config);
 			case 'rotating':
 				return $this->createRotatingDriver($config);
+			case 'stack':
+				return $this->createStackDriver($config);
 			default:
 				throw new \InvalidArgumentException("Log driver {$driver} for channel {$name} is not defined.");
 		}
@@ -202,7 +204,5 @@ class Manager extends Component
 		})->all();
 		return new Logger($adapters);
 	}
-
-
 
 }
