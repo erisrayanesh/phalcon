@@ -2,7 +2,7 @@
 
 namespace Phalcon\Logger;
 
-use Phalcon\Logger\Multiple as Logger;
+use Phalcon\Logger\Stack as Logger;
 use Phalcon\Logger\Adapter\File as FileAdapter;
 use Phalcon\Logger\Adapter\RotatingFile;
 use Phalcon\Logger\Formatter\Line as LineFormatter;
@@ -37,14 +37,14 @@ class Manager extends Component
 	/**
 	 * Returns an instance of Logger
 	 * @param string|null $name Channel name
-	 * @return Logger
+	 * @return Stack
 	 * @throws \Exception
 	 */
 	public function channel(string $name = null)
 	{
 		$name = $name ?: $this->getDefaultChannel();
 
-		if (isset($this->channels[$name]) && !is_array($this->channels[$name])){
+		if (isset($this->channels[$name]) && $this->channels[$name] instanceof Logger){
 			return $this->channels[$name];
 		}
 
@@ -71,7 +71,7 @@ class Manager extends Component
 
 	/**
 	 * @param array $channels List of expected channels
-	 * @return Logger
+	 * @return Stack
 	 */
 	public function stack(array $channels = [])
 	{
@@ -83,7 +83,7 @@ class Manager extends Component
 	 * @param $config
 	 * @return LineFormatter
 	 */
-	public function createFileFormatter($config = null): LineFormatter
+	public function createLineFormatter($config = null): LineFormatter
 	{
 		return new LineFormatter ($config['format'] ?? null , $config['date'] ?? null);
 	}
@@ -103,7 +103,7 @@ class Manager extends Component
 	/**
 	 * Resolves the channel
 	 * @param string $name
-	 * @return Logger
+	 * @return Stack
 	 * @throws \Exception
 	 */
 	protected function resolveChannel(string $name)
@@ -116,15 +116,15 @@ class Manager extends Component
 
 		if (isset($this->channelBuilders[$driver = $config['driver']])) {
 			$logger = $this->createLogger($config);
-			$this->channelBuilders[$driver]($name, $logger, $config);
+			$this->channelBuilders[$driver]($logger, $config);
 			return $logger;
 		}
 
 		switch ($driver) {
 			case 'single':
-				return $this->createSingleDriver($name, $config);
+				return $this->createSingleDriver($config);
 			case 'rotating':
-				return $this->createRotatingDriver($name, $config);
+				return $this->createRotatingDriver($config);
 			default:
 				throw new \InvalidArgumentException("Log driver {$driver} for channel {$name} is not defined.");
 		}
@@ -136,18 +136,25 @@ class Manager extends Component
 			return null;
 		}
 
-		if (!is_array($this->channels[$name])){
+		if ($this->channels[$name] instanceof Logger){
 			return null;
 		}
 
 		return $this->channels[$name];
 	}
 
+	protected function resolveLogLevel($config): int
+	{
+		return intval($config['level'] ?? \Phalcon\Logger::DEBUG) ;
+	}
+
+	// Factory methods
+
 	/**
 	 * Creates a Logger instance including a File Adapter
 	 * @param $name
 	 * @param $config
-	 * @return Logger
+	 * @return Stack
 	 */
 	protected function createSingleDriver($config): Logger
 	{
@@ -155,17 +162,17 @@ class Manager extends Component
 			throw new \InvalidArgumentException('File path not defined for channel');
 		}
 
-		$file = new FileAdapter ($config['file'], $config);
-		$logger = $this->createLogger($config);
-		$logger->push($file);
-		return $logger;
+		$adapter = new FileAdapter ($config['file'], $config);
+		$adapter->setLogLevel($this->resolveLogLevel($config));
+		$adapter->setFormatter($this->createLineFormatter($config));
+		return new Logger([$adapter]);
 	}
 
 	/**
 	 * Creates a Logger instance including a RotatingFile Adapter
 	 * @param $name
 	 * @param $config
-	 * @return Logger
+	 * @return Stack
 	 * @throws \Exception
 	 */
 	protected function createRotatingDriver($config):Logger
@@ -174,10 +181,10 @@ class Manager extends Component
 			throw new \InvalidArgumentException('File path not defined for channel');
 		}
 
-		$file = new RotatingFile($config['file'], $config);
-		$logger = $this->createLogger($config);
-		$logger->push($file);
-		return $logger;
+		$adapter = new RotatingFile($config['file'], $config);
+		$adapter->setLogLevel($this->resolveLogLevel($config));
+		$adapter->setFormatter($this->createLineFormatter($config));
+		return new Logger([$adapter]);
 	}
 
 	protected function createStackDriver($config):Logger
@@ -190,29 +197,12 @@ class Manager extends Component
 			throw new \InvalidArgumentException('Channels attribute is not array for channel');
 		}
 
-		$logger = $this->createLogger($config);
 		$adapters = collect($config['channels'])->flatMap(function ($channel) {
-			return $this->channel($channel)->getLoggers();
+			return $this->channel($channel)->getAdapters();
 		})->all();
-
-		foreach ($adapters as $adapter) {
-			$logger->push($adapter);
-		}
-
-		return $logger;
+		return new Logger($adapters);
 	}
 
-	/**
-	 * Creates a Logger instance
-	 * @param $config
-	 * @return Logger
-	 */
-	protected function createLogger($config= null): Logger
-	{
-		$logger = new Logger();
-		$logger->setLogLevel($config['level'] ?? \Phalcon\Logger::DEBUG);
-		$logger->setFormatter($this->createFileFormatter($config));
-		return $logger;
-	}
+
 
 }
