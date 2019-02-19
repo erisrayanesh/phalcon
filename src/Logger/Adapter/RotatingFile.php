@@ -209,10 +209,6 @@ class RotatingFile extends Adapter
 	 */
 	protected function openFileHandler(): void
 	{
-		if (!is_array($this->options)) {
-			throw new \Exception("Can't open log file at '" . $this->getTimedFilename() . "'");
-		}
-
 		$mode = null;
 
 		if (isset($this->options["mode"])) {
