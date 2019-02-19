@@ -45,10 +45,10 @@ class Stack implements \Countable
 		return $this->adapters;
 	}
 
-	public function __call($name, $arguments)
+	public function __call($method, $arguments)
 	{
 		foreach ($this->adapters as $adapter){
-			$adapter->{$name}($arguments);
+			$adapter->{$method}(...$arguments);
 		}
 	}
 
