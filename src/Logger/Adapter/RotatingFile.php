@@ -37,6 +37,7 @@ class RotatingFile extends Adapter
 				'Invalid filename format - filename must contain at least `{date}`, because otherwise rotating is impossible.'
 			);
 		}
+		$this->path = $name;
 		$this->options = $options;
 		$this->dateFormats = [
 			self::FILE_PER_DAY => "Y-m-d",
@@ -122,13 +123,15 @@ class RotatingFile extends Adapter
 		$fileInfo = pathinfo($this->getPath());
 		$timedFilename = str_replace(
 			'{date}',
-			$this->getMinPeriodDate()->format($this->getPeriodDateFormat()),
-			$this->getPath()
+			$this->getPeriodStart()->format($this->getPeriodDateFormat()),
+			$fileInfo['filename']
 		);
+
 		if (!empty($fileInfo['extension'])) {
 			$timedFilename .= '.'.$fileInfo['extension'];
 		}
-		return $timedFilename;
+
+		return $fileInfo['dirname'] . DIRECTORY_SEPARATOR . $timedFilename;
 	}
 
 	/**
@@ -154,7 +157,7 @@ class RotatingFile extends Adapter
 	 * @return \DateTimeImmutable
 	 * @throws \Exception
 	 */
-	protected function getMinPeriodDate(): \DateTimeImmutable
+	protected function getPeriodStart(): \DateTimeImmutable
 	{
 		switch ($this->getPeriod()){
 			case static::FILE_PER_WEEK:
@@ -174,7 +177,7 @@ class RotatingFile extends Adapter
 	 * @return \DateTimeImmutable
 	 * @throws \Exception
 	 */
-	protected function getMaxPeriodDate(): \DateTimeImmutable
+	protected function getPeriodFinish(): \DateTimeImmutable
 	{
 		switch ($this->getPeriod()){
 			case static::FILE_PER_WEEK:
@@ -197,7 +200,7 @@ class RotatingFile extends Adapter
 	 */
 	protected function needsRotate($time): bool
 	{
-		return $this->getMaxPeriodDate()->getTimestamp() <= $time;
+		return $this->getPeriodFinish()->getTimestamp() <= $time;
 	}
 
 	/**
