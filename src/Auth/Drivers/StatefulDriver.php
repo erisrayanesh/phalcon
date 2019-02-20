@@ -3,6 +3,7 @@
 namespace Phalcon\Auth\Drivers;
 
 use Phalcon\Auth\Authenticatable;
+use Phalcon\Auth\Driver;
 
 interface StatefulDriver extends Driver
 {
@@ -26,7 +27,7 @@ interface StatefulDriver extends Driver
     /**
      * Log a user into the application.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Phalcon\Auth\Authenticatable  $user
      * @param  bool  $remember
      * @return void
      */
@@ -37,7 +38,7 @@ interface StatefulDriver extends Driver
      *
      * @param  mixed  $id
      * @param  bool   $remember
-     * @return \Illuminate\Contracts\Auth\Authenticatable
+     * @return \Phalcon\Auth\Authenticatable
      */
     public function loginUsingId($id, $remember = false);
 

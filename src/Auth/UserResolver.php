@@ -1,8 +1,6 @@
 <?php
 
-namespace Phalcon\Auth\UserResolvers;
-
-use Phalcon\Auth\Authenticatable;
+namespace Phalcon\Auth;
 
 interface UserResolver
 {

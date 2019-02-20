@@ -3,7 +3,7 @@
 namespace Phalcon\Auth\Drivers;
 
 use Phalcon\Auth\Authenticatable;
-use Phalcon\Auth\UserResolvers\UserResolver;
+use Phalcon\Auth\UserResolver;
 use Phalcon\Events\EventsAware;
 use Phalcon\Events\EventsAwareInterface;
 

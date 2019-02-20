@@ -4,7 +4,7 @@ namespace Phalcon\Auth\Drivers;
 
 use Phalcon\Auth\AuthenticationException;
 use Phalcon\Auth\Authenticatable;
-use Phalcon\Auth\UserResolvers\UserResolver;
+use Phalcon\Auth\UserResolver;
 
 trait DriverHelpers
 {
@@ -18,7 +18,7 @@ trait DriverHelpers
     /**
      * The user provider implementation.
      *
-     * @var \Phalcon\Auth\UserResolvers\UserResolver
+     * @var UserResolver
      */
     protected $userResolver;
 
@@ -95,7 +95,7 @@ trait DriverHelpers
     /**
      * Get the user provider used by the guard.
      *
-     * @return \Phalcon\Auth\UserResolvers\UserResolver
+     * @return UserResolver
      */
     public function getUserResolver()
     {
@@ -103,9 +103,9 @@ trait DriverHelpers
     }
 
 	/**
-	 * @param UserProvider $userResolver
+	 * @param UserResolver $userResolver
 	 */
-    public function setUserResolver(UserProvider $userResolver)
+    public function setUserResolver(UserResolver $userResolver)
     {
         $this->userResolver = $userResolver;
     }

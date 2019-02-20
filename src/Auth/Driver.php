@@ -1,8 +1,6 @@
 <?php
 
-namespace Phalcon\Auth\Drivers;
-
-use Phalcon\Auth\Authenticatable;
+namespace Phalcon\Auth;
 
 interface Driver
 {

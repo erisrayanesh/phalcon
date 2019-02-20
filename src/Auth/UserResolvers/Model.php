@@ -3,6 +3,7 @@
 namespace Phalcon\Auth\UserResolvers;
 
 use Phalcon\Auth\Authenticatable;
+use Phalcon\Auth\UserResolver;
 use Phalcon\Support\Interfaces\Arrayable;
 
 class Model implements UserResolver
