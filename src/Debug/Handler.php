@@ -1,21 +1,25 @@
 <?php
 
-namespace Phalcon\Support;
+namespace Phalcon\Debug;
 
+use Exception;
 use Phalcon\Http\Response;
-use Phalcon\Mvc\Dispatcher;
-use Phalcon\Validation\Exceptions\ValidationException;
+use Phalcon\Validation\ValidationException;
 use \Phalcon\Http\Response\Exception as HttpResponseException;
 use Whoops\Run as Whoops;
 
-trait ExceptionHandler
+Class Handler implements ExceptionHandler
 {
 
 	protected $errorsViewDir = "errors";
 
-	public function handle(Dispatcher $dispatcher, \Exception $e)
+	public function report(Exception $e)
 	{
 
+	}
+
+	public function render(Exception $e)
+	{
 		if ($e instanceof \Phalcon\Mvc\Dispatcher\Exception) {
 			switch ($e->getCode()) {
 				case \Phalcon\Mvc\Dispatcher::EXCEPTION_HANDLER_NOT_FOUND:
@@ -36,11 +40,6 @@ trait ExceptionHandler
 		}
 
 		return $this->renderUnhandledException($e);
-
-		//TODO: throwing the exception causes cyclic routing.
-		// The dispatcher tries to redispatch the exception handler controller to handle the exception
-		//throw $e;
-
 	}
 
 	protected function buildHttpResponseException(HttpResponseException $exception)
