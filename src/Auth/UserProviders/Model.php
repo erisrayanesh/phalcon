@@ -1,12 +1,12 @@
 <?php
 
-namespace Phalcon\Auth\UserResolvers;
+namespace Phalcon\Auth\UserProviders;
 
 use Phalcon\Auth\Authenticatable;
-use Phalcon\Auth\UserResolver;
+use Phalcon\Auth\UserProvider;
 use Phalcon\Support\Interfaces\Arrayable;
 
-class Model implements UserResolver
+class Model implements UserProvider
 {
 
 	/**

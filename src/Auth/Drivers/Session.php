@@ -3,7 +3,7 @@
 namespace Phalcon\Auth\Drivers;
 
 use Phalcon\Auth\Authenticatable;
-use Phalcon\Auth\UserResolver;
+use Phalcon\Auth\UserProvider;
 use Phalcon\Events\EventsAware;
 use Phalcon\Events\EventsAwareInterface;
 
@@ -28,9 +28,9 @@ class Session implements StatefulDriver, EventsAwareInterface
 	/**
 	 * Session constructor.
 	 * @param $name
-	 * @param UserResolver $resolver
+	 * @param UserProvider $resolver
 	 */
-	public function __construct($name, UserResolver $resolver)
+	public function __construct($name, UserProvider $resolver)
 	{
 		$this->name = $name;
 		$this->userResolver = $resolver;

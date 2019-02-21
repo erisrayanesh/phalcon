@@ -2,7 +2,7 @@
 
 namespace Phalcon\Auth;
 
-interface UserResolver
+interface UserProvider
 {
     /**
      * Retrieve a user by their unique identifier.

@@ -4,12 +4,15 @@ namespace Phalcon\Auth;
 
 use Phalcon\Mvc\User\Component;
 use Phalcon\Auth\Drivers\Session as SessionGuard;
-use Phalcon\Auth\UserResolvers\Model as ModelResolver;
+use Phalcon\Auth\UserProviders\Model as ModelUserProvider;
+use Phalcon\Auth\Driver as GuardDriver;
 
 class Manager extends Component
 {
 
-	protected $default;
+	protected $default_guard;
+
+	protected $default_provider;
 
 	/**
 	 * System guards
@@ -17,9 +20,15 @@ class Manager extends Component
 	 */
 	protected $guards = [];
 
+	/**
+	 * System user providers
+	 * @var array
+	 */
+	protected $providers = [];
+
 	protected $guardBuilders = [];
 
-	protected $userResolverBuilders = [];
+	protected $userProviderBuilders = [];
 
 	public function __construct()
 	{
@@ -38,33 +47,34 @@ class Manager extends Component
 		return $this->guard()->{$method}(...$parameters);
 	}
 
+	/**
+	 * @param null $name
+	 * @return GuardDriver
+	 */
 	public function guard($name = null)
 	{
 		$name = $name ?: $this->getDefaultGuard();
 
-		if (isset($this->guards[$name]) && !is_array($this->guards[$name])){
+		if (isset($this->guards[$name]) && $this->guards[$name] instanceof GuardDriver){
 			return $this->guards[$name];
 		}
 
 		return $this->guards[$name] = $this->resolveGuard($name);
 	}
 
-	public function setGuard($name, $driver, array $provider)
+	public function setGuard($name, $guard)
 	{
-		$this->guards[$name] = [
-			"driver" => $driver,
-			"provider" => $provider,
-		];
+		$this->guards[$name] = $guard;
 	}
 
 	public function getDefaultGuard()
 	{
-		return $this->default;
+		return $this->default_guard;
 	}
 
 	public function setDefaultGuard($name)
 	{
-		$this->default = $name ?: $this->getDefaultGuard();
+		$this->default_guard = $name ?: $this->getDefaultGuard();
 	}
 
 	public function addGuardBuilder($name, callable $builder)
@@ -73,31 +83,23 @@ class Manager extends Component
 		return $this;
 	}
 
-	public function addGuardBuilders($builders)
+	protected function resolveGuard($guard)
 	{
-		foreach ($builders as $key => $builder) {
-			$this->addGuardBuilder($key, $builder);
-		}
-		return $this;
-	}
-
-	protected function resolveGuard($name)
-	{
-		$config = $this->getGuardConfig($name);
+		$config = $this->getGuardConfig($guard);
 
 		if (is_null($config)) {
-			throw new \InvalidArgumentException("Auth guard [{$name}] is not defined.");
+			throw new \InvalidArgumentException("Auth guard [{$guard}] is not defined.");
 		}
 
 		if (isset($this->guardBuilders[$driver = $config['driver']])) {
-			return $this->guardBuilders[$driver]($name, $config);
+			return $this->guardBuilders[$driver]($guard, $config);
 		}
 
 		switch ($driver) {
 			case 'session':
-				return $this->createSessionDriver($name, $config);
+				return $this->createSessionDriver($guard, $config);
 			default:
-				throw new \InvalidArgumentException("Auth guard driver {$driver} for guard {$name} is not defined.");
+				throw new \InvalidArgumentException("Auth guard driver {$driver} for guard {$guard} is not defined.");
 		}
 
 	}
@@ -115,10 +117,63 @@ class Manager extends Component
 		return $this->guards[$name];
 	}
 
-	public function createUserResolver($config = null)
+	protected function getGuardProvider($name)
 	{
-		if (isset($this->userResolverBuilders[$driver = ($config['driver'] ?? null)])) {
-			return call_user_func($this->userResolverBuilders[$driver], $config);
+		$config = $this->getGuardConfig($name);
+
+		if (is_null($config)) {
+			throw new \InvalidArgumentException("Auth guard [{$name}] is not defined.");
+		}
+
+		return $config['provider'] ?? null;
+	}
+
+	protected function createSessionDriver($guard, $config)
+	{
+		$provider = $this->createUserProvider( $config['provider'] ?? null);
+		return new SessionGuard($guard, $provider);
+	}
+
+	// USER PROVIDER
+
+	public function setProvider($name, $provider)
+	{
+		if (is_null($provider)){
+			throw new \InvalidArgumentException('Provider ' . $name . ' can not be null or empty');
+		}
+
+		if (empty($provider['driver'] ?? null)) {
+			throw new \InvalidArgumentException('No driver specified for provider ' . $name);
+		};
+
+		$this->providers[$name] = $provider;
+	}
+
+	public function getDefaultProvider()
+	{
+		return $this->default_provider;
+	}
+
+	public function setDefaultProvider($name)
+	{
+		$this->default_provider = $name ?: $this->getDefaultProvider();
+	}
+
+	public function addUserProviderBuilder($name, callable $builder)
+	{
+		$this->userProviderBuilders[$name] = $builder;
+		return $this;
+	}
+
+	public function createUserProvider($provider = null)
+	{
+
+		if (is_null($config = $this->getProviderConfig($provider))) {
+			return;
+		}
+
+		if (isset($this->userProviderBuilders[$driver = ($config['driver'] ?? null)])) {
+			return call_user_func($this->userProviderBuilders[$driver], $config);
 		}
 
 		switch ($driver) {
@@ -131,25 +186,11 @@ class Manager extends Component
 		}
 	}
 
-	public function addUserResolverBuilder($name, callable $builder)
+	protected function getProviderConfig($provider)
 	{
-		$this->userResolverBuilders[$name] = $builder;
-		return $this;
-	}
-
-	public function addUserResolverBuilders($builders)
-	{
-		foreach ($builders as $key => $builder) {
-			$this->addUserResolverBuilder($key, $builder);
+		if ($provider = $provider ?: $this->getDefaultProvider()) {
+			return $this->providers[$provider] ?? null;
 		}
-		return $this;
-	}
-
-
-	protected function createSessionDriver($key, $config)
-	{
-		$resolver = $this->createUserResolver($config['provider'] ?? null);
-		return new SessionGuard($key, $resolver);
 	}
 
 	protected function createModelProvider($config)
@@ -158,6 +199,6 @@ class Manager extends Component
 			return null;
 		}
 
-		return new ModelResolver($config['model']);
+		return new ModelUserProvider($config['model']);
 	}
 }
