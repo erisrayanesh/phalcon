@@ -110,7 +110,7 @@ class Manager extends Component
 			return null;
 		}
 
-		if (!is_array($this->guards[$name])){
+		if ($this->guards[$name] instanceof GuardDriver){
 			return null;
 		}
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Phalcon\Validation\Exceptions;
+namespace Phalcon\Validation;
 
 use Phalcon\Http\Response;
 use Phalcon\Validation;
