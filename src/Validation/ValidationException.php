@@ -22,6 +22,20 @@ class ValidationException extends \Exception
 	public $response;
 
 	/**
+	 * The status code to use for the response.
+	 *
+	 * @var int
+	 */
+	public $status = 422;
+
+	/**
+	 * The path the client should be redirected to.
+	 *
+	 * @var string
+	 */
+	public $redirectTo;
+
+	/**
 	 * Create a new exception instance.
 	 *
 	 * @param  Validation  $validator
@@ -44,5 +58,24 @@ class ValidationException extends \Exception
 	public function getResponse()
 	{
 		return $this->response;
+	}
+
+	public function errors()
+	{
+		return $this->validator->getMessages();
+	}
+
+	public function status($status)
+	{
+		$this->status = $status;
+
+		return $this;
+	}
+
+	public function redirectTo($url)
+	{
+		$this->redirectTo = $url;
+
+		return $this;
 	}
 }
