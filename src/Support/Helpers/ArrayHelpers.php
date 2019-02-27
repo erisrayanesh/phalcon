@@ -44,6 +44,32 @@ function array_get($array, $key, $default = null)
 	return $array;
 }
 
+function array_set(&$array, $key, $value)
+{
+	if (is_null($key)) {
+		return $array = $value;
+	}
+
+	$keys = explode('.', $key);
+
+	while (count($keys) > 1) {
+		$key = array_shift($keys);
+
+		// If the key doesn't exist at this depth, we will just create an empty array
+		// to hold the next value, allowing us to create the arrays to hold final
+		// values at the correct depth. Then we'll keep digging into the array.
+		if (! isset($array[$key]) || ! is_array($array[$key])) {
+			$array[$key] = [];
+		}
+
+		$array = &$array[$key];
+	}
+
+	$array[array_shift($keys)] = $value;
+
+	return $array;
+}
+
 function array_pull(&$array, $key, $default = null)
 {
 	$value = array_get($array, $key, $default);
@@ -184,6 +210,15 @@ function array_except($array, $keys)
 function array_where($array, callable $callback)
 {
 	return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+}
+
+function array_wrap($value)
+{
+	if (is_null($value)) {
+		return [];
+	}
+
+	return is_array($value) ? $value : [$value];
 }
 
 if (! function_exists('data_get')) {

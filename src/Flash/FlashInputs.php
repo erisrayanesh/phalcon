@@ -3,43 +3,28 @@ namespace Phalcon\Flash;
 
 use Phalcon\Support\ErrorsBag;
 use Phalcon\Mvc\User\Component;
+use Phalcon\Support\Interfaces\Jsonable;
 use Phalcon\Validation\Message;
 
-class FlashInputs extends Component
+class FlashInputs extends Component implements \Countable, \ArrayAccess, \Iterator, Jsonable
 {
 
-	protected $inputsNewVar = "__inputs.new";
-	protected $inputsOldVar = "__inputs.old";
-	protected $errorsVar    = "__errors";
-
-	public function init()
-	{
-		$new = $this->session->get($this->inputsNewVar, []);
-		$this->session->set($this->inputsOldVar, $new);
-
-		$this->session->set($this->inputsNewVar, $_REQUEST);
-
-		$this->view->setVar("errors", new ErrorsBag($this->session->get($this->errorsVar)));
-		$this->forgetErrors();
-	}
+	protected $inputsNewVar = "_inputs.new";
+	protected $inputsOldVar = "_inputs.old";
 
 	/**
+	 * Returns an old flashed input value with given key
 	 * @param $key
 	 * @param $default
 	 * @return mixed|null
 	 */
 	public function getOld($key = null, $default = null)
 	{
-		$old = $this->session->get($this->inputsOldVar);
-		if ($key == null)
-		{
-			return $old;
-		}
-
-		return isset($old[$key])? $old[$key] : $default;
+		return array_get($this->allOld(), $key, $default);
 	}
 
 	/**
+	 * Checks if old flashed inputs has a value with given key
 	 * @param $key
 	 * @return bool
 	 */
@@ -48,56 +33,202 @@ class FlashInputs extends Component
 		return $this->getOld($key) != null;
 	}
 
+	/**
+	 * Returns an flashed input value with given key
+	 * @param null $key
+	 * @param null $default
+	 * @return mixed
+	 */
+	public function get($key = null, $default = null)
+	{
+		return array_get($this->all(), $key, $default);
+	}
 
 	/**
-	 * @param $key
-	 * @param $message
-	 * @return static
+	 * Flashes an input value with given key
+	 * @param string|array $key
+	 * @param bool $value
+	 * @return $this
 	 */
-	public function addError($key, $message = null)
+	public function set($key, $value = true)
 	{
-		if (is_array($key)){
-			return $this->addErrors($key);
+		if (!is_array($key)) {
+			$key = [$key => $value];
 		}
 
-		if (is_null($message)){
-			return $this;
+		$all = $this->all();
+
+		foreach ($key as $k => $v) {
+			$all[$k] = $v;
 		}
 
-		$errors = $this->getErrors();
-		$errors[] = [$key, $message];
-		$this->session->set($this->errorsVar, $errors);
+		$this->session->set($this->inputsNewVar, $all);
 
 		return $this;
 	}
 
-	public function addErrors($errors)
+	/**
+	 * Checks if flashed inputs has a value with given key
+	 * @param $key
+	 * @return bool
+	 */
+	public function has($key)
 	{
-		foreach ($errors as $index => $error) {
-			if ($error instanceof Message) {
-				$this->addValidationError($error);
-				continue;
-			}
-
-			if (is_array($error)){
-				$this->addError($error[0], $error->getMessage());
-			}
-		}
+		return $this->get($key) != null;
 	}
 
-	public function addValidationError(Message $message)
+	/**
+	 * Alias of remove
+	 * @param string|array $key
+	 * @return FlashInputs
+	 */
+	public function forget($key)
 	{
-		$this->addError($message->getField(), $message->getMessage());
+		return $this->remove($key);
 	}
 
-	public function forgetErrors()
+	/**
+	 * Removes a flashed input with given key
+	 * @param string|array $key
+	 * @return $this
+	 */
+	public function remove($key)
 	{
-		$this->session->set($this->errorsVar, []);
+		array_forget($this->all(), $key);
+		return $this;
 	}
 
-	public function getErrors()
+	public function clear()
 	{
-		return $this->session->get($this->errorsVar);
+		$this->session->set($this->inputsNewVar, []);
+		return $this;
 	}
+
+	public function flush()
+	{
+		return $this->clear();
+	}
+
+	public function allOld()
+	{
+		return $this->session->get($this->inputsOldVar, []);
+	}
+
+	public function all()
+	{
+		return $this->session->get($this->inputsNewVar, []);
+	}
+
+	public function save()
+	{
+		$this->session->set($this->inputsOldVar, $this->all());
+		$this->session->set($this->inputsNewVar, []);
+	}
+
+	public function __get($key)
+	{
+		return $this->get($key);
+	}
+
+	public function __set($key, $value)
+	{
+		return $this->set($key, $value);
+	}
+
+	public function __isset($key)
+	{
+		return $this->has($key);
+	}
+
+	public function count()
+	{
+		return count($this->all());
+	}
+
+	/**
+	 * Determine if an item exists at an offset.
+	 *
+	 * @param  mixed  $key
+	 * @return bool
+	 */
+	public function offsetExists($key)
+	{
+		return array_key_exists($key, $this->all());
+	}
+
+	/**
+	 * Get an item at a given offset.
+	 *
+	 * @param  mixed  $key
+	 * @return mixed
+	 */
+	public function offsetGet($key)
+	{
+		return $this->get($key);
+	}
+
+	/**
+	 * Set the item at a given offset.
+	 *
+	 * @param  mixed  $key
+	 * @param  mixed  $value
+	 * @return void
+	 */
+	public function offsetSet($key, $value)
+	{
+		$this->set($key, $value);
+	}
+
+	/**
+	 * Unset the item at a given offset.
+	 *
+	 * @param  string  $key
+	 * @return void
+	 */
+	public function offsetUnset($key)
+	{
+		$this->remove($key);
+	}
+
+	/**
+	 * Convert the flashed inputs to its string representation.
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return $this->toJson();
+	}
+
+	public function current()
+	{
+		return current($this->all());
+	}
+
+	public function next()
+	{
+		next($this->all());
+	}
+
+	public function key()
+	{
+		return key($this->all());
+	}
+
+	public function valid()
+	{
+		return $this->has($this->key());
+	}
+
+	public function rewind()
+	{
+		rewind($this->all());
+	}
+
+	public function toJson($options = 0)
+	{
+		return json_encode($this->all(), $options);
+	}
+
 
 }

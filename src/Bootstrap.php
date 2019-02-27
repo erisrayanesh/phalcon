@@ -162,7 +162,9 @@ class Bootstrap
 	protected function initApplication()
 	{
 		$this->app = new Application($this->di);
-		$this->app->setEventsManager($this->di->getShared('eventsManager'));
+		$this->app->setEventsManager($this->di->getShared('eventsManager'))
+			->sendHeadersOnHandleRequest(false)
+			->sendCookiesOnHandleRequest(false);
 	}
 
 	/**

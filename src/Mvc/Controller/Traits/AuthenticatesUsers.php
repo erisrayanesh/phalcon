@@ -2,7 +2,7 @@
 
 namespace Phalcon\Mvc\Controller\Traits;
 
-use Phalcon\Validation\Exceptions\ValidationException;
+use Phalcon\Validation\ValidationException;
 
 trait AuthenticatesUsers
 {

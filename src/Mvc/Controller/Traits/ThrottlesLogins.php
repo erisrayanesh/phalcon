@@ -5,7 +5,7 @@ namespace Phalcon\Mvc\Controller\Traits;
 
 use Apps\LoginAttempts;
 use Apps\Users;
-use Phalcon\Validation\Exceptions\ValidationException;
+use Phalcon\Validation\ValidationException;
 
 trait ThrottlesLogins
 {

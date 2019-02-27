@@ -10,6 +10,7 @@ if (!function_exists('dd')){
 	}
 }
 
+
 function flash_error($errorKey = null, $error = null)
 {
 
@@ -44,20 +45,40 @@ function flash_error($errorKey = null, $error = null)
 	}
 }
 
-function redirect($location, $withKey = null, $with = null)
+/**
+ * @param string $location
+ * @param int $code
+ * @param array $headers
+ * @param bool $external
+ * @return \Phalcon\Http\RedirectResponse
+ */
+function redirect($location, $code = 302, $headers = [], $external = false)
 {
-	flash_error($withKey, $with);
-	return response()->redirect($location);
+	return response()->redirectTo($location, $code, $headers, $external);
 }
 
-function redirect_back($withKey = null, $with = null)
+/**
+ * @param int $code
+ * @param array $headers
+ * @param bool $fallback
+ * @return \Phalcon\Http\RedirectResponse
+ */
+function redirect_back($code = 302, $headers = [], $fallback = false)
 {
-	return redirect(trim(old("_url"), '\/\\'), $withKey, $with);
+	return redirect(previous_request_url($fallback), $code, $headers);
 }
 
-function redirect_route($name, $data = null, $query = null, $withKey = null, $with = null)
+/**
+ * @param $name
+ * @param null $data
+ * @param null $query
+ * @param int $code
+ * @param array $headers
+ * @return \Phalcon\Http\RedirectResponse
+ */
+function redirect_route($name, $data = null, $query = null, $code = 302, $headers = [])
 {
-	return redirect(route($name, $data, $query), $withKey, $with);
+	return redirect(route($name, $data, $query), $code, $headers);
 }
 
 function abort($code)

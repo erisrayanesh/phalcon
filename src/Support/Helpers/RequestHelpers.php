@@ -11,72 +11,24 @@ function route($name, $data = null, $query = null)
 	}
 
 	$data["for"] = $name;
-	return url()->get($data, $query);
+	return url($data, $query);
 }
 
-function request_only($list)
+function previous_request_url($fallback = false)
 {
 
-	if (!is_array($list)){
-		$list = func_get_args();
+	$referrer = request()->getHTTPReferer();
+
+	//TODO: check _url value
+	$url = $referrer ? url($referrer) : session()->get('_url');
+
+	if ($url) {
+		return $url;
+	} elseif ($fallback) {
+		return url($fallback);
 	}
 
-	if (!is_array($list)){
-		$list = [];
-	}
+	return url('/');
 
-	$values = [];
-	foreach ($list as $item){
-		$values[$item] = request()->get($item);
-	}
-	return $values;
-}
-
-function request_except($list)
-{
-
-	if (!is_array($list)){
-		$list = func_get_args();
-	}
-
-	if (!is_array($list)){
-		$list = [];
-	}
-
-	$keys = array_keys(array_except($_REQUEST, $list));
-
-	$values = [];
-	foreach ($keys as $item){
-		$values[$item] = request()->get($item);
-	}
-	return $values;
-}
-
-function request_expects_json()
-{
-	return (request()->isAjax() && ! request_is_pjax()) || request_wants_json();
-}
-
-function request_wants_json()
-{
-	$acceptable = request()->getBestAccept();
-
-	if (is_array($acceptable)) {
-		foreach ($acceptable as $acc) {
-			$acceptable = $acc;
-			break;
-		}
-	}
-
-	return str_contains($acceptable, ['/json', '+json']);
-}
-
-function request_is_pjax()
-{
-	return request()->getHeader('X-PJAX') == true;
-}
-
-function previous_request_url()
-{
-	return trim(old("_url"), '\/\\');
+	//return trim(old("_url"), '\/\\') ?? ($fallback ?: null);
 }

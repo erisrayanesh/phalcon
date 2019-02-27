@@ -2,10 +2,9 @@
 
 namespace Phalcon\Mvc\Controller\Traits;
 
-
-use Phalcon\Http\Response;
+use Phalcon\Http\JsonResponse;
 use Phalcon\Validation;
-use Phalcon\Validation\Exceptions\ValidationException;
+use Phalcon\Validation\ValidationException;
 use \Phalcon\Validation\Message\Group;
 
 trait ValidatesRequests
@@ -14,15 +13,22 @@ trait ValidatesRequests
 	public function validate($rules, $values)
 	{
 		$validator = $this->getValidationFactory();
-
 		$this->appendRulesToValidator($validator, $rules);
-
 		$messages = $validator->validate($values);
 
 		if (count($messages)){
 			$this->throwValidationException($validator, $messages);
 		}
 
+	}
+
+	/**
+	 * Instantiates a validation class
+	 * @return \Phalcon\Validation
+	 */
+	protected function getValidationFactory()
+	{
+		return new Validation();
 	}
 
 	protected function throwValidationException(Validation $validator, Group $messages)
@@ -33,10 +39,7 @@ trait ValidatesRequests
 	protected function buildFailedValidationResponse(Group $messages)
 	{
 		if (request_expects_json()) {
-			$jsonResponse = new Response();
-			$jsonResponse->setStatusCode(422, 'Unprocessable Entity');
-			$jsonResponse->setJsonContent($this->formatValidationMessagesForJson($messages));
-			return $jsonResponse;
+			return new JsonResponse($this->formatValidationMessagesForJson($messages), 422);
 		}
 
 		inputs()->addErrors($messages);
@@ -44,8 +47,7 @@ trait ValidatesRequests
 		return $this->redirectFailedValidation();
 	}
 
-
-	protected function appendRulesToValidator(Validation &$validator, array $rules)
+	protected function appendRulesToValidator(Validation $validator, array $rules)
 	{
 		foreach ($rules as $rule) {
 			$validator->add($rule[0], $rule[1]);
@@ -62,14 +64,6 @@ trait ValidatesRequests
 			];
 		}
 		return $arr;
-	}
-
-	/**
-	 * @return \Phalcon\Validation
-	 */
-	protected function getValidationFactory()
-	{
-		return new Validation();
 	}
 
 	protected function redirectFailedValidation()

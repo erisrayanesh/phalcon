@@ -17,6 +17,15 @@ Class Handler implements ExceptionHandler
 
 	protected $errorsViewDir = "errors";
 
+	protected $noReport = [
+		//
+	];
+
+	protected $noFlash = [
+		'password',
+		'password_confirmation',
+	];
+
 	public function report(Exception $e)
 	{
 

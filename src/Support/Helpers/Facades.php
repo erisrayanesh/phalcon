@@ -31,6 +31,22 @@ if (! function_exists('auth')) {
 	}
 }
 
+if (! function_exists('cookie')) {
+	/**
+	 * @return \Phalcon\Http\Cookie
+	 */
+	function cookie($name = null, $value = null, $expire = 0, $path = null, $secure = false, $domain = null, $httpOnly = true, $raw = false, $sameSite = null)
+	{
+		$cookie = DI()->get(\Phalcon\Http\Cookie\Factory::class);
+
+		if (is_null($name)) {
+			return $cookie;
+		}
+
+		return new \Phalcon\Http\Cookie($name, $value, $expire, $path, $secure, $domain, $httpOnly);
+	}
+}
+
 if (! function_exists('config')) {
 	/**
 	 * @param $name
@@ -50,16 +66,6 @@ if (! function_exists('config')) {
 
 //	return DI()->getConfig()->path($name, $default);
 //    return DI()->getConfig()->get($name, $default);
-	}
-}
-
-if (! function_exists('cookies')) {
-	/**
-	 * @return \Phalcon\Http\Response\Cookies
-	 */
-	function cookies()
-	{
-		return DI()->get("cookies");
 	}
 }
 
@@ -113,13 +119,13 @@ if (! function_exists('flashSession')) {
 	}
 }
 
-if (! function_exists('inputs')) {
+if (! function_exists('flashInputs')) {
 	/**
 	 * @return \Phalcon\Flash\FlashInputs
 	 */
-	function inputs()
+	function flashInputs()
 	{
-		return DI()->get("inputs");
+		return DI()->get("flashInputs");
 	}
 }
 
@@ -195,21 +201,46 @@ if (! function_exists('logs')) {
 
 if (! function_exists('request')) {
 	/**
-	 * @return \Phalcon\Http\Request
+	 * @param null $key
+	 * @param null $default
+	 * @param null $filters
+	 * @param bool $notAllowEmpty
+	 * @param bool $noRecursive
+	 * @return string|array|\Phalcon\Http\FormRequest
 	 */
-	function request()
+	function request($key = null, $default = null, $filters = null, $notAllowEmpty = false, $noRecursive = false)
 	{
-		return DI()->get("request");
+		if (is_null($key)) {
+			return DI()->get("request");
+		}
+
+		if (is_array($key)) {
+			return DI()->get("request")->only($key);
+		}
+
+		$value = DI()->get("request")->get($key, $filters, $default, $notAllowEmpty, $noRecursive);
+
+		return is_null($value) ? value($default) : $value;
 	}
 }
 
 if (! function_exists('response')) {
 	/**
-	 * @return \Phalcon\Http\Response
+	 * @param string $content
+	 * @param int $code
+	 * @param null $status
+	 * @param array $headers
+	 * @return \Phalcon\Http\ResponseFactory
 	 */
-	function response()
+	function response($content = '', $code = 200, $status = null, $headers = [])
 	{
-		return DI()->get("response");
+		$factory = DI()->get("response");
+
+		if (func_num_args() === 0) {
+			return $factory;
+		}
+
+		return $factory->make($content, $code, $status, $headers);
 	}
 }
 
@@ -235,11 +266,21 @@ if (! function_exists('security')) {
 
 if (! function_exists('session')) {
 	/**
-	 * @return Phalcon\Session\Adapter\Files
+	 * @param null $key
+	 * @param null $default
+	 * @return mixed|Phalcon\Session\Adapter\Files
 	 */
-	function session()
+	function session($key = null, $default = null)
 	{
-		return DI()->get("session");
+		if (is_null($key)) {
+			return DI()->get("session");
+		}
+
+		if (is_array($key)) {
+			return DI()->get("session")->set($key);
+		}
+
+		return DI()->get("session")->get($key, $default);
 	}
 }
 
@@ -256,11 +297,17 @@ if (! function_exists('storage')) {
 
 if (! function_exists('url')) {
 	/**
-	 * @return \Phalcon\Mvc\Url
+	 * @param null $path
+	 * @param array $parameters
+	 * @return \Phalcon\Mvc\Url|string
 	 */
-	function url()
+	function url($path = null, $parameters = [])
 	{
-		return DI()->get("url");
+		if (is_null($path)) {
+			return DI()->get("url");
+		}
+
+		return DI()->get("url")->get($path, $parameters);
 	}
 }
 
