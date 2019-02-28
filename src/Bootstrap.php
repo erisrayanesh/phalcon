@@ -3,11 +3,10 @@
 namespace Phalcon;
 
 use Phalcon\Debug\ExceptionHandler;
+use Phalcon\Debug\FatalThrowableError;
 use Phalcon\Di\ServiceProviderInterface;
-use Phalcon\Di;
-use Phalcon\DiInterface;
+use Phalcon\Http\Response;
 use Phalcon\Http\ResponseInterface;
-use Phalcon\Loader;
 use Phalcon\Mvc\Application;
 
 
@@ -141,22 +140,17 @@ class Bootstrap
 	public function handleException($e)
 	{
 		if (!$e instanceof \Exception) {
-			if ($e instanceof \ParseError) {
-				$severity = E_PARSE;
-			} elseif ($e instanceof \TypeError) {
-				$severity = E_RECOVERABLE_ERROR;
-			} else {
-				$severity = E_ERROR;
-			}
-
-			$e = new \ErrorException($e->getMessage(), $e->getCode(), $severity, $e->getFile(), $e->getLine(), $e->getPrevious());
+			$e = new FatalThrowableError($e);
 		}
 
-		if ($this->getDi()->has(ExceptionHandler::class)){
-			$this->getDi()->get(ExceptionHandler::class)->render($e)->send();
+		try {
+			$this->getExceptionHandler()->report($e);
+			$this->renderException($e)->send();;
+			return;
+		} catch (\Exception $exception) {
+			echo "Sorry. Something went wrong...";
 		}
 
-		echo "Sorry. Something went wrong...";
 	}
 
 	protected function initApplication()
@@ -174,7 +168,17 @@ class Bootstrap
 	 */
 	protected function handleRequest()
 	{
-		return $this->app->handle();
+		try {
+			$response = $this->app->handle();
+		} catch (\Exception $e) {
+			$this->reportException($e);
+			$response = $this->renderException($e);
+		} catch (\Throwable $e) {
+			$this->reportException($e = new FatalThrowableError($e));
+			$response = $this->renderException($e);
+		}
+
+		return $response;
 	}
 
 	protected function initErrorHandlers()
@@ -189,6 +193,36 @@ class Bootstrap
 	protected function isFatalError($type)
 	{
 		return in_array($type, [E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE]);
+	}
+
+	/**
+	 * @return ExceptionHandler|null
+	 */
+	protected function getExceptionHandler()
+	{
+		return $this->getDi()->get(ExceptionHandler::class);
+	}
+
+	/**
+	 * Report the exception to the exception handler.
+	 *
+	 * @param  \Exception  $e
+	 * @return void
+	 */
+	protected function reportException(\Exception $e)
+	{
+		$this->getExceptionHandler()->report($e);
+	}
+
+	/**
+	 * Render the exception to a response.
+	 *
+	 * @param  \Exception  $e
+	 * @return ResponseInterface
+	 */
+	protected function renderException(\Exception $e)
+	{
+		return $this->getExceptionHandler()->render($e);
 	}
 
 }

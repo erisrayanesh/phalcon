@@ -6,6 +6,7 @@ use Phalcon\Http\Cookie;
 
 class Factory
 {
+
 	/**
 	 * @param null $name
 	 * @param null $value
@@ -48,5 +49,24 @@ class Factory
 	public function forget($name, $path = null, $domain = null)
 	{
 		return $this->make($name, null, -2628000, $path, $domain);
+	}
+
+	/**
+	 * Set if cookies in the bag must be automatically encrypted/decrypted
+	 *
+	 * @param bool $useEncryption
+	 * @return Factory
+	 */
+	public function useEncryption($useEncryption) {
+
+	}
+
+	/**
+	 * Returns if the bag is automatically encrypting/decrypting cookies
+	 *
+	 * @return bool
+	 */
+	public function isUsingEncryption() {
+
 	}
 }
