@@ -38,7 +38,7 @@ trait ValidatesRequests
 
 	protected function buildFailedValidationResponse(Group $messages)
 	{
-		if (request_expects_json()) {
+		if (request()->expectsJson()) {
 			return new JsonResponse($this->formatValidationMessagesForJson($messages), 422);
 		}
 

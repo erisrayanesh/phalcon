@@ -33,17 +33,24 @@ if (! function_exists('auth')) {
 
 if (! function_exists('cookie')) {
 	/**
+	 * @param null $name
+	 * @param null $value
+	 * @param int $expire
+	 * @param null $path
+	 * @param bool $secure
+	 * @param null $domain
+	 * @param bool $httpOnly
 	 * @return \Phalcon\Http\Cookie
 	 */
-	function cookie($name = null, $value = null, $expire = 0, $path = null, $secure = false, $domain = null, $httpOnly = true, $raw = false, $sameSite = null)
+	function cookie($name = null, $value = null, $expire = 0, $path = null, $secure = false, $domain = null, $httpOnly = true)
 	{
-		$cookie = DI()->get(\Phalcon\Http\Cookie\Factory::class);
+		$cookie = DI()->get('cookie');
 
 		if (is_null($name)) {
 			return $cookie;
 		}
 
-		return new \Phalcon\Http\Cookie($name, $value, $expire, $path, $secure, $domain, $httpOnly);
+		return new $cookie->make($name, $value, $expire, $path, $secure, $domain, $httpOnly);
 	}
 }
 

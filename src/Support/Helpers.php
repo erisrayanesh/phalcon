@@ -215,7 +215,7 @@ if (! function_exists('t')) {
 
 function old($key, $default = null)
 {
-	return inputs()->getOld($key, $default);
+	return flashInputs()->getOld($key, $default);
 }
 
 function csrf_field()

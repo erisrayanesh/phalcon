@@ -17,11 +17,11 @@ Class Handler implements ExceptionHandler
 
 	protected $errorsViewDir = "errors";
 
-	protected $noReport = [
+	protected $ignoreReporting = [
 		//
 	];
 
-	protected $noFlash = [
+	protected $ignoreFlashing = [
 		'password',
 		'password_confirmation',
 	];
@@ -71,10 +71,9 @@ Class Handler implements ExceptionHandler
 	 */
 	protected function unauthenticated(AuthenticationException $exception)
 	{
-		return request_expects_json() ?
-			tap(new Response('', 401), function (Response $response) use ($exception) {
-			})
-			: ($exception->redirectTo()? redirect($exception->redirectTo()) : redirect_route('login'));
+		return request()->expectsJson() ?
+			response()->json(['message' => $exception->getMessage()], 401)
+			: response()->redirectTo($exception->redirectTo() ??  route('login'));
 	}
 
 	/**
@@ -89,7 +88,7 @@ Class Handler implements ExceptionHandler
 			return $e->response;
 		}
 
-		return request_expects_json()
+		return request()->expectsJson()
 			? $this->ValidationToJsonResponse($e)
 			: $this->ValidationToResponse($e);
 	}
@@ -102,7 +101,9 @@ Class Handler implements ExceptionHandler
 	 */
 	protected function ValidationToResponse(ValidationException $e)
 	{
-		return redirect($e->redirectTo ?? previous_request_url(), 'errors', $e->errors());
+		return redirect($e->redirectTo ?? previous_request_url())
+				->withInput(request()->except($this->ignoreFlashing))
+				->withMessage($e->errors());
 	}
 
 	/**
@@ -113,12 +114,10 @@ Class Handler implements ExceptionHandler
 	 */
 	protected function ValidationToJsonResponse(ValidationException $e)
 	{
-		return tap(new Response('', $e->status), function (Response $response) use ($e) {
-			$response->setJsonContent([
-				'message' => $e->getMessage(),
-				'errors' => $e->errors(),
-			]);
-		});
+		return response()->json([
+			'message' => $e->getMessage(),
+			'errors' => $e->errors(),
+		], $e->status);
 	}
 
 	/**
@@ -128,15 +127,11 @@ Class Handler implements ExceptionHandler
 	 */
 	protected function buildHttpResponseException(HttpResponseException $e)
 	{
-		if (request_expects_json()){
-			$response = new Response();
-			$response->setStatusCode($e->getCode())
-				->setJsonContent(["error" => $response->getHeaders()->get('Status'), "message" => $e->getMessage()]);
-			return $response;
+		if (request()->expectsJson()){
+			return response()->json(["message" => $e->getMessage()], $e->getCode());
 		}
 
-		response()->setStatusCode($e->getCode());
-		view($this->errorsViewDir . "/" . $e->getCode(), ["exception" => $e]);
+		return response()->view($this->errorsViewDir . "/" . $e->getCode(), ["exception" => $e], $e->getCode());
 	}
 
 	/**
@@ -146,7 +141,7 @@ Class Handler implements ExceptionHandler
 	 */
 	protected function renderUnhandledException(\Exception $e)
 	{
-		return request_expects_json()?
+		return request()->expectsJson()?
 					$this->prepareJsonResponse($e) :
 					$this->prepareResponse($e);
 	}
@@ -183,16 +178,16 @@ Class Handler implements ExceptionHandler
 		$whoops->allowQuit(false);
 
 		return $json ?
-			new JsonResponse($whoops->handleException($e), $e->getMessage()) :
-			new Response($whoops->handleException($e), $e->getMessage());
+			response()->json($whoops->handleException($e), 500) :
+			response($whoops->handleException($e), 500);
 	}
 
 	protected function renderExceptionForDeployment(\Exception $e, $json = false)
 	{
 		$message = "Whoops! Something went wrong";
 		return $json ?
-			new Response($message, 500) :
-			new JsonResponse (['message' =>$message],500,null,JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+			response($message, 500) :
+			response()->json(['message' => $message],500,null,JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 	}
 
 	/**
