@@ -40,19 +40,20 @@ if (! function_exists('cookie')) {
 	 * @param bool $secure
 	 * @param null $domain
 	 * @param bool $httpOnly
-	 * @return \Phalcon\Http\Cookie
+	 * @return \Phalcon\Http\Cookie|\Phalcon\Http\Cookie\Factory
 	 */
 	function cookie($name = null, $value = null, $expire = 0, $path = null, $secure = false, $domain = null, $httpOnly = true)
 	{
-		$cookie = DI()->get('cookie');
+		$cookies = DI()->get('cookie');
 
 		if (is_null($name)) {
-			return $cookie;
+			return $cookies;
 		}
 
-		return new $cookie->make($name, $value, $expire, $path, $secure, $domain, $httpOnly);
+		return $cookies->make($name, $value, $expire, $path, $secure, $domain, $httpOnly);
 	}
 }
+
 
 if (! function_exists('config')) {
 	/**

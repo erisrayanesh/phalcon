@@ -16,8 +16,8 @@ trait RemembersLogin
 
 	protected function setupRememberCookie($rmu, $rmt, $expire)
 	{
-		$this->cookies->set('RMU', $rmu, $expire);
-		$this->cookies->set('RMT', $rmt, $expire);
+		cookie()->set('RMU', $rmu, $expire);
+		cookie()->set('RMT', $rmt, $expire);
 	}
 
 	/**
@@ -52,18 +52,18 @@ trait RemembersLogin
 	 */
 	protected function hasRememberMe()
 	{
-		return $this->cookies->has('RMU');
+		return cookie()->has('RMU');
 	}
 
 	/**
 	 * Logs on using the information in the cookies
 	 *
-	 * @return \Phalcon\Http\Response
+	 * @return bool
 	 */
 	protected function attemptLoginWithRememberMe()
 	{
-		$userId = $this->cookies->get('RMU')->getValue();
-		$cookieToken = $this->cookies->get('RMT')->getValue();
+		$userId = cookie()->get('RMU')->getValue();
+		$cookieToken = cookie()->get('RMT')->getValue();
 
 		$user = Users::findFirstById($userId);
 		if (!$user) {
@@ -109,12 +109,12 @@ trait RemembersLogin
 	protected function terminateRemember()
 	{
 		if ($this->hasRememberMe()) {
-			$this->cookies->get('RMU')->delete();
+			cookie()->forget('RMU');
 		}
 
-		if ($this->cookies->has('RMT')) {
+		if (cookie()->has('RMT')) {
 
-			$token = $this->cookies->get('RMT')->getValue();
+			$token = cookie()->get('RMT')->getValue();
 
 			$remember = Remember::findFirst(
 				[
@@ -129,7 +129,7 @@ trait RemembersLogin
 				$remember->delete();
 			}
 
-			$this->cookies->get('RMT')->delete();
+			cookie()->forget('RMT');
 		}
 	}
 

@@ -208,7 +208,7 @@ class Session implements StatefulDriver, EventsAwareInterface
 
 	protected function getRememberCookie()
 	{
-		$rmu = cookies()->get($this->getRememberCookieName());
+		$rmu = cookie()->get($this->getRememberCookieName());
 		if (!empty($rmu) && !empty($rmu->getValue())){
 			return $rmu;
 		}
@@ -241,7 +241,7 @@ class Session implements StatefulDriver, EventsAwareInterface
 
 	protected function storeRememberCookie(Authenticatable $user)
 	{
-		cookies()->set($this->getRememberCookieName(), $user->getAuthIdentifier() . "|" . $user->getRememberToken(), time() + (10 * 365 * 24 * 60 * 60));
+		cookie()->set($this->getRememberCookieName(), $user->getAuthIdentifier() . "|" . $user->getRememberToken(), time() + (10 * 365 * 24 * 60 * 60));
 	}
 
 	public function getRememberCookieName()
@@ -254,7 +254,7 @@ class Session implements StatefulDriver, EventsAwareInterface
 		session()->remove($this->getName());
 
 		if (!empty($this->getRememberCookie())) {
-			cookies()->delete($this->getRememberCookieName());
+			cookie()->forget($this->getRememberCookieName());
 		}
 	}
 

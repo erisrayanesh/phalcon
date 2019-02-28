@@ -3,21 +3,18 @@
 namespace Phalcon\Http\Cookie;
 
 use Phalcon\Http\Cookie;
+use Phalcon\Http\Response\Cookies;
 
-class Factory
+class Factory extends Cookies
 {
 
-	/**
-	 * @param null $name
-	 * @param null $value
-	 * @param int $expire
-	 * @param null $path
-	 * @param bool $secure
-	 * @param null $domain
-	 * @param bool $httpOnly
-	 * @return Cookie
-	 */
-	public function make($name = null, $value = null, $expire = 0, $path = null, $secure = false, $domain = null, $httpOnly = true)
+	public function __construct($useEncryption = true, $signKey = null)
+	{
+		parent::__construct($useEncryption, $signKey);
+		$this->_registered = true;
+	}
+
+	public function make($name, $value = null, $expire = 0, $path = null, $secure = false, $domain = null, $httpOnly = true)
 	{
 		return new Cookie($name, $value, $expire, $path, $secure, $domain, $httpOnly);
 	}
@@ -31,42 +28,23 @@ class Factory
 	 * @param  string       $domain
 	 * @param  bool|null    $secure
 	 * @param  bool         $httpOnly
-	 * @return Cookie
+	 * @return Factory
 	 */
 	public function forever($name = null, $value = null, $path = null, $secure = false, $domain = null, $httpOnly = true)
 	{
-		return $this->make($name, $value, 2628000, $path, $domain, $secure, $httpOnly);
+		$this->set($name, $value, 2628000, $path, $domain, $secure, $httpOnly);
+		return $this;
 	}
 
 	/**
 	 * Expire the given cookie.
 	 *
 	 * @param  string  $name
-	 * @param  string  $path
-	 * @param  string  $domain
-	 * @return Cookie
-	 */
-	public function forget($name, $path = null, $domain = null)
-	{
-		return $this->make($name, null, -2628000, $path, $domain);
-	}
-
-	/**
-	 * Set if cookies in the bag must be automatically encrypted/decrypted
-	 *
-	 * @param bool $useEncryption
-	 * @return Factory
-	 */
-	public function useEncryption($useEncryption) {
-
-	}
-
-	/**
-	 * Returns if the bag is automatically encrypting/decrypting cookies
-	 *
 	 * @return bool
 	 */
-	public function isUsingEncryption() {
-
+	public function forget($name)
+	{
+		return $this->delete($name);
 	}
+
 }

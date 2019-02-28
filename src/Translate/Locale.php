@@ -40,8 +40,8 @@ class Locale extends Component
 	public function init()
 	{
 		$cookieLocale = null;
-		if ($this->cookies->has($this->getCookieVar())) {
-			$cookieLocale = $this->cookies->get($this->getCookieVar())->getValue();
+		if (cookie()->has($this->getCookieVar())) {
+			$cookieLocale = cookie()->get($this->getCookieVar())->getValue();
 		}
 
 		if (!$this->languageExists($cookieLocale)){
@@ -148,7 +148,7 @@ class Locale extends Component
 		}
 
 		$this->locale = $locale;
-		$this->cookies->set($this->getCookieVar(), $locale);
+		cookie()->set($this->getCookieVar(), $locale);
 		$this->cache($locale);
 
 	}
