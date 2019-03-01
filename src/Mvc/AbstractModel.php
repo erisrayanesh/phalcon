@@ -7,15 +7,15 @@ use Phalcon\Di;
 use Phalcon\DiInterface;
 use Phalcon\Mvc\Model\Criteria;
 use Phalcon\Mvc\Model\CriteriaBuilder;
-use Phalcon\Mvc\Model\Exceptions\ModelNotFoundException;
+use Phalcon\Mvc\Model\ModelNotFoundException;
 use Phalcon\Mvc\Model\Relation;
 use Phalcon\Mvc\Model\Resultset\Advanced;
 use Phalcon\Mvc\Model\Resultset\Simple;
-use Phalcon\Mvc\Model\Traits\HasEagerLoading;
-use Phalcon\Mvc\Model\Traits\HasAttributes;
-use Phalcon\Mvc\Model\Traits\HasTimestamps;
-use Phalcon\Mvc\Model\Traits\HasTracker;
-use Phalcon\Mvc\Model\Traits\InteractsWithPivotTable;
+use Phalcon\Mvc\Model\HasEagerLoading;
+use Phalcon\Mvc\Model\HasAttributes;
+use Phalcon\Mvc\Model\HasTimestamps;
+use Phalcon\Mvc\Model\HasTracker;
+use Phalcon\Mvc\Model\InteractsWithPivotTable;
 
 abstract class AbstractModel extends Model
 {

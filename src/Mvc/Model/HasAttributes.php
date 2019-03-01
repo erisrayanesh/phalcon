@@ -1,6 +1,6 @@
 <?php
 
-namespace Phalcon\Mvc\Model\Traits;
+namespace Phalcon\Mvc\Model;
 
 
 use Phalcon\Mvc\Model;
