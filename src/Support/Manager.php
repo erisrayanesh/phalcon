@@ -80,17 +80,17 @@ abstract class Manager extends \Phalcon\Di\Injectable
 			throw new \InvalidArgumentException("Driver [{$name}] is not defined.");
 		}
 
-		if (isset($this->driverBuilders[$driver = $config['driver']])) {
-			return $this->driverBuilders[$driver]($name, $config);
+		if (isset($this->driverBuilders[$adapter = $config['driver']])) {
+			return $this->driverBuilders[$adapter]($name, $config);
 		}
 
-		$method = "create".camelize($driver)."Driver";
+		$method = "create".camelize($adapter)."Adapter";
 
 		if (method_exists($this, $method)){
 			return $this->{$method}($name, $config);
 		}
 
-		throw new \InvalidArgumentException("Driver name {$driver} is not defined.");
+		throw new \InvalidArgumentException("Unknown or undefined adapter {$adapter} specified for driver {$name}.");
 	}
 
 	protected function getDriverConfig($name)
