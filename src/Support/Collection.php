@@ -296,9 +296,9 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 		}, $this->items);
 	}
 
-	public function toJson($options = 0)
+	public function toJson($options = 0, $depth = 512)
 	{
-		return json_encode($this->jsonSerialize(), $options);
+		return json_encode($this->jsonSerialize(), $options, $depth);
 	}
 
 	public function __set($key, $value)

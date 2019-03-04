@@ -3,11 +3,23 @@
 namespace Phalcon\Bootstrap;
 
 
+use Apps\Providers\RouterServiceProvider;
 use Phalcon\Di;
 use Phalcon\Di\ServiceProviderInterface;
+use Phalcon\Escaper\EscaperServiceProvider;
+use Phalcon\Events\EventsServiceProvider;
 use Phalcon\Events\Manager as EventsManager;
+use Phalcon\Filter\FilterServiceProvider;
+use Phalcon\Http\Response\ResponseServiceProvider;
 use Phalcon\Logger\Manager as LogManager;
 use Phalcon\Loader;
+use Phalcon\Logger\Providers\LogServiceProvider;
+use Phalcon\Mvc\Dispatcher\DispatcherServiceProvider;
+use Phalcon\Mvc\Model\MetaData\ModelMetaDataServiceProvider;
+use Phalcon\Mvc\Model\ModelManagerServiceProvider;
+use Phalcon\Mvc\Url\UrlServiceProvider;
+use Phalcon\Security\SecurityServiceProvider;
+use Phalcon\Session\SessionServiceProvider;
 
 
 class Application extends Di
@@ -20,6 +32,8 @@ class Application extends Di
 	protected $appPath;
 
 	protected $loader;
+
+	protected $serviceProviders;
 
 	protected $bootstrapped = false;
 
@@ -81,21 +95,50 @@ class Application extends Di
 	 *
 	 * @param ServiceProviderInterface $provider
 	 *
-	 * @return $this
+	 * @return ServiceProviderInterface
 	 */
 	public function register(ServiceProviderInterface $provider)
 	{
-		if (array_accessible($provider)) {
-			foreach ($provider as $name => $class) {
-				$this->register(new $class($this));
-			}
-			return $this;
+
+		if (($registered = $this->getProvider($provider))) {
+			return $registered;
 		}
 
-		if ($provider instanceof ServiceProviderInterface){
-			$provider->register($this);
+		$provider->register($this);
+
+		$this->serviceProviders[] = $provider;
+
+		if ($this->isBooted()) {
+			$this->bootProvider($provider);
 		}
-		return $this;
+
+		return $provider;
+	}
+
+	public function setupProviders($providers)
+	{
+		foreach ($providers as $provider) {
+			$this->register($provider);
+		}
+	}
+
+	/**
+	 * Boot the application's service providers.
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+		if ($this->isBooted()) {
+			return;
+		}
+
+		array_walk($this->getServices(), function ($p) {
+			$this->bootProvider($p);
+		});
+
+		$this->booted = true;
+
 	}
 
 	/**
@@ -107,9 +150,61 @@ class Application extends Di
 		return $this->booted;
 	}
 
-	public function bootstrap(array $bootstrappers = null)
+	/**
+	 * Indicates that the application kernel is booted
+	 * @return bool
+	 */
+	public function isBootstrapped(): bool
 	{
+		return $this->bootstrapped;
+	}
+
+	public function bootstrap(array $bootstrappers = [])
+	{
+		foreach ($bootstrappers as $bootstrapper) {
+
+			if (is_callable($bootstrapper) || $bootstrapper instanceof \Closure) {
+				call_user_func($bootstrapper, $this);
+			}
+
+			if (is_string($bootstrapper)) {
+				(new $bootstrapper)->bootstrap($this);
+			}
+
+		}
+
 		$this->bootstrapped = true;
+	}
+
+	public function resolveProvider($provider)
+	{
+		return new $provider($this);
+	}
+
+	/**
+	 * Get the registered service provider instance if it exists.
+	 *
+	 * @param  ServiceProviderInterface|string  $provider
+	 * @return ServiceProviderInterface|null
+	 */
+	public function getProvider($provider)
+	{
+		return array_values($this->getProviders($provider))[0] ?? null;
+	}
+
+	/**
+	 * Get the registered service provider instances if any exist.
+	 *
+	 * @param  ServiceProviderInterface|string  $provider
+	 * @return array
+	 */
+	public function getProviders($provider)
+	{
+		$name = is_string($provider) ? $provider : get_class($provider);
+
+		return array_where($this->serviceProviders, function ($value) use ($name) {
+			return $value instanceof $name;
+		});
 	}
 
 	protected function initLoader()
@@ -125,8 +220,25 @@ class Application extends Di
 
 	protected function registerBaseServiceProviders()
 	{
-		$this->setShared('eventsManager', new EventsManager());
-		$this->setShared('eventsManager', new LogManager());
+		$this->register(new EventsServiceProvider());
+		$this->register( new LogServiceProvider());
+		$this->register(new RouterServiceProvider());
+		$this->register(new UrlServiceProvider());
+		$this->register(new DispatcherServiceProvider());
+		$this->register(new ResponseServiceProvider());
+		$this->register(new EscaperServiceProvider());
+		$this->register(new FilterServiceProvider());
+		$this->register(new ModelManagerServiceProvider());
+		//$this->register(new ModelMetaDataServiceProvider());
+
 	}
+
+	protected function bootProvider(ServiceProviderInterface $provider)
+	{
+		if (method_exists($provider, 'boot')) {
+			call_user_func([$provider, 'boot']);
+		}
+	}
+
 
 }

@@ -33,17 +33,26 @@ class JsonResponse extends Response
 
 	public function setContent($content)
 	{
+		return $this->setJsonContent($content, $this->encodingOptions);
+	}
+
+	public function setJsonContent($content, $jsonOptions = 0, $depth = 512)
+	{
+		$this->setContentType("application/json", "UTF-8");
+
 		if ($content instanceof Jsonable) {
-			$this->_content = $content->toJson($this->encodingOptions);
+			$content = $content->toJson($jsonOptions ?? $this->encodingOptions, $depth);
 		} elseif ($content instanceof \JsonSerializable) {
-			$this->_content = json_encode($content->jsonSerialize(), $this->encodingOptions);
+			$this->_content = $content->jsonSerialize();
 		} elseif ($content instanceof Arrayable) {
-			$this->_content = json_encode($content->toArray(), $this->encodingOptions);
-		} else {
-			$this->_content = json_encode($content, $this->encodingOptions);
+			$content = $content->toArray();
 		}
 
-		return $this->setJsonContent($content, $this->encodingOptions);
+		if (array_accessible($content)){
+			$content = json_encode($jsonOptions ?? $this->encodingOptions, $depth);
+		}
+
+		$this->_content = $content;
 	}
 
 	public function appendContent($content)

@@ -5,6 +5,10 @@ namespace Phalcon\Http;
 use Phalcon\Bootstrap\Application;
 use Phalcon\Debug\ExceptionHandler;
 use Phalcon\Debug\FatalThrowableError;
+use Phalcon\Mvc\Model;
+use Phalcon\Mvc\Router\RouteInterface;
+use Phalcon\Support\Interfaces\Arrayable;
+use Phalcon\Support\Interfaces\Jsonable;
 
 class Kernel implements KernelInterface
 {
@@ -14,23 +18,27 @@ class Kernel implements KernelInterface
 	 */
 	protected  $app;
 
+	protected $bootstrappers = [];
+
 	public function __construct(Application $application)
 	{
 		$this->app = $application;
+		$this->bootstrappers[] = [$this, 'initErrorHandlers'];
 	}
 
 	public function bootstrap()
 	{
-		$this->initErrorHandlers();
-
 		if (! $this->app->isBooted()) {
-			$this->app->bootstrap([]);
+			$this->app->bootstrap($this->bootstrappers);
 		}
+
+		$this->app->boot();
 	}
 
-	public function handle(RequestInterface $request)
+	public function handle(FormRequest $request)
 	{
 		try {
+			$request->setHttpMethodParameterOverride(true);
 			$response = $this->handleRequest($request);
 		} catch (\Exception $e) {
 			$this->reportException($e);
@@ -43,7 +51,7 @@ class Kernel implements KernelInterface
 		return $response;
 	}
 
-	public function terminate(RequestInterface $request, ResponseInterface $response)
+	public function terminate(FormRequest $request, ResponseInterface $response)
 	{
 		// TODO: Implement terminate() method.
 	}
@@ -140,60 +148,85 @@ class Kernel implements KernelInterface
 
 	// ============ EXCEPTION HANDLER
 
-	protected function prepareResponse($value)
-	{
-		if ($value instanceof ResponseInterface) {
-			return $value;
-		}
-
-		if (is_bool($value) && $value === false){
-			$value = '';
-		}
-
-		return response($value);
-	}
-
-	protected function callRouteMatchedHandler(RouterInterface $router, RouteInterface $route)
-	{
-		$match = $route->getMatch();
-
-		if ($match instanceof \Closure) {
-			$match = \Closure::bind($match, $this->getDi());
-		}
-
-		return call_user_func_array($match, $router->getParams());
-	}
-
-	protected function handleRequest(RequestInterface $request)
+	protected function handleRequest(FormRequest $request)
 	{
 		$this->app->setShared('request', $request);
 
 		$this->bootstrap();
 
-		router()->handle($uri);
-		$matchedRoute = router()->getMatchedRoute();
+		if (! ($response = $this->dispatch($request)) instanceof ResponseInterface){
+			$response = $this->prepareResponse($request, $response);
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Dispatches request through router
+	 * @param FormRequest $request
+	 * @return mixed
+	 */
+	protected function dispatch(FormRequest $request)
+	{
+
+		$matchedRoute = $this->getMatchedRoute($request);
 
 		if  ($matchedRoute instanceof RouteInterface && $matchedRoute->getMatch() !== null) {
-			return $this->prepareResponse($this->callRouteMatchedHandler($matchedRoute));
+			return $this->callMatchedRouteHandler($matchedRoute);
 		}
 
 		$dispatcher = dispatcher();
+		$dispatcher->setControllerName(router()->getControllerName());
+		$dispatcher->setActionName(router()->getActionName());
+		$dispatcher->setParams(router()->getParams());
 
-		$dispatcher->setControllerName(
-			router()->getControllerName()
-		);
-
-		$dispatcher->setActionName(
-			$router->getActionName()
-		);
-
-		$dispatcher->setParams(
-			$router->getParams()
-		);
-
-
-		$value = $dispatcher->getReturnedValue();
+		return $dispatcher->getReturnedValue();
 	}
 
+	/**
+	 * @param FormRequest $request
+	 * @return RouteInterface
+	 */
+	protected function getMatchedRoute(FormRequest $request)
+	{
+		router()->handle();
+		return router()->getMatchedRoute();
+	}
 
+	protected function callMatchedRouteHandler(RouteInterface $route)
+	{
+		$match = $route->getMatch();
+
+		if ($match instanceof \Closure) {
+			$match = \Closure::bind($match, $this->app);
+		}
+
+		return call_user_func_array($match, router()->getParams());
+	}
+
+	protected function prepareResponse(FormRequest $request, $response)
+	{
+		if ($response instanceof ResponseInterface) {
+			return $response;
+		}
+
+		if (is_bool($response) && $response === false){
+			$response = '';
+		}
+
+		if ($response instanceof Model) {
+			$response = new JsonResponse($response, 201);
+		} elseif (! $response instanceof Response &&
+			($response instanceof Arrayable ||
+				$response instanceof Jsonable ||
+				$response instanceof \ArrayObject ||
+				$response instanceof \JsonSerializable ||
+				is_array($response))) {
+			$response = new JsonResponse($response);
+		} elseif (! $response instanceof Response) {
+			$response = new Response($response);
+		}
+
+		return $response;
+	}
 }

@@ -17,7 +17,7 @@ interface KernelInterface
      * @param  Request  $request
      * @return Response
      */
-    public function handle(RequestInterface $request);
+    public function handle(FormRequest $request);
 
     /**
      * Perform any final actions for the request lifecycle.
@@ -26,7 +26,7 @@ interface KernelInterface
      * @param  Response  $response
      * @return void
      */
-    public function terminate(RequestInterface $request, ResponseInterface $response);
+    public function terminate(FormRequest $request, ResponseInterface $response);
 
     /**
      * Returns application instance.
