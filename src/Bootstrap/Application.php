@@ -228,8 +228,6 @@ class Application extends Di
 		$this->register(new ResponseServiceProvider());
 		$this->register(new EscaperServiceProvider());
 		$this->register(new FilterServiceProvider());
-		$this->register(new ModelManagerServiceProvider());
-		//$this->register(new ModelMetaDataServiceProvider());
 
 	}
 

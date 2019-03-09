@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Providers;
+namespace Phalcon\Crypt;
 
 use Phalcon\Crypt;
 use Phalcon\Di\ServiceProviderInterface;

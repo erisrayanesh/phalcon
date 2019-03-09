@@ -2,21 +2,17 @@
 
 namespace Phalcon\FileSystem;
 
-use Phalcon\Mvc\User\Component;
+use Phalcon\Di\Injectable;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Filesystem as BaseFileSystem;
 
-class FileSystemManager extends Component
+class Manager extends Injectable
 {
 
 	protected $default;
 	protected $cloud;
 	protected $adapters = [];
 
-	public function __construct()
-	{
-
-	}
 
 	/**
 	 * @return array

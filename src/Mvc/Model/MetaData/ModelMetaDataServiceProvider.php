@@ -13,15 +13,7 @@ class ModelMetaDataServiceProvider implements ServiceProviderInterface
 	public function register(DiInterface $di)
 	{
 		$di->setShared('modelsMetadata', function () {
-			$config = $this->getConfig();
-
-			if ($config->application->debug){
-				return new Memory();
-			} else {
-				return new Files([
-					'metaDataDir' => $config->application->cacheDir . 'metaData/'
-				]);
-			}
+			return new Manager();
 		});
 	}
 
