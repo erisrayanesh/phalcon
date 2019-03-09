@@ -72,6 +72,11 @@ abstract class Manager extends \Phalcon\Di\Injectable
 		return $this;
 	}
 
+	public function hasCustomDriveBuilder($name)
+	{
+		return isset($this->driverBuilders[$name]);
+	}
+
 	protected function createDriver($name)
 	{
 		$config = $this->getDriverConfig($name);
@@ -80,17 +85,15 @@ abstract class Manager extends \Phalcon\Di\Injectable
 			throw new \InvalidArgumentException("Driver [{$name}] is not defined.");
 		}
 
-		if (isset($this->driverBuilders[$adapter = $config['driver']])) {
-			return $this->driverBuilders[$adapter]($name, $config);
+		if ($this->hasCustomDriveBuilder($name)) {
+			return $this->callCustomDriverBuilder($name, $config);
 		}
 
-		$method = "create".camelize($adapter)."Adapter";
-
-		if (method_exists($this, $method)){
+		if (method_exists($this, $method = "create".camelize($name)."Adapter")){
 			return $this->{$method}($name, $config);
 		}
 
-		throw new \InvalidArgumentException("Unknown or undefined adapter {$adapter} specified for driver {$name}.");
+		throw new \InvalidArgumentException("Undefined driver builder for drive {$name}.");
 	}
 
 	protected function getDriverConfig($name)
@@ -106,8 +109,9 @@ abstract class Manager extends \Phalcon\Di\Injectable
 		return $this->drivers[$name];
 	}
 
-	protected function callCustomCreator($driver)
+	protected function callCustomDriverBuilder($driver, $config)
 	{
-		return $this->customCreators[$driver]($this->app);
+		return $this->driverBuilders[$driver]($config);
 	}
+
 }

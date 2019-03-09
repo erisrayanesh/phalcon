@@ -2,12 +2,11 @@
 
 namespace Phalcon\Auth;
 
-use Phalcon\Mvc\User\Component;
 use Phalcon\Auth\Drivers\Session as SessionGuard;
 use Phalcon\Auth\UserProviders\Model as ModelUserProvider;
 use Phalcon\Auth\Driver as GuardDriver;
 
-class Manager extends Component
+class Manager extends \Phalcon\Di\Injectable
 {
 
 	protected $default_guard;

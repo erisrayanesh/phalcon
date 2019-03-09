@@ -1,10 +1,8 @@
 <?php
 
-namespace Phalcon\Mvc\Controller\Traits;
+namespace Phalcon\Mvc\Controller;
 
 
-use Apps\LoginAttempts;
-use Apps\Users;
 use Phalcon\Validation\ValidationException;
 
 trait ThrottlesLogins

@@ -1,9 +1,7 @@
 <?php
 
-namespace Phalcon\Mvc\Controller\Traits;
+namespace Phalcon\Mvc\Controller;
 
-
-use Phalcon\Auth\AuthorizationException;
 
 trait AuthorizesRequests
 {

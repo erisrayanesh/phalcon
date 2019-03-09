@@ -1,9 +1,7 @@
 <?php
 
-namespace Phalcon\Mvc\Controller\Traits;
+namespace Phalcon\Mvc\Controller;
 
-
-use Apps\Users;
 use Phalcon\Mvc\Model;
 
 trait RemembersLogin

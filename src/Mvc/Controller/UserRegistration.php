@@ -1,6 +1,6 @@
 <?php
 
-namespace Phalcon\Mvc\Controller\Traits;
+namespace Phalcon\Mvc\Controller;
 
 
 use Apps\Users;

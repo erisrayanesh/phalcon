@@ -1,11 +1,8 @@
 <?php
 
-namespace Phalcon\Auth;
+namespace Phalcon\Auth\Access;
 
-use Phalcon\Mvc\User\Component;
-use Phalcon\Auth\AuthorizationException;
-
-class AccessManager extends Component
+class Manager extends \Phalcon\Di\Injectable
 {
 
 	protected $abilities = [];
@@ -60,6 +57,12 @@ class AccessManager extends Component
 		});
 	}
 
+	/**
+	 * @param $ability
+	 * @param array $arguments
+	 * @return bool
+	 * @throws AuthorizationException
+	 */
 	public function authorize($ability, $arguments = [])
 	{
 		$result = $this->find($ability, $arguments);
@@ -99,8 +102,9 @@ class AccessManager extends Component
 			$callback = $this->abilities[$ability];
 		}
 
-		return $callback($user, ...$arguments);
+		array_unshift($arguments, $user);
 
+		return call_user_func_array($callback, $arguments);
 	}
 
 	protected function generateCallback($callback)

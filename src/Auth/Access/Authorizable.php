@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Phalcon\Auth;
+namespace Phalcon\Auth\Access;
 
 
 interface Authorizable
