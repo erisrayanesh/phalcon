@@ -2,7 +2,9 @@
 
 namespace Phalcon\Support;
 
-abstract class Manager extends \Phalcon\Di\Injectable
+use \Phalcon\Di\Injectable;
+
+abstract class Manager extends Injectable
 {
 
 	protected $default;
@@ -89,8 +91,12 @@ abstract class Manager extends \Phalcon\Di\Injectable
 			return $this->callCustomDriverBuilder($name, $config);
 		}
 
-		if (method_exists($this, $method = "create".camelize($name)."Adapter")){
+		if (method_exists($this, $method = "create".camelize($name)."Driver")){
 			return $this->{$method}($name, $config);
+		}
+
+		if (isset($config['adapter']) && method_exists($this, 'createAdapter')){
+			return $this->createAdapter($config['adapter'], $config);
 		}
 
 		throw new \InvalidArgumentException("Undefined driver builder for drive {$name}.");

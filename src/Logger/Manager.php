@@ -2,72 +2,21 @@
 
 namespace Phalcon\Logger;
 
+use \Phalcon\Support\Manager as BaseManager;
 use Phalcon\Logger\Stack as Logger;
 use Phalcon\Logger\Adapter\File as FileAdapter;
 use Phalcon\Logger\Adapter\RotatingFile;
 use Phalcon\Logger\Formatter\Line as LineFormatter;
-use Phalcon\Mvc\User\Component;
+use Phalcon\Support\ProvidesAdapter;
 
-class Manager extends Component
+class Manager extends BaseManager
 {
 
-	protected $default;
+	use ProvidesAdapter;
 
-	/**
-	 * Loggers list
-	 * @var array
-	 */
-	protected $channels = [];
+	protected $driverType = Logger::class;
 
-	protected $channelBuilders = [];
-
-	/**
-	 * Dynamically call the default Adapter instance.
-	 * @param $method
-	 * @param $parameters
-	 * @return mixed
-	 * @throws \Exception
-	 */
-
-	public function __call($method, $parameters)
-	{
-		return $this->channel()->{$method}(...$parameters);
-	}
-
-	/**
-	 * Returns an instance of Logger
-	 * @param string|null $name Channel name
-	 * @return Stack
-	 * @throws \Exception
-	 */
-	public function channel(string $name = null)
-	{
-		$name = $name ?: $this->getDefaultChannel();
-
-		if (isset($this->channels[$name]) && $this->channels[$name] instanceof Logger){
-			return $this->channels[$name];
-		}
-
-		return $this->channels[$name] = $this->resolveChannel($name);
-	}
-
-	public function setChannel(string $name, $config)
-	{
-		if (! isset($config['driver'])){
-			throw new \Exception('Driver is not set');
-		}
-		$this->channels[$name] = $config;
-	}
-
-	public function getDefaultChannel()
-	{
-		return $this->default;
-	}
-
-	public function setDefaultChannel(string $name)
-	{
-		$this->default = $name ?: $this->getDefaultChannel();
-	}
+	protected $factory = Factory::class;
 
 	/**
 	 * @param array $channels List of expected channels
@@ -75,7 +24,7 @@ class Manager extends Component
 	 */
 	public function stack(array $channels = [])
 	{
-		return $this->createStackDriver(compact('channels'));
+		return $this->createStackAdapter(compact('channels'));
 	}
 
 	/**
@@ -88,66 +37,20 @@ class Manager extends Component
 		return new LineFormatter ($config['format'] ?? null , $config['date'] ?? null);
 	}
 
-	/**
-	 * Adds a custom channel builder
-	 * @param string $channel Channel name
-	 * @param \Closure $callback
-	 * @return Manager
-	 */
-	public function addChannelBuilder(string $channel, \Closure $callback):Manager
-	{
-		$this->channelBuilders[$channel] = $callback->bindTo($this, $this);
-		return $this;
-	}
-
-	/**
-	 * Resolves the channel
-	 * @param string $name
-	 * @return Stack
-	 * @throws \Exception
-	 */
-	protected function resolveChannel(string $name)
-	{
-		$config = $this->getChannelConfig($name);
-
-		if (is_null($config)) {
-			throw new \InvalidArgumentException("Channel [{$name}] is not defined.");
-		}
-
-		if (isset($this->channelBuilders[$driver = $config['driver']])) {
-			$logger = $this->createLogger($config);
-			$this->channelBuilders[$driver]($logger, $config);
-			return $logger;
-		}
-
-		switch ($driver) {
-			case 'single':
-				return $this->createSingleDriver($config);
-			case 'rotating':
-				return $this->createRotatingDriver($config);
-			case 'stack':
-				return $this->createStackDriver($config);
-			default:
-				throw new \InvalidArgumentException("Log driver {$driver} for channel {$name} is not defined.");
-		}
-	}
-
-	protected function getChannelConfig(string $name)
-	{
-		if (!isset($this->channels[$name])){
-			return null;
-		}
-
-		if ($this->channels[$name] instanceof Logger){
-			return null;
-		}
-
-		return $this->channels[$name];
-	}
-
 	protected function resolveLogLevel($config): int
 	{
 		return intval($config['level'] ?? \Phalcon\Logger::DEBUG) ;
+	}
+
+	protected function createDriver($name)
+	{
+		$adapter = parent::createDriver($name);
+
+		if (! $adapter instanceof Logger){
+			$adapter = new Logger([$adapter]);
+		}
+
+		return $adapter;
 	}
 
 	// Factory methods
@@ -158,7 +61,7 @@ class Manager extends Component
 	 * @param $config
 	 * @return Stack
 	 */
-	protected function createSingleDriver($config): Logger
+	protected function createSingleAdapter($config): Logger
 	{
 		if (!isset($config['file'])){
 			throw new \InvalidArgumentException('File path not defined for channel');
@@ -177,7 +80,7 @@ class Manager extends Component
 	 * @return Stack
 	 * @throws \Exception
 	 */
-	protected function createRotatingDriver($config):Logger
+	protected function createRotatingAdapter($config):Logger
 	{
 		if (!isset($config['file'])){
 			throw new \InvalidArgumentException('File path not defined for channel');
@@ -189,7 +92,7 @@ class Manager extends Component
 		return new Logger([$adapter]);
 	}
 
-	protected function createStackDriver($config):Logger
+	protected function createStackAdapter($config):Logger
 	{
 		if (!isset($config['channels'])){
 			throw new \InvalidArgumentException('Channels list not defined for channel');
@@ -200,7 +103,7 @@ class Manager extends Component
 		}
 
 		$adapters = collect($config['channels'])->flatMap(function ($channel) {
-			return $this->channel($channel)->getAdapters();
+			return $this->driver($channel)->getAdapters();
 		})->all();
 		return new Logger($adapters);
 	}

@@ -10,10 +10,8 @@ class FileSystemServiceProvider implements ServiceProviderInterface
 
 	public function register(DiInterface $di)
 	{
-		$this->registerNativeFileSystem($di);
-
-		$di->setShared('filesystem', function () use ($di) {
-			$fileSystem = new Manager($this);
+		$di->setShared('filesystem', function () {
+			$fileSystem = new Manager();
 			$fileSystem->setEventsManager($this->getEventsManager());
 			return $fileSystem;
 		});

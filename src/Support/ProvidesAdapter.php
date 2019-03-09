@@ -1,5 +1,7 @@
 <?php
 
+namespace Phalcon\Support;
+
 trait ProvidesAdapter
 {
 
@@ -49,4 +51,5 @@ trait ProvidesAdapter
 		$factory = $this->factory;
 		return $factory::load($config);
 	}
+
 }
