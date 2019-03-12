@@ -9,7 +9,7 @@ if (! function_exists('DI')) {
 
 if (! function_exists('access')) {
 	/**
-	 * @return \Phalcon\Auth\Manager
+	 * @return \Phalcon\Auth\Access\Manager
 	 */
 	function access()
 	{
