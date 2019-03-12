@@ -53,9 +53,15 @@ abstract class Manager extends Injectable
 		return $this->drivers[$name] = $this->createDriver($name);
 	}
 
+	/**
+	 * @param $name
+	 * @param $driver
+	 * @return static
+	 */
 	public function setDriver($name, $driver)
 	{
 		$this->drivers[$name] = $driver;
+		return $this;
 	}
 
 	public function getDefault()
@@ -63,11 +69,21 @@ abstract class Manager extends Injectable
 		return $this->default;
 	}
 
+	/**
+	 * @param $name
+	 * @return static
+	 */
 	public function setDefault($name)
 	{
 		$this->default = $name ?: $this->getDefault();
+		return $this;
 	}
 
+	/**
+	 * @param $name
+	 * @param callable $builder
+	 * @return static
+	 */
 	public function addDriverBuilder($name, callable $builder)
 	{
 		$this->driverBuilders[$name] = $builder;
