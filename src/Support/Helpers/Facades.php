@@ -31,6 +31,21 @@ if (! function_exists('auth')) {
 	}
 }
 
+if (! function_exists('db')) {
+	/**
+	 * @param string $connection A connection name
+	 * @return \Phalcon\Db\Manager
+	 */
+	function db($connection = null)
+	{
+		if (is_null($connection)) {
+			return DI()->get("db");
+		}
+
+		return DI()->get("db")->driver($connection);
+	}
+}
+
 if (! function_exists('cookie')) {
 	/**
 	 * @param null $name
@@ -265,7 +280,7 @@ if (! function_exists('session')) {
 	/**
 	 * @param null $key
 	 * @param null $default
-	 * @return mixed|Phalcon\Session\Adapter\Files
+	 * @return \Phalcon\Session\Manager|Phalcon\Session\Adapter\Files
 	 */
 	function session($key = null, $default = null)
 	{
