@@ -7,7 +7,7 @@ use Apps\TranslationKeys;
 use Apps\Translations;
 use Phalcon\Di\ServiceProviderInterface;
 use Phalcon\DiInterface;
-use Phalcon\Translate\Locale;
+use Phalcon\Translate\Manager;
 use Phalcon\Translate\NativeArrayLoader\Database;
 use Phalcon\Translate\NativeArrayLoader\File;
 
@@ -21,7 +21,7 @@ class TranslateServiceProvider implements ServiceProviderInterface
 		$di->setShared('locale', function () use ($di, $adapters) {
 			$config = $this->getConfig();
 
-			$locale = new Locale($this);
+			$locale = new Manager($this);
 
 			$locale->setEventsManager($this->getEventsManager());
 

@@ -29,8 +29,12 @@ trait ProvidesAdapter
 			return $this->{$method}($name, $config);
 		}
 
-		if  (!is_null($this->factory)){
+		if  (isset($this->factory) && !is_null($this->factory)){
 			return $this->callFactoryBuilder($config);
+		}
+
+		if  (isset($this->namespace) && !is_null($this->namespace)){
+			return $this->callInstanceBuilder($config);
 		}
 
 		throw new \InvalidArgumentException("Undefined adapter {$name}.");
@@ -44,12 +48,6 @@ trait ProvidesAdapter
 	protected function callCustomAdapterBuilder($driver, $config)
 	{
 		return $this->adapterBuilders[$driver]($config);
-	}
-
-	protected function callFactoryBuilder($config)
-	{
-		$factory = $this->factory;
-		return $factory::load($config);
 	}
 
 }

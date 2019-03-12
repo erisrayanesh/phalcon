@@ -54,7 +54,6 @@ if (! function_exists('cookie')) {
 	}
 }
 
-
 if (! function_exists('config')) {
 	/**
 	 * @param $name
@@ -134,16 +133,6 @@ if (! function_exists('flashInputs')) {
 	function flashInputs()
 	{
 		return DI()->get("flashInputs");
-	}
-}
-
-if (! function_exists('locale')) {
-	/**
-	 * @return \Phalcon\Translate\Locale
-	 */
-	function locale()
-	{
-		return DI()->get("locale");
 	}
 }
 
@@ -300,6 +289,16 @@ if (! function_exists('storage')) {
 	function storage($key = null)
 	{
 		return DI()->get('filesystem')->get($key);
+	}
+}
+
+if (! function_exists('translator')) {
+	/**
+	 * @return \Phalcon\Translate\Manager
+	 */
+	function translator()
+	{
+		return DI()->get("translator");
 	}
 }
 

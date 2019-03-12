@@ -162,7 +162,6 @@ function getSecurityRandom()
 	return new \Phalcon\Security\Random();
 }
 
-
 /**
  * @param $controller
  * @param array $options
@@ -207,9 +206,9 @@ function cannot($ability, $arguments = [])
 }
 
 if (! function_exists('t')) {
-	function t($key, array $placeholders = [])
+	function t($key, array $placeholders = [], $local = null)
 	{
-		return locale()->_($key, $placeholders);
+		return translator()->get($key, $placeholders, $local);
 	}
 }
 
