@@ -51,6 +51,9 @@ class Application extends Di
 		$this->registerBaseServiceProviders();
 
 		$this->loader = new Loader();
+
+		// Very important for service configurator !!!
+		$this->setInternalEventsManager(events());
 	}
 
 	/**
@@ -126,7 +129,7 @@ class Application extends Di
 			return;
 		}
 
-		array_walk($this->getServices(), function ($p) {
+		array_walk($this->serviceProviders, function ($p) {
 			$this->bootProvider($p);
 		});
 

@@ -111,6 +111,16 @@ if (! function_exists('escaper')) {
 	}
 }
 
+if (! function_exists('events')) {
+	/**
+	 * @return \Phalcon\Events\Manager
+	 */
+	function events()
+	{
+		return DI()->get('eventsManager');
+	}
+}
+
 if (! function_exists('files')) {
 	/**
 	 * @return \Phalcon\FileSystem\FileSystem
