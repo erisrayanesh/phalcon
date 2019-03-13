@@ -11,12 +11,14 @@ class GroupRecursive extends Group
 	 */
 	protected $name = '';
 
-	public static function make($paths = null, \Closure $closure = null)
+	public static function make($paths = null, $routes = null)
 	{
 		$group = new static($paths);
-		if (!is_null($closure)){
-			$closure($group);
+
+		if (!is_null($routes)){
+			$group->loadRoutes($routes);
 		}
+
 		return $group;
 	}
 
@@ -29,9 +31,9 @@ class GroupRecursive extends Group
 		parent::__construct($paths);
 	}
 
-	public function group($paths = null, \Closure $closure = null)
+	public function group($paths = null, $routes = null)
 	{
-		$this->addGroup(self::make($paths, $closure));
+		$this->addGroup(self::make($paths, $routes));
 	}
 
 	public function addGroup(GroupRecursive $group)
@@ -89,6 +91,16 @@ class GroupRecursive extends Group
 			$route->setName($this->getName().$route->getName());
 		}
 		return $routes;
+	}
+
+	public function loadRoutes($routes)
+	{
+		if ($routes instanceof \Closure) {
+			$routes($this);
+		} else {
+			$router = $this;
+			require $routes;
+		}
 	}
 
 

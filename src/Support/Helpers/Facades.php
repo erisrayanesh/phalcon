@@ -303,7 +303,7 @@ if (! function_exists('storage')) {
 	 */
 	function storage($key = null)
 	{
-		return DI()->get('filesystem')->get($key);
+		return DI()->get('storage')->get($key);
 	}
 }
 
