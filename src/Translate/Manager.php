@@ -2,14 +2,10 @@
 namespace Phalcon\Translate;
 
 use \Phalcon\Support\Manager as BaseManager;
-use Phalcon\Support\ProvidesAdapter;
-use Phalcon\Support\BuildsAdapterByNamespace;
 use Phalcon\Translate\Interpolator\AssociativeArray;
 
 class Manager extends BaseManager
 {
-
-	use ProvidesAdapter, BuildsAdapterByNamespace;
 
 	protected $driverType = LoaderInterface::class;
 

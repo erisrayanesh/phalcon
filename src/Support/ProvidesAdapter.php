@@ -4,10 +4,11 @@ namespace Phalcon\Support;
 
 trait ProvidesAdapter
 {
+	protected $factory;
+
+	protected $namespace;
 
 	protected $adapterBuilders = [];
-
-	protected $factory;
 
 	public function addAdapterBuilder($name, callable $builder)
 	{
@@ -29,11 +30,11 @@ trait ProvidesAdapter
 			return $this->{$method}($name, $config);
 		}
 
-		if  (isset($this->factory) && !is_null($this->factory)){
+		if  (!empty($this->factory)){
 			return $this->callFactoryBuilder($config);
 		}
 
-		if  (isset($this->namespace) && !is_null($this->namespace)){
+		if  (!empty($this->namespace)){
 			return $this->callInstanceBuilder($config);
 		}
 
@@ -48,6 +49,18 @@ trait ProvidesAdapter
 	protected function callCustomAdapterBuilder($driver, $config)
 	{
 		return $this->adapterBuilders[$driver]($config);
+	}
+
+	protected function callFactoryBuilder($config)
+	{
+		$factory = $this->factory;
+		return $factory::load($config);
+	}
+
+	protected function callInstanceBuilder($adapter, $config)
+	{
+		$class = trim($this->namespace, '\\\/') . "\\" . camelize($adapter);
+		return new $class($config);
 	}
 
 }

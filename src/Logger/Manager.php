@@ -2,18 +2,14 @@
 
 namespace Phalcon\Logger;
 
-use Phalcon\Support\BuildsAdapterByFactory;
 use \Phalcon\Support\Manager as BaseManager;
 use Phalcon\Logger\Stack as Logger;
 use Phalcon\Logger\Adapter\File as FileAdapter;
 use Phalcon\Logger\Adapter\RotatingFile;
 use Phalcon\Logger\Formatter\Line as LineFormatter;
-use Phalcon\Support\ProvidesAdapter;
 
 class Manager extends BaseManager
 {
-
-	use ProvidesAdapter, BuildsAdapterByFactory;
 
 	protected $driverType = Logger::class;
 

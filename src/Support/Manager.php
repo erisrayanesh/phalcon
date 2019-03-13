@@ -8,6 +8,8 @@ use Phalcon\Events\EventsAwareInterface;
 abstract class Manager extends Injectable
 {
 
+	use ProvidesAdapter;
+
 	protected $default;
 
 	/**
@@ -118,7 +120,7 @@ abstract class Manager extends Injectable
 			return $this->{$method}($name, $config);
 		}
 
-		if (isset($config['adapter']) && method_exists($this, 'createAdapter')){
+		if (isset($config['adapter'])){
 			return $this->createAdapter($config['adapter'], $config);
 		}
 
