@@ -111,7 +111,7 @@ class Application extends Di
 	public function setupProviders($providers)
 	{
 		foreach ($providers as $provider) {
-			$this->register($provider);
+			$this->register(new $provider());
 		}
 	}
 
