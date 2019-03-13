@@ -35,7 +35,7 @@ trait ProvidesAdapter
 		}
 
 		if  (!empty($this->namespace)){
-			return $this->callInstanceBuilder($config);
+			return $this->callInstanceBuilder($name, $config);
 		}
 
 		throw new \InvalidArgumentException("Undefined adapter {$name}.");

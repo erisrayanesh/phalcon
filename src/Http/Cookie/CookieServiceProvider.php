@@ -11,9 +11,7 @@ class CookieServiceProvider implements ServiceProviderInterface
 	public function register(DiInterface $di)
 	{
 		$di->setShared('cookie', function () use ($di){
-			$factory = new Factory();
-			$factory->setEventsManager($di->getEventsManager());
-			return $factory;
+			return new Factory();
 		});
 	}
 
