@@ -14,7 +14,7 @@ class RouterServiceProvider implements ServiceProviderInterface
 	{
 		$di->setShared('router', function () use ($di) {
 			$router = new Router(false);
-			$router->setEventsManager($di->getEvenetsManager());
+			$router->setEventsManager($di->getEventsManager());
 			return $router;
 		});
 	}
