@@ -311,9 +311,9 @@ if (! function_exists('translator')) {
 	/**
 	 * @return \Phalcon\Translate\Manager
 	 */
-	function translator()
+	function translate()
 	{
-		return DI()->get("translator");
+		return DI()->get("translate");
 	}
 }
 

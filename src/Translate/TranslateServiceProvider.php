@@ -10,7 +10,7 @@ class TranslateServiceProvider implements ServiceProviderInterface
 
 	public function register(DiInterface $di)
 	{
-		$di->setShared('locale', function () use ($di) {
+		$di->setShared('translate', function () use ($di) {
 			$locale = new Manager();
 			$locale->setEventsManager($this->getEventsManager());
 			return $locale;
