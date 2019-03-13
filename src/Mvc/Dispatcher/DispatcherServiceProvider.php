@@ -11,10 +11,9 @@ class DispatcherServiceProvider implements ServiceProviderInterface
 
 	public function register(DiInterface $di)
 	{
-		$di->setShared('dispatcher', function () {
+		$di->setShared('dispatcher', function () use ($di) {
 			$dispatcher = new Dispatcher();
-			$dispatcher->setDefaultNamespace('Apps\Http\Controllers');
-			$dispatcher->setEventsManager($this->getEventsManager());
+			$dispatcher->setEventsManager($di->getEventsManager());
 			return $dispatcher;
 		});
 	}

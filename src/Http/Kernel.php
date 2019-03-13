@@ -175,12 +175,38 @@ class Kernel implements KernelInterface
 			return $this->callMatchedRouteHandler($matchedRoute);
 		}
 
-		$dispatcher = dispatcher();
-		$dispatcher->setControllerName(router()->getControllerName());
-		$dispatcher->setActionName(router()->getActionName());
-		$dispatcher->setParams(router()->getParams());
+		$view = view();
 
-		return $dispatcher->getReturnedValue();
+		//Start the view here because later we add events,
+		// so that it's possible for theme to render something into the view
+		$view->start();
+
+		$router = router();
+		$dispatcher = dispatcher();
+		$dispatcher->setNamespaceName($router->getNamespaceName());
+		$dispatcher->setControllerName($router->getControllerName());
+		$dispatcher->setActionName($router->getActionName());
+		$dispatcher->setParams($router->getParams());
+
+		$controller = $dispatcher->dispatch();
+		$possibleResponse = $dispatcher->getReturnedValue();
+
+		$renderView  = $possibleResponse !== false
+							&& ! is_string($possibleResponse)
+							&& ! $possibleResponse instanceof ResponseInterface
+							&& is_object($controller);
+
+		if ($renderView) {
+			$view->render($dispatcher->getControllerName(),	$dispatcher->getActionName());
+		}
+
+		$view->finish();
+
+		if ($renderView) {
+			$possibleResponse = $view->getContent();
+		}
+
+		return $possibleResponse;
 	}
 
 	/**

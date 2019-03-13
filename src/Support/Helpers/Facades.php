@@ -317,7 +317,7 @@ if (! function_exists('storage')) {
 	}
 }
 
-if (! function_exists('translator')) {
+if (! function_exists('translate')) {
 	/**
 	 * @return \Phalcon\Translate\Manager
 	 */

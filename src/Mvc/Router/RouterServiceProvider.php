@@ -12,8 +12,10 @@ class RouterServiceProvider implements ServiceProviderInterface
 
 	public function register(DiInterface $di)
 	{
-		$di->setShared('router', function () {
-			return new Router(false);
+		$di->setShared('router', function () use ($di) {
+			$router = new Router(false);
+			$router->setEventsManager($di->getEvenetsManager());
+			return $router;
 		});
 	}
 

@@ -21,7 +21,7 @@ class Manager extends BaseManager
 	 */
 	public function stack(array $channels = [])
 	{
-		return $this->createStackAdapter(compact('channels'));
+		return $this->createStackAdapter("", compact('channels'));
 	}
 
 	/**
@@ -58,7 +58,7 @@ class Manager extends BaseManager
 	 * @param $config
 	 * @return Stack
 	 */
-	protected function createSingleAdapter($config): Logger
+	protected function createSingleAdapter($name, $config): Logger
 	{
 		if (!isset($config['file'])){
 			throw new \InvalidArgumentException('File path not defined for channel');
@@ -77,7 +77,7 @@ class Manager extends BaseManager
 	 * @return Stack
 	 * @throws \Exception
 	 */
-	protected function createRotatingAdapter($config):Logger
+	protected function createRotatingAdapter($name, $config):Logger
 	{
 		if (!isset($config['file'])){
 			throw new \InvalidArgumentException('File path not defined for channel');
@@ -89,7 +89,7 @@ class Manager extends BaseManager
 		return new Logger([$adapter]);
 	}
 
-	protected function createStackAdapter($config):Logger
+	protected function createStackAdapter($name, $config):Logger
 	{
 		if (!isset($config['channels'])){
 			throw new \InvalidArgumentException('Channels list not defined for channel');

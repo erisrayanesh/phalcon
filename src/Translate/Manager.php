@@ -48,8 +48,9 @@ class Manager extends BaseManager
 
 	public function get($key, $placeholders = [], $local = null)
 	{
+		$local = $local ?? $this->getLocale();
 		[$group, $item] = $this->parseKey($key);
-		$this->load($group, $this->getLocale());
+		$this->load($group, $local);
 		$definition = array_get($this->loaded[$local][$group], $item);
 
 		if (empty($definition)) {
