@@ -3,6 +3,7 @@
 namespace Phalcon\Support;
 
 use \Phalcon\Di\Injectable;
+use Phalcon\Events\EventsAwareInterface;
 
 abstract class Manager extends Injectable
 {
@@ -50,7 +51,13 @@ abstract class Manager extends Injectable
 			return $this->drivers[$name];
 		}
 
-		return $this->drivers[$name] = $this->createDriver($name);
+		$driver = $this->createDriver($name);
+
+		if ($driver instanceof EventsAwareInterface) {
+			$driver->setEventsManager($this->getEventsManager());
+		}
+
+		return $this->drivers[$name] = $driver;
 	}
 
 	/**

@@ -11,9 +11,9 @@ class ViewServiceProvider implements ServiceProviderInterface
 
 	public function register(DiInterface $di)
 	{
-		$di->setShared('view', function () {
+		$di->setShared('view', function () use ($di) {
 			$view = new View();
-			$view->setEventsManager($this->getEventsManager());
+			$view->setEventsManager($di->getEventsManager());
 			return $view;
 		});
 	}

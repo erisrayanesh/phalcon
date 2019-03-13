@@ -10,8 +10,10 @@ class LogServiceProvider implements ServiceProviderInterface
 
 	public function register(DiInterface $di)
 	{
-		$di->setShared('logger', function (){
-			return new Manager();
+		$di->setShared('logger', function () use ($di){
+			$manager = new Manager();
+			$manager->setEventsManager($di->getEventsManager());
+			return $manager;
 		});
 	}
 

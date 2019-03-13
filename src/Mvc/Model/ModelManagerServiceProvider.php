@@ -10,9 +10,9 @@ class ModelManagerServiceProvider implements ServiceProviderInterface
 
 	public function register(DiInterface $di)
 	{
-		$di->setShared('modelsManager', function(){
+		$di->setShared('modelsManager', function() use ($di) {
 			$manager = new Manager();
-			$manager->setEventsManager($this->getEventsManager());
+			$manager->setEventsManager($di->getEventsManager());
 			return $manager;
 		});
 	}

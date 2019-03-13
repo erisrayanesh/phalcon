@@ -12,8 +12,10 @@ class ModelMetaDataServiceProvider implements ServiceProviderInterface
 
 	public function register(DiInterface $di)
 	{
-		$di->setShared('modelsMetadata', function () {
-			return new Manager();
+		$di->setShared('modelsMetadata', function () use ($di) {
+			$manager = new Manager();
+			$manager->setEventsManager($di->getEventsManager());
+			return $manager;
 		});
 	}
 

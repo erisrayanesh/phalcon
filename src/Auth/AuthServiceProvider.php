@@ -18,7 +18,7 @@ class AuthServiceProvider implements ServiceProviderInterface
 	{
 		$di->setShared('auth', function () use ($di) {
 			$auth = new AuthManager();
-			$auth->setEventsManager($this->getEventsManager());
+			$auth->setEventsManager($di->getEventsManager());
 			return $auth;
 		});
 	}
