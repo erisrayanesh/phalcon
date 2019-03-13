@@ -1,9 +1,10 @@
 <?php
 
-namespace Phalcon\Translate\NativeArrayLoader;
+namespace Phalcon\Translate\Loader;
 
 use Phalcon\Mvc\Model\Query;
 use Phalcon\Mvc\Model\Query\Builder;
+use Phalcon\Translate\Loader;
 
 class Database extends Loader
 {
