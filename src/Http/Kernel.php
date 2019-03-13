@@ -183,6 +183,7 @@ class Kernel implements KernelInterface
 
 		$router = router();
 		$dispatcher = dispatcher();
+		$dispatcher->setModuleName($router->getModuleName());
 		$dispatcher->setNamespaceName($router->getNamespaceName());
 		$dispatcher->setControllerName($router->getControllerName());
 		$dispatcher->setActionName($router->getActionName());
