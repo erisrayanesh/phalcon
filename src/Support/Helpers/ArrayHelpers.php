@@ -196,18 +196,18 @@ function array_last(array $array, callable $callback = null, $default = null)
 	return array_first(array_reverse($array, true), $callback, $default);
 }
 
-function array_only($array, $keys)
+function array_only(array $array, $keys)
 {
 	return array_intersect_key($array, array_flip((array) $keys));
 }
 
-function array_except($array, $keys)
+function array_except(array $array, $keys)
 {
 	array_forget($array, $keys);
 	return $array;
 }
 
-function array_where($array, callable $callback)
+function array_where(array $array, callable $callback)
 {
 	return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
 }

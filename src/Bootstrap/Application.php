@@ -2,24 +2,17 @@
 
 namespace Phalcon\Bootstrap;
 
-
-use Apps\Providers\RouterServiceProvider;
 use Phalcon\Di;
+use Phalcon\Loader;
 use Phalcon\Di\ServiceProviderInterface;
 use Phalcon\Escaper\EscaperServiceProvider;
 use Phalcon\Events\EventsServiceProvider;
-use Phalcon\Events\Manager as EventsManager;
 use Phalcon\Filter\FilterServiceProvider;
 use Phalcon\Http\Response\ResponseServiceProvider;
-use Phalcon\Logger\Manager as LogManager;
-use Phalcon\Loader;
-use Phalcon\Logger\Providers\LogServiceProvider;
+use Phalcon\Logger\LogServiceProvider;
 use Phalcon\Mvc\Dispatcher\DispatcherServiceProvider;
-use Phalcon\Mvc\Model\MetaData\ModelMetaDataServiceProvider;
-use Phalcon\Mvc\Model\ModelManagerServiceProvider;
+use Phalcon\Mvc\Router\RouterServiceProvider;
 use Phalcon\Mvc\Url\UrlServiceProvider;
-use Phalcon\Security\SecurityServiceProvider;
-use Phalcon\Session\SessionServiceProvider;
 
 
 class Application extends Di
@@ -33,7 +26,7 @@ class Application extends Di
 
 	protected $loader;
 
-	protected $serviceProviders;
+	protected $serviceProviders = [];
 
 	protected $bootstrapped = false;
 

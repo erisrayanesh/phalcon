@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Providers;
+namespace Phalcon\Mvc\Router;
 
 use Phalcon\Di\ServiceProviderInterface;
 use Phalcon\DiInterface;

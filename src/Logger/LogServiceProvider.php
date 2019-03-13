@@ -1,10 +1,9 @@
 <?php
 
-namespace Phalcon\Logger\Providers;
+namespace Phalcon\Logger;
 
 use Phalcon\Di\ServiceProviderInterface;
 use Phalcon\DiInterface;
-use Phalcon\Logger\Manager as LogManager;
 
 class LogServiceProvider implements ServiceProviderInterface
 {
@@ -12,7 +11,7 @@ class LogServiceProvider implements ServiceProviderInterface
 	public function register(DiInterface $di)
 	{
 		$di->setShared('logger', function (){
-			return new LogManager();
+			return new Manager();
 		});
 	}
 
