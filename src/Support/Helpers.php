@@ -208,7 +208,7 @@ function cannot($ability, $arguments = [])
 if (! function_exists('t')) {
 	function t($key, array $placeholders = [], $local = null)
 	{
-		return translator()->get($key, $placeholders, $local);
+		return translate()->get($key, $placeholders, $local);
 	}
 }
 
