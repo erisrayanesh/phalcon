@@ -24,8 +24,8 @@ class File extends Loader
 
 	public function load($language, $group)
 	{
-		$dir = $this->getBaseDir() . DIRECTORY_SEPARATOR . $language;
-		$baseFile = $dir . DIRECTORY_SEPARATOR . $group . ".{$this->getFileExtension()}";
+		$group = $group ?? $language;
+		$baseFile = $this->getBaseDir() . $language . DIRECTORY_SEPARATOR . $group . ".{$this->getFileExtension()}";
 
 		if (!file_exists($baseFile)){
 			return [];

@@ -8,6 +8,6 @@ class Manager extends BaseManager
 {
 	protected $driverType = StrategyInterface::class;
 
-	protected $factory = Factory::class;
+	protected $namespace = __NAMESPACE__;
 
 }

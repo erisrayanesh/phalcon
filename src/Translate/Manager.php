@@ -50,7 +50,7 @@ class Manager extends BaseManager
 	{
 		$local = $local ?? $this->getLocale();
 		[$group, $item] = $this->parseKey($key);
-		$this->load($group, $local);
+		$this->load($local, $group);
 		$definition = array_get($this->loaded[$local][$group], $item);
 
 		if (empty($definition)) {
@@ -60,9 +60,9 @@ class Manager extends BaseManager
 		return $this->interpolator->replacePlaceholders($definition, $placeholders);
 	}
 
-	public function load($group, $locale)
+	public function load($locale, $group)
 	{
-		if ($this->isLoaded($group ?? $locale, $locale)) {
+		if ($this->isLoaded($locale, $group)) {
 			return;
 		}
 
@@ -112,9 +112,9 @@ class Manager extends BaseManager
 		return $this;
 	}
 
-	protected function isLoaded($group, $locale)
+	protected function isLoaded($locale, $group)
 	{
-		return isset($this->loaded[$group][$locale]);
+		return isset($this->loaded[$locale][$group]);
 	}
 
 	protected function parseKey($key)
@@ -126,7 +126,5 @@ class Manager extends BaseManager
 		$segments = explode('.', $key);
 		return [$segments[0], implode('.', array_slice($segments, 1))];
 	}
-
-
 
 }
