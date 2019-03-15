@@ -15,9 +15,9 @@ class FlashSessionServiceProvider implements ServiceProviderInterface
 			return new FlashSession();
 		});
 
-		$di->setShared('flashInputs', function () {
+		$di->setShared('flashInputs', function () use ($di) {
 			$inputs = new FlashInputs();
-			$inputs->setEventsManager($this->getEventsManager());
+			$inputs->setEventsManager($di->getEventsManager());
 			return $inputs;
 		});
 	}

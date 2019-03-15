@@ -146,7 +146,7 @@ class Kernel implements KernelInterface
 		return $this->getExceptionHandler()->render($e);
 	}
 
-	// ============ EXCEPTION HANDLER
+
 
 	protected function handleRequest(FormRequest $request)
 	{
@@ -154,9 +154,17 @@ class Kernel implements KernelInterface
 
 		$this->bootstrap();
 
+		// Call boot event
+		if ($this->fireBootEvent() === false) {
+			return false;
+		}
+
 		if (! ($response = $this->dispatch($request)) instanceof ResponseInterface){
 			$response = $this->prepareResponse($request, $response);
 		}
+
+		// Call beforeSendResponse
+		$this->fireBeforeSendResponse($response);
 
 		return $response;
 	}
@@ -164,7 +172,8 @@ class Kernel implements KernelInterface
 	/**
 	 * Dispatches request through router
 	 * @param FormRequest $request
-	 * @return mixed
+	 * @return mixed|string
+	 * @throws \Exception
 	 */
 	protected function dispatch(FormRequest $request)
 	{
@@ -175,10 +184,10 @@ class Kernel implements KernelInterface
 			return $this->callMatchedRouteHandler($matchedRoute);
 		}
 
-		$view = view();
 
 		//Start the view here because later we add events,
 		// so that it's possible for theme to render something into the view
+		$view = view();
 		$view->start();
 
 		$router = router();
@@ -189,6 +198,9 @@ class Kernel implements KernelInterface
 		$dispatcher->setActionName($router->getActionName());
 		$dispatcher->setParams($router->getParams());
 
+		// Calling beforeHandleRequest
+		$this->fireBeforeHandleRequestEvent($dispatcher);
+
 		$controller = $dispatcher->dispatch();
 		$possibleResponse = $dispatcher->getReturnedValue();
 
@@ -198,7 +210,15 @@ class Kernel implements KernelInterface
 							&& is_object($controller);
 
 		if ($renderView) {
-			$view->render($dispatcher->getControllerName(),	$dispatcher->getActionName());
+			// Calling afterHandleRequest
+			$this->fireAfterHandleRequestEvent($controller);
+
+			$renderStatus = $this->fireViewRender($view);
+
+			// Check if the view process has been treated by the developer
+			if ($renderStatus !== false) {
+				$view->render($dispatcher->getControllerName(), $dispatcher->getActionName());
+			}
 		}
 
 		$view->finish();
@@ -255,5 +275,30 @@ class Kernel implements KernelInterface
 		}
 
 		return $response;
+	}
+
+	protected function fireBootEvent()
+	{
+		return $this->app->getEventsManager()->fire("application:boot", $this) ;
+	}
+
+	protected function fireBeforeHandleRequestEvent($dispatcher)
+	{
+		return $this->app->getEventsManager()->fire("application:beforeHandleRequest", $this, $dispatcher) ;
+	}
+
+	protected function fireAfterHandleRequestEvent($controller)
+	{
+		$this->app->getEventsManager()->fire("application:afterHandleRequest", $this, $controller) ;
+	}
+
+	protected function fireViewRender($view)
+	{
+		return $this->app->getEventsManager()->fire("application:viewRender", $this, $view) ;
+	}
+
+	protected function fireBeforeSendResponse($response)
+	{
+		$this->app->getEventsManager()->fire("application:beforeSendResponse", $this, $response) ;
 	}
 }

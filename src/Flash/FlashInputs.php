@@ -1,12 +1,10 @@
 <?php
 namespace Phalcon\Flash;
 
-use Phalcon\Support\ErrorsBag;
-use Phalcon\Mvc\User\Component;
+use Phalcon\Di\Injectable;
 use Phalcon\Support\Interfaces\Jsonable;
-use Phalcon\Validation\Message;
 
-class FlashInputs extends Component implements \Countable, \ArrayAccess, \Iterator, Jsonable
+class FlashInputs extends Injectable implements \Countable, \ArrayAccess, \Iterator, Jsonable
 {
 
 	protected $inputsNewVar = "_inputs.new";
@@ -123,21 +121,6 @@ class FlashInputs extends Component implements \Countable, \ArrayAccess, \Iterat
 	{
 		$this->session->set($this->inputsOldVar, $this->all());
 		$this->session->set($this->inputsNewVar, []);
-	}
-
-	public function __get($key)
-	{
-		return $this->get($key);
-	}
-
-	public function __set($key, $value)
-	{
-		return $this->set($key, $value);
-	}
-
-	public function __isset($key)
-	{
-		return $this->has($key);
 	}
 
 	public function count()
