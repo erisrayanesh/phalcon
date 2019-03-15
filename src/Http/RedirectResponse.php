@@ -96,7 +96,7 @@ class RedirectResponse extends Response
 	 */
 	public function onlyInput()
 	{
-		return $this->withInput(request_only(func_get_args()));
+		return $this->withInput(request()->only(func_get_args()));
 	}
 
 	/**
@@ -106,7 +106,7 @@ class RedirectResponse extends Response
 	 */
 	public function exceptInput()
 	{
-		return $this->withInput(request_except(func_get_args()));
+		return $this->withInput(request()->except(func_get_args()));
 	}
 
 	public function withMessage($type, $message = null)

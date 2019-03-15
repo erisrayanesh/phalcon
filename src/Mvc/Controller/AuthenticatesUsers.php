@@ -48,7 +48,7 @@ trait AuthenticatesUsers
 
 	protected function getLoginCredentials()
 	{
-		return request_only($this->username(), 'password');
+		return request()->only($this->username(), 'password');
 	}
 
 	protected function attemptLogin($credentials)
