@@ -6,7 +6,7 @@ namespace Phalcon\Mvc;
 use Phalcon\Di;
 use Phalcon\DiInterface;
 use Phalcon\Mvc\Model\Criteria;
-use Phalcon\Mvc\Model\CriteriaBuilder;
+use Phalcon\Mvc\Model\Builder;
 use Phalcon\Mvc\Model\ModelNotFoundException;
 use Phalcon\Mvc\Model\Relation;
 use Phalcon\Mvc\Model\Resultset\Advanced;
@@ -77,9 +77,9 @@ abstract class AbstractModel extends Model
 		 * Gets Criteria instance from DI container
 		 */
 		if ($dependencyInjector instanceof DiInterface) {
-			$criteria = $dependencyInjector->get("Phalcon\\Mvc\\Model\\CriteriaBuilder");
+			$criteria = $dependencyInjector->get("\Phalcon\Mvc\Model\Builder");
 		} else {
-			$criteria = new CriteriaBuilder();
+			$criteria = new Builder();
 			$criteria->setDI($dependencyInjector);
 		}
 

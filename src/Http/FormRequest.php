@@ -49,7 +49,7 @@ class FormRequest extends Request
 
 		$results = [];
 		$input = $this->get();
-		$placeholder = new stdClass;
+		$placeholder = new \stdClass;
 
 		foreach (is_array($keys) ? $keys : func_get_args() as $key) {
 			$value = data_get($input, $key, $placeholder);

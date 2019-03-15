@@ -2,7 +2,7 @@
 
 namespace Phalcon\Mvc\Model;
 
-class Builder extends \Phalcon\Mvc\Model\Criteria
+class Builder extends Criteria
 {
 
 }
