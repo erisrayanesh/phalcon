@@ -31,11 +31,23 @@ class GroupRecursive extends Group
 		parent::__construct($paths);
 	}
 
+	/**
+	 * Creates a group and then adds it to its collection and returns it
+	 * @param null $paths
+	 * @param null $routes
+	 * @return GroupRecursive
+	 */
 	public function group($paths = null, $routes = null)
 	{
-		$this->addGroup(self::make($paths, $routes));
+		$group = self::make($paths, $routes);
+		$this->addGroup($group);
+		return $group;
 	}
 
+	/**
+	 * @param GroupRecursive $group
+	 * @return GroupRecursive
+	 */
 	public function addGroup(GroupRecursive $group)
 	{
 		$module = $this->getModule();
@@ -54,7 +66,7 @@ class GroupRecursive extends Group
 			$route->reConfigure($this->getPrefix() . $route->getPattern(), $paths);
 			$this->_routes[] = $route;
 		}
-
+		return $this;
 	}
 
 	/**

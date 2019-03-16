@@ -181,7 +181,10 @@ class Kernel implements KernelInterface
 		$matchedRoute = $this->getMatchedRoute($request);
 
 		if  ($matchedRoute instanceof RouteInterface && $matchedRoute->getMatch() !== null) {
-			return $this->callMatchedRouteHandler($matchedRoute);
+			$response = $this->callMatchedRouteHandler($matchedRoute);
+			if (is_string($response) || $response instanceof ResponseInterface){
+				return $response;
+			}
 		}
 
 

@@ -19,7 +19,7 @@ trait Authenticatable
 	 */
 	public function getAuthIdentifierName()
 	{
-		return $this->getKeyName();
+		return $this->getModelsMetaData()->getPrimaryKeyAttributes($this)[0];
 	}
 
 	/**

@@ -1,26 +1,24 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: eris2
- * Date: 2/25/19
- * Time: 2:46 PM
- */
 
-namespace Phalcon\Http;
+namespace Phalcon\Http\Response;
 
+use Phalcon\Http\FileResponse;
+use Phalcon\Http\HttpResponse;
+use Phalcon\Http\JsonResponse;
+use Phalcon\Http\RedirectResponse;
 
-class ResponseFactory
+class Factory
 {
 	/**
 	 * @param string $content
-	 * @param int $code
+	 * @param int $status
 	 * @param null $status
 	 * @param array $headers
 	 * @return HttpResponse
 	 */
-	public function make($content = '', $code = 200, $status = null, $headers = [])
+	public function make($content = '', $status = 200, $headers = [])
 	{
-		return new HttpResponse($content, $code, $status, $headers);
+		return new HttpResponse($content, $status, null, $headers);
 	}
 
 	/**
@@ -28,7 +26,7 @@ class ResponseFactory
 	 *
 	 * @param  int  $status
 	 * @param  array  $headers
-	 * @return \Phalcon\Http\HttpResponse
+	 * @return HttpResponse
 	 */
 	public function noContent($status = 204, $headers = [])
 	{
@@ -42,11 +40,11 @@ class ResponseFactory
 	 * @param  array  $data
 	 * @param  int  $status
 	 * @param  array  $headers
-	 * @return \Phalcon\Http\HttpResponse
+	 * @return HttpResponse
 	 */
 	public function view($view, $data = [], $status = 200, $headers = [])
 	{
-		return $this->make(getView($view, $data), $status, $headers);
+		return $this->make(getView($view, $data)->getContent(), $status, $headers);
 	}
 
 	/**
@@ -56,7 +54,7 @@ class ResponseFactory
 	 * @param  int  $status
 	 * @param  array  $headers
 	 * @param  int  $options
-	 * @return \Phalcon\Http\JsonResponse
+	 * @return JsonResponse
 	 */
 	public function json($data = [], $status = 200, $headers = [], $options = 15)
 	{
@@ -69,7 +67,7 @@ class ResponseFactory
 	 * @param  string  $file
 	 * @param  string|null  $name
 	 * @param  array  $headers
-	 * @return \Phalcon\Http\FileResponse
+	 * @return FileResponse
 	 */
 	public function download($file, $name = null, array $headers = [])
 	{
@@ -81,7 +79,7 @@ class ResponseFactory
 	 *
 	 * @param  string  $file
 	 * @param  array  $headers
-	 * @return \Phalcon\Http\FileResponse
+	 * @return FileResponse
 	 */
 	public function file($file, array $headers = [])
 	{
@@ -95,7 +93,7 @@ class ResponseFactory
 	 * @param  int  $code
 	 * @param  array  $headers
 	 * @param  bool|null  $externalRedirect
-	 * @return \Phalcon\Http\RedirectResponse
+	 * @return RedirectResponse
 	 */
 	public function redirectTo($path, $code = 302, $headers = [], $externalRedirect = false)
 	{
@@ -110,7 +108,7 @@ class ResponseFactory
 	 * @param  array  $query
 	 * @param  int  $code
 	 * @param  array  $headers
-	 * @return \Phalcon\Http\RedirectResponse
+	 * @return RedirectResponse
 	 */
 	public function redirectToRoute($route, $parameters = [], $query = [], $code = 302, $headers = [])
 	{
@@ -119,7 +117,7 @@ class ResponseFactory
 
 	public function redirectBack($status = 302, $headers = [], $fallback = false)
 	{
-		return new RedirectResponse($this->generator->previous($fallback), $status, $headers);
+		return new RedirectResponse(previous_request_url(), $status, $headers);
 	}
 
 }

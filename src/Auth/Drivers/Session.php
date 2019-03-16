@@ -265,7 +265,7 @@ class Session implements StatefulDriver, EventsAwareInterface
 
 	protected function hasValidCredentials($user, $credentials)
 	{
-		return !is_null($user) && $this->getUserResolver()->validateCredentials($user, $credentials);
+		return !empty($user) && $this->getUserResolver()->validateCredentials($user, $credentials);
 	}
 
 	protected function fireAuthenticatedEvent($user)
