@@ -252,7 +252,7 @@ if (! function_exists('response')) {
 	 * @param int $code
 	 * @param null $status
 	 * @param array $headers
-	 * @return \Phalcon\Http\Factory
+	 * @return \Phalcon\Http\Response\Factory|\Phalcon\Http\HttpResponse
 	 */
 	function response($content = '', $code = 200, $status = null, $headers = [])
 	{

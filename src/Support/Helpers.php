@@ -165,7 +165,7 @@ function getSecurityRandom()
 /**
  * @param $controller
  * @param array $options
- * @return \Phalcon\Mvc\Router\GroupRecursive
+ * @return \Phalcon\Mvc\Router\NestedGroup
  */
 function resourceRoute($controller, array $options = [])
 {

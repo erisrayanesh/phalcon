@@ -117,7 +117,7 @@ class Factory
 
 	public function redirectBack($status = 302, $headers = [], $fallback = false)
 	{
-		return new RedirectResponse(previous_request_url(), $status, $headers);
+		return new RedirectResponse(previous_request_url($fallback), $status, $headers);
 	}
 
 }

@@ -2,7 +2,7 @@
 
 namespace Phalcon\Mvc\Router;
 
-use Phalcon\Mvc\Router\GroupRecursive as RouteGroup;
+use Phalcon\Mvc\Router\NestedGroup as RouteGroup;
 
 class ResourceRouteBuilder
 {
