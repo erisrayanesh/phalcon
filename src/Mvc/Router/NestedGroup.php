@@ -8,7 +8,7 @@ class NestedGroup extends Group
 	/**
 	 * @var string
 	 */
-	protected $name = '';
+	protected $namePrefix = '';
 
 	public static function make($paths = null, $routes = null)
 	{
@@ -25,7 +25,7 @@ class NestedGroup extends Group
 	{
 		if (is_array($paths)) {
 			$this->setPrefix(array_pull($paths, "prefix", ''));
-			$this->name = array_pull($paths, "name", '');
+			$this->setNamePrefix(array_pull($paths, "name_prefix", ''));
 		}
 
 		parent::__construct($paths);
@@ -51,8 +51,12 @@ class NestedGroup extends Group
 	{
 		foreach ($group->getRoutes() as $route){
 			$paths = $this->mergePaths($this->getPaths(), $route->getPaths());
+
+			if (!empty($this->getNamePrefix())){
+				$mergedPaths = $this->getNamePrefix() . ($mergedPaths['name_prefix'] ?? '');
+			}
+
 			$route->reConfigure($this->getPrefix() . $route->getPattern(), $paths);
-			$route->setName($this->getName().$route->getName());
 			$this->_routes[] = $route;
 		}
 		return $this;
@@ -62,9 +66,19 @@ class NestedGroup extends Group
 	 * Returns the prefix name of child routes
 	 * @return string
 	 */
-	public function getName()
+	public function getNamePrefix()
 	{
-		return $this->name;
+		return $this->namePrefix;
+	}
+
+	/**
+	 * @param string $namePrefix
+	 * @return NestedGroup
+	 */
+	public function setNamePrefix(string $namePrefix)
+	{
+		$this->namePrefix = $namePrefix;
+		return $this;
 	}
 
 	public function loadRoutes($routes)
@@ -80,12 +94,17 @@ class NestedGroup extends Group
 	protected function _addRoute($pattern, $paths = null, $httpMethods = null)
 	{
 		$mergedPaths = $this->mergePaths($this->getPaths(), $paths);
-		$route = new Route($this->getPrefix() . $pattern, $mergedPaths, $httpMethods);
-		$route->setName($this->getName().$route->getName())
-			->setGroup($this);
+
+		if (!empty($this->getNamePrefix())){
+			$mergedPaths = $this->getNamePrefix() . ($mergedPaths['name_prefix'] ?? '');
+		}
+
+		$route = new NestedGroupRoute($this->getPrefix() . $pattern, $mergedPaths, $httpMethods);
+		$route->setGroup($this);
 		$this->_routes[] = $route;
 		return $route;
 	}
+
 
 	protected function mergePaths($defaultPaths, $paths)
 	{
@@ -110,17 +129,14 @@ class NestedGroup extends Group
 
 	protected function mergePathParts(array $defaultPaths, array $paths)
 	{
-//		if (isset($defaultPaths['name'])){
-//			$paths['name'] = $defaultPaths['name'] . ($paths['name'] ?? '');
-//		}
-//
-//		if (isset($defaultPaths['prefix'])){
-//			$paths['prefix'] = $defaultPaths['prefix'] . ($paths['prefix'] ?? '');
-//		}
 
 		$mergedParts = array_merge($defaultPaths, $paths);
 
-		if (isset($paths['middleware'])){
+		if (isset($defaultPaths['name_prefix']) && isset($paths['name_prefix'])){
+			$mergedParts['name_prefix'] = $defaultPaths['name_prefix'] . $paths['name_prefix'];
+		}
+
+		if (isset($defaultPaths['middleware']) && isset($paths['middleware'])){
 			$defaultMiddleware = array_wrap(array_get($defaultPaths, 'middleware', []));
 			$middleware = array_wrap(array_get($paths, 'middleware', []));
 			$mergedParts['middleware'] = array_unique(array_merge($defaultMiddleware, $middleware));
