@@ -5,7 +5,10 @@ namespace Phalcon\Mvc\Router;
 
 class NestedGroup extends Group
 {
-
+	/**
+	 * @var string
+	 */
+	protected $name = '';
 
 	public static function make($paths = null, $routes = null)
 	{
@@ -22,6 +25,7 @@ class NestedGroup extends Group
 	{
 		if (is_array($paths)) {
 			$this->setPrefix(array_pull($paths, "prefix", ''));
+			$this->name = array_pull($paths, "name", '');
 		}
 
 		parent::__construct($paths);
@@ -60,7 +64,7 @@ class NestedGroup extends Group
 	 */
 	public function getName()
 	{
-		return array_get($this->getPaths(), 'name');
+		return $this->name;
 	}
 
 	public function loadRoutes($routes)
@@ -117,10 +121,9 @@ class NestedGroup extends Group
 		$mergedParts = array_merge($defaultPaths, $paths);
 
 		if (isset($paths['middleware'])){
-			if (is_array($defaultMiddleware = array_get($defaultPaths, 'middleware', []))){
-				$middleware = array_get($paths, 'middleware', []);
-				$mergedParts['middleware'] = array_unique(array_merge($defaultMiddleware, $middleware));
-			}
+			$defaultMiddleware = array_wrap(array_get($defaultPaths, 'middleware', []));
+			$middleware = array_wrap(array_get($paths, 'middleware', []));
+			$mergedParts['middleware'] = array_unique(array_merge($defaultMiddleware, $middleware));
 		}
 
 		return $mergedParts;

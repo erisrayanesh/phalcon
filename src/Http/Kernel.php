@@ -3,10 +3,14 @@
 namespace Phalcon\Http;
 
 use Phalcon\Bootstrap\Application;
+use Phalcon\Bootstrap\MiddlewareStack;
 use Phalcon\Debug\ExceptionHandler;
 use Phalcon\Debug\FatalThrowableError;
+use Phalcon\Mvc\ControllerInterface;
+use \Phalcon\Mvc\DispatcherInterface;
 use Phalcon\Mvc\Model;
-use Phalcon\Mvc\Router\RouteInterface;
+use Phalcon\Mvc\Router\Route;
+use Phalcon\Mvc\RouterInterface;
 use Phalcon\Support\Interfaces\Arrayable;
 use Phalcon\Support\Interfaces\Jsonable;
 
@@ -19,6 +23,12 @@ class Kernel implements KernelInterface
 	protected  $app;
 
 	protected $bootstrappers = [];
+
+	protected $middleware = [];
+
+	protected $middlewareGroups = [];
+
+	protected $routeMiddleware = [];
 
 	public function __construct(Application $application)
 	{
@@ -146,8 +156,6 @@ class Kernel implements KernelInterface
 		return $this->getExceptionHandler()->render($e);
 	}
 
-
-
 	protected function handleRequest(FormRequest $request)
 	{
 		$this->app->setShared('request', $request);
@@ -177,16 +185,29 @@ class Kernel implements KernelInterface
 	 */
 	protected function dispatch(FormRequest $request)
 	{
+		return (new MiddlewareStack())->setPassable($request)
+					->setStack($this->middleware)
+					->run(function ($request) {
+						return $this->dispatchToRouter($request);
+					});
+	}
 
+	/**
+	 * @param FormRequest $request
+	 * @return mixed|string|ResponseInterface
+	 * @throws \Exception
+	 */
+	protected function dispatchToRouter(FormRequest $request)
+	{
 		$matchedRoute = $this->getMatchedRoute($request);
 
-		if  ($matchedRoute instanceof RouteInterface && $matchedRoute->getMatch() !== null) {
+		if  ($matchedRoute instanceof Route && $matchedRoute->getMatch() !== null) {
 			$response = $this->callMatchedRouteHandler($matchedRoute);
+
 			if (is_string($response) || $response instanceof ResponseInterface){
 				return $response;
 			}
 		}
-
 
 		//Start the view here because later we add events,
 		// so that it's possible for theme to render something into the view
@@ -195,47 +216,62 @@ class Kernel implements KernelInterface
 
 		$router = router();
 		$dispatcher = dispatcher();
-		$dispatcher->setModuleName($router->getModuleName());
-		$dispatcher->setNamespaceName($router->getNamespaceName());
-		$dispatcher->setControllerName($router->getControllerName());
-		$dispatcher->setActionName($router->getActionName());
-		$dispatcher->setParams($router->getParams());
 
 		// Calling beforeHandleRequest
 		$this->fireBeforeHandleRequestEvent($dispatcher);
 
-		$controller = $dispatcher->dispatch();
-		$possibleResponse = $dispatcher->getReturnedValue();
+		$this->setupDispatcher($dispatcher, $router);
+		$controller  = $this->app->getShared($dispatcher->getControllerClass());
 
-		$renderView  = $possibleResponse !== false
-							&& ! is_string($possibleResponse)
-							&& ! $possibleResponse instanceof ResponseInterface
-							&& is_object($controller);
-
-		if ($renderView) {
-			// Calling afterHandleRequest
-			$this->fireAfterHandleRequestEvent($controller);
-
-			$renderStatus = $this->fireViewRender($view);
-
-			// Check if the view process has been treated by the developer
-			if ($renderStatus !== false) {
-				$view->render($dispatcher->getControllerName(), $dispatcher->getActionName());
-			}
+		if (!is_object($controller)) {
+			throw new \Exception('Handler class not exists or can not be resolved by dependency manager');
 		}
 
-		$view->finish();
+		$routeMiddleware = $this->gatherRouteMiddleware($matchedRoute);
+		$controllerMiddleware = $this->gatherControllerMiddleware($controller, $dispatcher->getActiveMethod());
 
-		if ($renderView) {
-			$possibleResponse = $view->getContent();
-		}
+		$middleware = collect($this->mergeMiddleware($routeMiddleware, $controllerMiddleware))->map(function ($name) {
+			return (array) $this->resolveMiddlewareName($name);
+		})->all();
 
-		return $possibleResponse;
+		return (new MiddlewareStack())->setPassable($request)
+			->setStack($middleware)
+			->run(function ($request) use ($dispatcher, $view){
+				$controller = $dispatcher->dispatch();
+				$possibleResponse = $dispatcher->getReturnedValue();
+
+				$renderView = $possibleResponse !== false
+					&& ! is_string($possibleResponse)
+					&& ! $possibleResponse instanceof ResponseInterface
+					&& is_object($controller);
+
+				if ($renderView) {
+					// Calling afterHandleRequest
+					$this->fireAfterHandleRequestEvent($controller);
+
+					$renderStatus = $this->fireViewRender($view);
+
+					// Check if the view process has been treated by the developer
+					if ($renderStatus !== false) {
+						$view->render($dispatcher->getControllerName(), $dispatcher->getActionName());
+					}
+				}
+
+				$view->finish();
+
+				if ($renderView) {
+					$possibleResponse = $view->getContent();
+				}
+
+				return $possibleResponse;
+
+			});
 	}
+
 
 	/**
 	 * @param FormRequest $request
-	 * @return RouteInterface
+	 * @return Route|null
 	 */
 	protected function getMatchedRoute(FormRequest $request)
 	{
@@ -243,7 +279,7 @@ class Kernel implements KernelInterface
 		return router()->getMatchedRoute();
 	}
 
-	protected function callMatchedRouteHandler(RouteInterface $route)
+	protected function callMatchedRouteHandler(Route $route)
 	{
 		$match = $route->getMatch();
 
@@ -254,6 +290,98 @@ class Kernel implements KernelInterface
 		return call_user_func_array($match, router()->getParams());
 	}
 
+	protected function gatherRouteMiddleware(Route $route)
+	{
+		return array_get($route->getPaths(), "middleware", []);
+	}
+
+	protected function resolveMiddlewareName($name)
+	{
+		if ($name instanceof \Closure) {
+			return $name;
+		}
+
+		if (isset($this->routeMiddleware[$name])) {
+
+			if ($this->routeMiddleware[$name] instanceof \Closure) {
+				return $this->routeMiddleware[$name];
+			}
+
+			if (is_array($this->routeMiddleware[$name])) {
+				return $this->parseMiddlewareGroup($this->routeMiddleware[$name]);
+			}
+
+		}
+
+//		if (isset($this->routeMiddleware[$name]) && $this->routeMiddleware[$name] instanceof \Closure) {
+//			return $this->routeMiddleware[$name];
+//		}
+//
+//		if (isset($this->middlewareGroups[$name])) {
+//			return $this->parseMiddlewareGroup($name);
+//		}
+
+		[$name, $parameters] = array_pad(explode(':', $name, 2), 2, null);
+		return ($map[$name] ?? $name).(! is_null($parameters) ? ':' . $parameters : '');
+	}
+
+	protected function parseMiddlewareGroup(array $group)
+	{
+		$results = [];
+
+		foreach ($group as $middleware) {
+			$resolved = $this->resolveMiddlewareName($middleware);
+
+			if (is_array($resolved)) {
+				$results = array_merge($results, $resolved);
+				continue;
+			}
+
+			$results[] = $this->resolveMiddlewareName($middleware);
+		}
+
+		return $results;
+	}
+
+	protected function gatherControllerMiddleware(ControllerInterface $controller, $method)
+	{
+		if (! method_exists($controller, 'getMiddleware')) {
+			return [];
+		}
+
+		return collect($controller->getMiddleware())->reject(function ($data) use ($method) {
+			$options = $data['options'];
+			return (isset($options['only']) && ! in_array($method, (array) $options['only'])) ||
+				(! empty($options['except']) && in_array($method, (array) $options['except']));
+		})->pluck('middleware')->all();
+	}
+
+	protected function mergeMiddleware()
+	{
+		$result = [];
+
+		foreach (func_get_args() as $item) {
+			$item = array_wrap($item);
+			$result = array_merge($result, $item);
+		}
+
+		return array_unique($result, SORT_REGULAR);
+	}
+
+	protected function setupDispatcher(DispatcherInterface $dispatcher, RouterInterface $router)
+	{
+		$dispatcher->setModuleName($router->getModuleName());
+		$dispatcher->setNamespaceName($router->getNamespaceName());
+		$dispatcher->setControllerName($router->getControllerName());
+		$dispatcher->setActionName($router->getActionName());
+		$dispatcher->setParams($router->getParams());
+	}
+
+	/**
+	 * @param FormRequest $request
+	 * @param $response
+	 * @return JsonResponse|Response|string
+	 */
 	protected function prepareResponse(FormRequest $request, $response)
 	{
 		if ($response instanceof ResponseInterface) {
@@ -280,6 +408,7 @@ class Kernel implements KernelInterface
 		return $response;
 	}
 
+
 	protected function fireBootEvent()
 	{
 		return $this->app->getEventsManager()->fire("application:boot", $this) ;
@@ -304,4 +433,7 @@ class Kernel implements KernelInterface
 	{
 		$this->app->getEventsManager()->fire("application:beforeSendResponse", $this, $response) ;
 	}
+
+
+
 }
