@@ -8,7 +8,7 @@ class NestedGroup extends Group
 	/**
 	 * @var string
 	 */
-	protected $namePrefix = '';
+	protected $name = '';
 
 	public static function make($paths = null, $routes = null)
 	{
@@ -25,7 +25,7 @@ class NestedGroup extends Group
 	{
 		if (is_array($paths)) {
 			$this->setPrefix(array_pull($paths, "prefix", ''));
-			$this->setNamePrefix(array_pull($paths, "name_prefix", ''));
+			$this->setName(array_pull($paths, "name", ''));
 		}
 
 		parent::__construct($paths);
@@ -52,7 +52,7 @@ class NestedGroup extends Group
 		foreach ($group->getRoutes() as $route){
 			$paths = $this->mergePaths($this->getPaths(), $route->getPaths());
 			$route->reConfigure($this->getPrefix() . $route->getPattern(), $paths);
-			$route->setNamePrefix($this->getNamePrefix());
+			$route->setNamePrefix($this->getName());
 			$this->_routes[] = $route;
 		}
 		return $this;
@@ -62,18 +62,18 @@ class NestedGroup extends Group
 	 * Returns the prefix name of child routes
 	 * @return string
 	 */
-	public function getNamePrefix()
+	public function getName()
 	{
-		return $this->namePrefix;
+		return $this->name;
 	}
 
 	/**
-	 * @param string $namePrefix
+	 * @param string $name
 	 * @return NestedGroup
 	 */
-	public function setNamePrefix(string $namePrefix)
+	public function setName($name)
 	{
-		$this->namePrefix = $namePrefix;
+		$this->name = $name;
 		return $this;
 	}
 
@@ -91,7 +91,7 @@ class NestedGroup extends Group
 	{
 		$mergedPaths = $this->mergePaths($this->getPaths(), $paths);
 		$route = new NestedGroupRoute($this->getPrefix() . $pattern, $mergedPaths, $httpMethods);
-		$route->setNamePrefix($this->getNamePrefix())->setGroup($this);
+		$route->setNamePrefix($this->getName())->setGroup($this);
 		$this->_routes[] = $route;
 		return $route;
 	}
@@ -119,12 +119,7 @@ class NestedGroup extends Group
 
 	protected function mergePathParts(array $defaultPaths, array $paths)
 	{
-
 		$mergedParts = array_merge($defaultPaths, $paths);
-
-		if (isset($defaultPaths['name_prefix']) && isset($paths['name_prefix'])){
-			$mergedParts['name_prefix'] = $defaultPaths['name_prefix'] . $paths['name_prefix'];
-		}
 
 		if (isset($defaultPaths['middleware']) && isset($paths['middleware'])){
 			$defaultMiddleware = array_wrap(array_get($defaultPaths, 'middleware', []));

@@ -3,7 +3,7 @@
 namespace Phalcon\Http;
 
 use Phalcon\Bootstrap\Application;
-use Phalcon\Bootstrap\MiddlewareStack;
+use Phalcon\Mvc\Middleware\MiddlewareStack;
 use Phalcon\Debug\ExceptionHandler;
 use Phalcon\Debug\FatalThrowableError;
 use Phalcon\Mvc\ControllerInterface;

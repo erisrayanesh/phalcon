@@ -1,6 +1,6 @@
 <?php
 
-namespace Phalcon\Bootstrap;
+namespace Phalcon\Mvc\Middleware;
 
 use Phalcon\Di\Injectable;
 
