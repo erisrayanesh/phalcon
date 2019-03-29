@@ -51,12 +51,8 @@ class NestedGroup extends Group
 	{
 		foreach ($group->getRoutes() as $route){
 			$paths = $this->mergePaths($this->getPaths(), $route->getPaths());
-
-			if (!empty($this->getNamePrefix())){
-				$mergedPaths = $this->getNamePrefix() . ($mergedPaths['name_prefix'] ?? '');
-			}
-
 			$route->reConfigure($this->getPrefix() . $route->getPattern(), $paths);
+			$route->setNamePrefix($this->getNamePrefix());
 			$this->_routes[] = $route;
 		}
 		return $this;
@@ -94,17 +90,11 @@ class NestedGroup extends Group
 	protected function _addRoute($pattern, $paths = null, $httpMethods = null)
 	{
 		$mergedPaths = $this->mergePaths($this->getPaths(), $paths);
-
-		if (!empty($this->getNamePrefix())){
-			$mergedPaths = $this->getNamePrefix() . ($mergedPaths['name_prefix'] ?? '');
-		}
-
 		$route = new NestedGroupRoute($this->getPrefix() . $pattern, $mergedPaths, $httpMethods);
-		$route->setGroup($this);
+		$route->setNamePrefix($this->getNamePrefix())->setGroup($this);
 		$this->_routes[] = $route;
 		return $route;
 	}
-
 
 	protected function mergePaths($defaultPaths, $paths)
 	{
