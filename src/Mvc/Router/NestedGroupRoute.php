@@ -41,9 +41,19 @@ class NestedGroupRoute extends Route
 	 * @param array $middleware
 	 * @return NestedGroupRoute
 	 */
-	public function setMiddleware(array $middleware)
+	public function setMiddleware($middleware)
 	{
-		$this->middleware = $middleware;
+		$this->middleware = array_wrap($middleware);
+		return $this;
+	}
+
+	public function appendMiddleware($middleware)
+	{
+		if (is_string($middleware)) {
+			$middleware = func_get_args();
+		}
+
+		$this->middleware = array_merge($this->middleware, $middleware);
 		return $this;
 	}
 

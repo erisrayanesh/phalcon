@@ -10,6 +10,8 @@ class NestedGroup extends Group
 	 */
 	protected $name = '';
 
+	protected $middleware = [];
+
 	public static function make($paths = null, $routes = null)
 	{
 		$group = new static($paths);
@@ -24,6 +26,7 @@ class NestedGroup extends Group
 	public function __construct($paths = null)
 	{
 		if (is_array($paths)) {
+			$this->setMiddleware(array_pull($paths, "middleware", []));
 			$this->setPrefix(array_pull($paths, "prefix", ''));
 			$this->setName(array_pull($paths, "name", ''));
 		}
@@ -50,9 +53,9 @@ class NestedGroup extends Group
 	public function addGroup(NestedGroup $group)
 	{
 		foreach ($group->getRoutes() as $route){
-			$paths = $this->mergePaths($this->getPaths(), $route->getPaths());
+			$paths = $this->mergePaths($route->getPaths());
 			$route->reConfigure($this->getPrefix() . $route->getPattern(), $paths);
-			$route->setNamePrefix($this->getName());
+			$this->mergePathParts($route);
 			$this->_routes[] = $route;
 		}
 		return $this;
@@ -77,6 +80,24 @@ class NestedGroup extends Group
 		return $this;
 	}
 
+	/**
+	 * @return array
+	 */
+	public function getMiddleware()
+	{
+		return $this->middleware;
+	}
+
+	/**
+	 * @param $middleware
+	 * @return NestedGroup
+	 */
+	public function setMiddleware($middleware)
+	{
+		$this->middleware = array_wrap($middleware);
+		return $this;
+	}
+
 	public function loadRoutes($routes)
 	{
 		if ($routes instanceof \Closure) {
@@ -89,15 +110,17 @@ class NestedGroup extends Group
 
 	protected function _addRoute($pattern, $paths = null, $httpMethods = null)
 	{
-		$mergedPaths = $this->mergePaths($this->getPaths(), $paths);
+		$mergedPaths = $this->mergePaths($paths);
 		$route = new NestedGroupRoute($this->getPrefix() . $pattern, $mergedPaths, $httpMethods);
-		$route->setNamePrefix($this->getName())->setGroup($this);
+		$this->mergePathParts($route, false);
 		$this->_routes[] = $route;
 		return $route;
 	}
 
-	protected function mergePaths($defaultPaths, $paths)
+	protected function mergePaths($paths)
 	{
+
+		$defaultPaths = $this->getPaths();
 
 		if (!is_array($defaultPaths)) {
 			return $paths;
@@ -113,20 +136,30 @@ class NestedGroup extends Group
 			return $defaultPaths;
 		}
 
-		$mergedPaths = $this->mergePathParts($defaultPaths, $processedPaths);
+		$mergedPaths = array_merge($defaultPaths, $processedPaths);
 		return $mergedPaths;
 	}
 
-	protected function mergePathParts(array $defaultPaths, array $paths)
+//	protected function mergePathParts(array $defaultPaths, array $paths)
+	protected function mergePathParts(NestedGroupRoute $route, $setGroup = false)
 	{
-		$mergedParts = array_merge($defaultPaths, $paths);
+//		$mergedParts = $defaultPaths, $paths);
 
-		if (isset($defaultPaths['middleware']) && isset($paths['middleware'])){
-			$defaultMiddleware = array_wrap(array_get($defaultPaths, 'middleware', []));
-			$middleware = array_wrap(array_get($paths, 'middleware', []));
-			$mergedParts['middleware'] = array_unique(array_merge($defaultMiddleware, $middleware));
+//		if (isset($defaultPaths['middleware']) && isset($paths['middleware'])){
+//			$defaultMiddleware = array_wrap(array_get($defaultPaths, 'middleware', []));
+//			$middleware = array_wrap(array_get($paths, 'middleware', []));
+//			$mergedParts['middleware'] = array_unique(array_merge($defaultMiddleware, $middleware));
+//		}
+
+//		return $mergedParts;
+
+		$route->setNamePrefix($this->getName());
+		$route->appendMiddleware($this->getMiddleware());
+
+		if ($setGroup){
+			$route->setGroup($this);
 		}
 
-		return $mergedParts;
+		return $route;
 	}
 }
