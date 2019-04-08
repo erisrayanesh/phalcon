@@ -9,6 +9,7 @@ use Phalcon\Debug\FatalThrowableError;
 use Phalcon\Mvc\ControllerInterface;
 use \Phalcon\Mvc\DispatcherInterface;
 use Phalcon\Mvc\Model;
+use Phalcon\Mvc\Router\NestedGroupRoute;
 use Phalcon\Mvc\Router\Route;
 use Phalcon\Mvc\RouterInterface;
 use Phalcon\Support\Interfaces\Arrayable;
@@ -242,7 +243,7 @@ class Kernel implements KernelInterface
 	{
 		$matchedRoute = $this->getMatchedRoute($request);
 
-		if  ($matchedRoute instanceof Route && $matchedRoute->getMatch() !== null) {
+		if  ($matchedRoute instanceof NestedGroupRoute && $matchedRoute->getMatch() !== null) {
 			$response = $this->callMatchedRouteHandler($matchedRoute);
 
 			if (is_string($response) || $response instanceof ResponseInterface){
@@ -320,7 +321,7 @@ class Kernel implements KernelInterface
 		return router()->getMatchedRoute();
 	}
 
-	protected function callMatchedRouteHandler(Route $route)
+	protected function callMatchedRouteHandler(NestedGroupRoute $route)
 	{
 		$match = $route->getMatch();
 
@@ -331,9 +332,9 @@ class Kernel implements KernelInterface
 		return call_user_func_array($match, router()->getParams());
 	}
 
-	protected function gatherRouteMiddleware(Route $route)
+	protected function gatherRouteMiddleware(NestedGroupRoute $route)
 	{
-		return array_get($route->getPaths(), "middleware", []);
+		return $route->getMiddleware();
 	}
 
 	protected function resolveMiddlewareName($name)
