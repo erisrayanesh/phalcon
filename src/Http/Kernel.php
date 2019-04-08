@@ -363,7 +363,7 @@ class Kernel implements KernelInterface
 //		}
 
 		[$name, $parameters] = array_pad(explode(':', $name, 2), 2, null);
-		return ($map[$name] ?? $name).(! is_null($parameters) ? ':' . $parameters : '');
+		return ($this->routeMiddleware[$name] ?? $name).(! is_null($parameters) ? ':' . $parameters : '');
 	}
 
 	protected function parseMiddlewareGroup(array $group)
@@ -378,7 +378,8 @@ class Kernel implements KernelInterface
 				continue;
 			}
 
-			$results[] = $this->resolveMiddlewareName($middleware);
+			//$results[] = $this->resolveMiddlewareName($middleware);
+			$results[] = $resolved;
 		}
 
 		return $results;
