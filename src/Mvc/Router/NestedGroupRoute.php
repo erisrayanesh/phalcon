@@ -52,11 +52,18 @@ class NestedGroupRoute extends Route
 
 	public function appendMiddleware($middleware)
 	{
+
+		if (empty($middleware)) {
+			return $this;
+		}
+
 		if (is_string($middleware)) {
 			$middleware = func_get_args();
 		}
 
-		$this->middleware = array_merge($this->middleware, $middleware);
+		$middleware = array_wrap($middleware);
+
+		$this->middleware = array_merge($middleware, $this->middleware);
 		return $this;
 	}
 
