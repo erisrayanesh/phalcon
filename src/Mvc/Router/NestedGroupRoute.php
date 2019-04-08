@@ -9,7 +9,10 @@ class NestedGroupRoute extends Route
 
 	public function reConfigure($pattern, $paths = null)
 	{
-		$this->setMiddleware(array_pull($paths, 'middleware', []));
+		if ($middleware = array_pull($paths, 'middleware')){
+			$this->setMiddleware($middleware);
+		}
+
 		parent::reConfigure($pattern, $paths);
 	}
 
