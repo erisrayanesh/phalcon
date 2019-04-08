@@ -7,10 +7,10 @@ class NestedGroupRoute extends Route
 
 	protected $middleware = [];
 
-	public function __construct($pattern, $paths = null, $httpMethods = null)
+	public function reConfigure($pattern, $paths = null)
 	{
 		$this->setMiddleware(array_pull($paths, 'middleware', []));
-		parent::__construct($pattern, $paths, $httpMethods);
+		parent::reConfigure($pattern, $paths);
 	}
 
 	public function setNamePrefix($name)
