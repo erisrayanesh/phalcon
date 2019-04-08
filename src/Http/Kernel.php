@@ -71,6 +71,47 @@ class Kernel implements KernelInterface
 		return $this->app;
 	}
 
+	/**
+	 * Determine if the kernel has a given middleware.
+	 *
+	 * @param  string  $middleware
+	 * @return bool
+	 */
+	public function hasMiddleware($middleware)
+	{
+		return in_array($middleware, $this->middleware);
+	}
+
+	/**
+	 * Add a new middleware to beginning of the stack if it does not already exist.
+	 *
+	 * @param  string  $middleware
+	 * @return $this
+	 */
+	public function prependMiddleware($middleware)
+	{
+		if (array_search($middleware, $this->middleware) === false) {
+			array_unshift($this->middleware, $middleware);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Add a new middleware to end of the stack if it does not already exist.
+	 *
+	 * @param  string  $middleware
+	 * @return $this
+	 */
+	public function AppendMiddleware($middleware)
+	{
+		if (array_search($middleware, $this->middleware) === false) {
+			$this->middleware[] = $middleware;
+		}
+
+		return $this;
+	}
+
 	// ============ EXCEPTION HANDLER
 
 	/**
@@ -232,7 +273,7 @@ class Kernel implements KernelInterface
 
 		$middleware = collect($this->mergeMiddleware($routeMiddleware, $controllerMiddleware))->map(function ($name) {
 			return (array) $this->resolveMiddlewareName($name);
-		})->all();
+		})->flatten()->all();
 
 		return (new MiddlewareStack())->setPassable($request)
 			->setStack($middleware)

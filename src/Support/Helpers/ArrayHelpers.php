@@ -221,6 +221,25 @@ function array_wrap($value)
 	return is_array($value) ? $value : [$value];
 }
 
+function array_flatten($array, $depth = INF)
+{
+	$result = [];
+
+	foreach ($array as $item) {
+		$item = $item instanceof \Phalcon\Support\Collection ? $item->all() : $item;
+
+		if (! is_array($item)) {
+			$result[] = $item;
+		} elseif ($depth === 1) {
+			$result = array_merge($result, array_values($item));
+		} else {
+			$result = array_merge($result, array_flatten($item, $depth - 1));
+		}
+	}
+
+	return $result;
+}
+
 if (! function_exists('data_get')) {
 	/**
 	 * Get an item from an array or object using "dot" notation.

@@ -96,6 +96,11 @@ class Collection implements \ArrayAccess, \Countable, \JsonSerializable, \Iterat
 		return $this->items;
 	}
 
+	public function flatten($depth = INF)
+	{
+		return new static(array_flatten($this->items, $depth));
+	}
+
 	/**
 	 * Collapse the collection of items into a single array.
 	 *
